@@ -1,0 +1,32 @@
+/*phan trang */
+.navigation {
+	font-size:11px;
+	clear: both;
+	padding: 15px 0px 20px;
+	text-align: center;
+	cursor:default;
+	font-weight:bold;
+	color:#0066b3;
+}
+.navigation .current_page_item, .navigation .page_item a {
+	outline:none;
+	margin:2px;
+	padding:3px 7px;
+	text-decoration:none;
+	background:#CCCCCC;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.navigation .page_item a {
+	color:#FFF;
+	background-color:#CCCCCC;
+}
+
+.navigation .current_page_item, .navigation .page_item a:hover 
+{
+	color:#fff;
+	background-color:#0066b3;
+}
+/*end phan trang*/

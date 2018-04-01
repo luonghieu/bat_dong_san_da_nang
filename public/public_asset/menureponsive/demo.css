@@ -1,0 +1,44 @@
+.header img{width: 45px;padding-top: 10px}
+
+
+nav:not(.mm-menu)
+{
+	display: none;
+}
+.header,
+.content,
+.footer
+{
+
+}
+.header,
+.footer
+{
+
+    overflow: hidden;
+}
+.header.fixed
+{
+	position: fixed;
+	top: 0;
+	left: 0;
+}
+.footer.fixed
+{
+	position: fixed;
+	bottom: 0;
+	left: 0;
+}
+.header a
+{
+	background: center center no-repeat transparent;
+	background-image: url(../images/menu-list.png);
+
+	display: block;
+	width: 35px;
+	height: 35px;
+	position: fixed;
+	top: 8px;
+	left: 5px;
+    z-index: 9993;
+}
