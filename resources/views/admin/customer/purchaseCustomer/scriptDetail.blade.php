@@ -5,8 +5,8 @@
  <script src="{!! asset('admin_asset/js/vendor/datatables/extensions/TableTools/js/dataTables.tableTools.min.js') !!}"></script>
  <!--/ vendor javascripts -->
  
- <!--Page Specific Scripts -->
- <script>
+<!--Page Specific Scripts -->
+  <script>
   $(window).load(function(){
     //initialize editable datatable
     var table2 = $('#editable-usage');
@@ -28,10 +28,10 @@
       var aData = oTable.row(nRow).data();
 
       $.ajax({
-        url: "{!! route('admins.product.delete') !!}",
+        url: "{!! route('admins.postCustomer.deletePurchaseTransaction') !!}",
         method: "GET",
         data: {
-          'id' : aData[1]
+          'id' : aData[1],
         },
         dataType : 'json',
         success : function(result){

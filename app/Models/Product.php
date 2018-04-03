@@ -87,4 +87,12 @@ class Product extends Model
     {
         return $this->hasMany('App\Models\RatingProduct', 'product_id', 'id');
     }
+
+    /**
+     * Get ratingProducts relationship
+     */
+    public function getDirectionAttribute($value)
+    {
+        return $this::DIRECTION[$value];
+    }
 }

@@ -24,7 +24,7 @@ Route::group(['prefix' => 'managements'], function () {
             Route::get('active', 'AdminController@activePostCustomer')->name('admins.postCustomer.active');
             Route::get('detail/{customer_id}', 'AdminController@detailProductTransaction')->name('admins.postCustomer.detail');
             // product transaction
-            Route::get('detailProduct/{product_id}', 'AdminController@detailProduct')->name('admins.postCustomer.detailProduct');
+            
             Route::get('activeProductTransaction', 'AdminController@activeProductTransaction')->name('admins.postCustomer.activeProductTransaction');
             Route::get('activePaidProductTransaction', 'AdminController@activePaidProductTransaction')->name('admins.postCustomer.activePaidProductTransaction');
             Route::post('actionProductTransaction', 'AdminController@actionProductTransaction')->name('admins.postCustomer.actionProductTransaction');
@@ -34,16 +34,15 @@ Route::group(['prefix' => 'managements'], function () {
         // purchase-Admin
         Route::group(['prefix' => 'purchaseCustomer'], function () {
             Route::get('list', 'AdminController@listPurchaseCustomer')->name('admins.purchaseCustomer.list');
-            Route::get('delete', 'AdminController@deletePostCustomer')->name('admins.postCustomer.delete');
-            Route::post('action', 'AdminController@actionPostCustomer')->name('admins.postCustomer.action');
-            Route::get('active', 'AdminController@activePostCustomer')->name('admins.postCustomer.active');
-            Route::get('detail/{customer_id}', 'AdminController@detailProductTransaction')->name('admins.postCustomer.detail');
-            // product transaction
-            Route::get('detailProduct/{product_id}', 'AdminController@detailProduct')->name('admins.postCustomer.detailProduct');
-            Route::get('activeProductTransaction', 'AdminController@activeProductTransaction')->name('admins.postCustomer.activeProductTransaction');
-            Route::get('activePaidProductTransaction', 'AdminController@activePaidProductTransaction')->name('admins.postCustomer.activePaidProductTransaction');
-            Route::post('actionProductTransaction', 'AdminController@actionProductTransaction')->name('admins.postCustomer.actionProductTransaction');
-            Route::get('deleteProductTransaction', 'AdminController@deleteProductTransaction')->name('admins.postCustomer.deleteProductTransaction');
+            Route::get('delete', 'AdminController@deletePurchaseCustomer')->name('admins.purchaseCustomer.delete');
+            Route::post('action', 'AdminController@actionPurchaseCustomer')->name('admins.purchaseCustomer.action');
+            Route::get('active', 'AdminController@activePurchaseCustomer')->name('admins.purchaseCustomer.active');
+            Route::get('detail/{customer_id}', 'AdminController@detailPurchaseTransaction')->name('admins.purchaseCustomer.detail');
+            // purchase transaction
+            Route::get('activeDepositPurchaseTransaction', 'AdminController@activeDepositPurchaseTransaction')->name('admins.purchaseCustomer.activeDepositPurchaseTransaction');
+            Route::get('activePaymentPurchaseTransaction', 'AdminController@activePaymentPurchaseTransaction')->name('admins.purchaseCustomer.activePaymentPurchaseTransaction');
+            Route::post('actionPurchaseTransaction', 'AdminController@actionPurchaseTransaction')->name('admins.purchaseCustomer.actionPurchaseTransaction');
+            Route::get('deletePurchaseTransaction', 'AdminController@deletePurchaseTransaction')->name('admins.purchaseCustomer.deletePurchaseTransaction');
         });
         
    });
@@ -61,6 +60,21 @@ Route::group(['prefix' => 'managements'], function () {
         Route::get('active', 'AdminController@active')->name('admins.news.active');
 
    });
+
+    // products
+    Route::group(['prefix' => 'products'], function () {
+        Route::get('list', 'AdminController@listProducts')->name('admins.product.list');
+        Route::get('create', 'AdminController@createProduct')->name('admins.product.create');
+        Route::post('create', 'AdminController@storeProduct')->name('admins.product.store');
+        Route::get('{id}/edit', 'AdminController@editProduct')->name('admins.product.edit');
+        Route::post('{id}/update', 'AdminController@updateProduct')->name('admins.product.update');
+        Route::get('delete', 'AdminController@deleteProduct')->name('admins.product.delete');
+        Route::get('detail/{product_id}', 'AdminController@detailProduct')->name('admins.product.detail');
+        Route::post('action', 'AdminController@actionProduct')->name('admins.product.action');
+        Route::get('active', 'AdminController@activeProduct')->name('admins.product.active');
+   });
+
+    
 });
 
 Route::group(['prefix' => 'common'], function () {

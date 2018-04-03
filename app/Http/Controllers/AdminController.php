@@ -12,6 +12,10 @@ use App\Models\News;
 use App\Models\CatNew;
 use App\Models\Product;
 use App\Models\ProductTransaction;
+use App\Models\Category;
+use App\Models\District;
+use App\Models\Village;
+use App\Models\Street;
 use Carbon;
  
 class AdminController extends Controller
@@ -198,7 +202,11 @@ class AdminController extends Controller
     {
         $obj = ProductTransaction::find($request->id);
         if ($obj->delete()) {
-            if (Product::find($obj->product_id)->delete()) {
+            $deleteProduct = Product::find($obj->product_id);
+            if ($deleteProduct->delete()) {
+                if (!empty($deleteProduct->image)) {
+                    unlink($deleteProduct->image);
+                }
                 echo json_encode('ok');
             }
         }
@@ -212,10 +220,14 @@ class AdminController extends Controller
             switch ($request->option) {
             case 1:
                 foreach ($listObj as $item) {
-                    if (!empty($item->image)) {
-                        unlink($item->image);
+                    if ($item->delete()) {
+                        $deleteProduct = Product::find($item->product_id);
+                        if ($deleteProduct->delete()) {
+                            if (!empty($deleteProduct->image)) {
+                                unlink($deleteProduct->image);
+                            }
+                        }
                     }
-                    $item->delete();
                 }
                 break;
             case 2:
@@ -246,34 +258,23 @@ class AdminController extends Controller
         
     }
 
-    // detail product transaction
-    public function detailProduct($product_id)
-    {
-        $obj = Product::find($product_id);
-        return view('admin.customer.postCustomer.detailProduct', ['obj' => $obj]);
-    }
-
     // ==========purchase customer management=============
     // list
-    // ==========post customer management=============
-    // list
-    public function listPostCustomer()
+    public function listPurchaseCustomer()
     {
-        $list  = Customer::where('type_customer',Customer::TYPECUSTOMER['post'])->get();
-        return view('admin.customer.postCustomer.index', ['list' => $list]);
+        $list  = Customer::where('type_customer',Customer::TYPECUSTOMER['purchase'])->get();
+        return view('admin.customer.purchaseCustomer.index', ['list' => $list]);
     }
 
     // apply action
-    public function actionPostCustomer(Request $request)
+    public function actionPurchaseCustomer(Request $request)
     {
         $listObj = Customer::whereIn('id', $request->selected)->get();
         if (!empty($listObj)) {
             switch ($request->option) {
             case 1:
                 foreach ($listObj as $item) {
-                    if ($item->delete()) {
-                        User::find($item->user_id)->delete();
-                    }
+                    $item->delete();
                 }
                 break;
             case 2:
@@ -287,15 +288,15 @@ class AdminController extends Controller
                 }
                 break;
         }
-            return redirect()->route('admins.postCustomer.list')->with('success', 'Success');
+            return redirect()->route('admins.purchaseCustomer.list')->with('success', 'Success');
         } else {
 
         }
         
     }
 
-    // active
-    public function activePostCustomer(Request $request)
+    // activeDeposit
+    public function activePurchaseCustomer(Request $request)
     {
         $objUpdate = Customer::find($request->id);
         $objUpdate->update(['active' => !($objUpdate->active)]);
@@ -303,97 +304,82 @@ class AdminController extends Controller
     }
 
     //delete
-    public function deletePostCustomer(Request $request)
+    public function deletePurchaseCustomer(Request $request)
     {
         $obj = Customer::find($request->id);
         if ($obj->delete()) {
-            if (User::find($obj->user_id)->delete()) {
-                echo json_encode('ok');
-            }
+            echo json_encode('ok');
         }
     }
 
-    // detail product transaction
-    public function detailProductTransaction($customer_id)
+    // detail purchase transaction
+    public function detailPurchaseTransaction($customer_id)
     {
-        $list = Customer::find($customer_id)->productTransaction()->get();
-        return view('admin.customer.postCustomer.detail', ['list' => $list, 'customer_id' => $customer_id]);
+        $list = Customer::find($customer_id)->purchaseTransaction()->get();
+        return view('admin.customer.purchaseCustomer.detail', ['list' => $list, 'customer_id' => $customer_id]);
     }
 
-    public function activeProductTransaction(Request $request)
+    public function activeDepositPurchaseTransaction(Request $request)
     {
-        $objUpdate = ProductTransaction::find($request->id);
-        $objUpdate->update(['active' => !($objUpdate->active)]);
+        $objUpdate = PurchaseTransaction::find($request->id);
+        $objUpdate->update(['deposit' => !($objUpdate->active)]);
         echo json_encode('ok');
     }
 
-    public function activePaidProductTransaction(Request $request)
+    public function activePaymentProductTransaction(Request $request)
     {
-        $objUpdate = ProductTransaction::find($request->id);
-        $objUpdate->update(['payed' => !($objUpdate->payed)]);
+        $objUpdate = PurchaseTransaction::find($request->id);
+        $objUpdate->update(['payment' => !($objUpdate->payed)]);
         echo json_encode('ok');
     }
 
      //delete
-    public function deleteProductTransaction(Request $request)
+    public function deletePurchaseTransaction(Request $request)
     {
-        $obj = ProductTransaction::find($request->id);
+        $obj = PurchaseTransaction::find($request->id);
         if ($obj->delete()) {
-            if (Product::find($obj->product_id)->delete()) {
-                echo json_encode('ok');
-            }
+            echo json_encode('ok');
         }
     }
 
     // apply action
-    public function actionProductTransaction(Request $request)
+    public function actionPurchaseTransaction(Request $request)
     {
-        $listObj = ProductTransaction::whereIn('id', $request->selected)->get();
+        $listObj = PurchaseTransaction::whereIn('id', $request->selected)->get();
         if (!empty($listObj)) {
             switch ($request->option) {
             case 1:
                 foreach ($listObj as $item) {
-                    if (!empty($item->image)) {
-                        unlink($item->image);
-                    }
                     $item->delete();
                 }
                 break;
             case 2:
                 foreach ($listObj as $item) {
-                    $item->update(['active' => 1]);
+                    $item->update(['deposit' => 1]);
                 }
                 break;
             case 3:
                 foreach ($listObj as $item) {
-                    $item->update(['active' => 0]);
+                    $item->update(['deposit' => 0]);
                 }
                 break;
             case 4:
                 foreach ($listObj as $item) {
-                    $item->update(['payed' => 0]);
+                    $item->update(['payment' => 0]);
                 }
                 break;
             case 5:
                 foreach ($listObj as $item) {
-                    $item->update(['payed' => 0]);
+                    $item->update(['payment' => 0]);
                 }
                 break;
         }
-            return redirect()->route('admins.postCustomer.detail',['customer_id' => $request->customer_id])->with('success', 'Success');
+            return redirect()->route('admins.purchaseCustomer.detail',['customer_id' => $request->customer_id])->with('success', 'Success');
         } else {
 
         }
         
     }
-
-    // detail product transaction
-    public function detailProduct($product_id)
-    {
-        $obj = Product::find($product_id);
-        return view('admin.customer.postCustomer.detailProduct', ['obj' => $obj]);
-    }
-
 
     // ==========purchase customer management=============
     // news
@@ -516,5 +502,148 @@ class AdminController extends Controller
         $objUpdate->update(['active' => !($objUpdate->active)]);
         echo json_encode('ok');
     }
+
+    // =========Products=============
+
+    // products
+    public function listProducts()
+    {
+        $list  = Product::all();
+        return view('admin.product.index', ['list' => $list]);
+    }
+
+    // edit
+    public function createProduct()
+    {
+       $listCat = Category::all();
+       $villages = Village::all();
+       $streets = Street::all();
+       $districts = District::all();
+       $direction = Product::DIRECTION;
+       return view('admin.product.add', [
+            'listCat' => $listCat,
+            'villages' => $villages,
+            'streets' => $streets,
+            'districts' => $districts,
+            'direction' => $direction
+        ]);
+    }
+
+    // // store
+    // public function storeNews(NewsCreateRequest $request)
+    // {
+    //     $data = $request->all();
+    //     $data['created_at'] = Carbon\Carbon::now();;
+
+    //     if ($request->hasFile('image')) {
+    //         $path = "images/news/";
+    //         $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+    //         $request->image->move($path, $fileName);
+    //         $data['image'] = $path . $fileName;
+    //     } else {
+    //         $data['image'] = "";
+    //     }
+        
+    //    if (News::create($data)) {
+    //         return redirect()->route('admins.news.list')->with('success', 'Success');
+    //     } else {
+    //         return redirect()->back()->withInput()->with('error', 'Fail');
+    //     }
+    // }
+
+    // // create or edit
+    // public function editNews($id)
+    // {
+    //     $listCat = CatNew::where('active',1)->get();
+    //     $obj = News::find($id);
+    //     return view('admin.news.edit', ['obj' => $obj, 'listCat' => $listCat]);
+    // }
+
+    // // update
+    // public function updateNews(NewsCreateRequest $request, $id)
+    // {
+    //     $oldObj = News::find($id);
+    //     $data = $request->all();
+
+    //     if ($request->hasFile('image')) {
+    //         if (!empty($oldObj->image)) {
+    //             unlink($oldObj->image);
+    //         }
+    //         $path = "images/news/";
+    //         $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+    //         $request->image->move($path, $fileName);
+    //         $data['image'] = $path . $fileName;
+    //     } else {
+    //         $data['image'] = $oldObj->image;
+    //     }
+        
+    //    if ($oldObj->update($data)) {
+    //         return redirect()->route('admins.news.list')->with('success', 'Success');
+    //     } else {
+    //         return redirect()->back()->withInput()->with('error', 'Fail');
+    //     }
+    // }
+
+    //delete
+    public function deleteProduct($id)
+    {
+        $obj = Product::find($id);
+        if ($obj->delete()) {
+            if (!empty($obj->image)) {
+                unlink($obj->image);
+            }
+            ProductTransaction::where('product_id', $obj->id)->delete();
+            PurchaseTransaction::where('product_id', $obj->id)->delete();
+            echo json_encode('ok');
+        }
+    }
+
+    // // apply action
+    // public function action(Request $request)
+    // {
+    //     $listObj = News::whereIn('id', $request->selected)->get();
+    //     if (!empty($listObj)) {
+    //         switch ($request->option) {
+    //         case 1:
+    //             foreach ($listObj as $item) {
+    //                 if (!empty($item->image)) {
+    //                     unlink($item->image);
+    //                 }
+    //                 $item->delete();
+    //             }
+    //             break;
+    //         case 2:
+    //             foreach ($listObj as $item) {
+    //                 $item->update(['active' => 1]);
+    //             }
+    //             break;
+    //         case 3:
+    //             foreach ($listObj as $item) {
+    //                 $item->update(['active' => 0]);
+    //             }
+    //             break;
+    //     }
+    //         return redirect()->route('admins.news.list')->with('success', 'Success');
+    //     } else {
+
+    //     }
+        
+    // }
+
+    // // active
+    // public function active(Request $request)
+    // {
+    //     $objUpdate = News::find($request->id);
+    //     $objUpdate->update(['active' => !($objUpdate->active)]);
+    //     echo json_encode('ok');
+    // }
+    
+    // detail product transaction
+    public function detailProduct($product_id)
+    {
+        $obj = Product::find($product_id);
+        return view('admin.product.detail', ['obj' => $obj]);
+    }
+
 
 }

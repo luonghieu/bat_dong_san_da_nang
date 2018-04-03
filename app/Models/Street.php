@@ -29,3 +29,4 @@ class Street extends Model
     {
         return $this->hasMany('App\Models\Product', 'street_id', 'id');
     }
+}

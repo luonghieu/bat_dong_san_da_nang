@@ -25,11 +25,14 @@
       }
 
       var nRow = $(this).parents('tr')[0];
+      var aData = oTable.row(nRow).data();
 
       $.ajax({
-        url: "{!! route('admins.news.delete',['id' => $obj->id]) !!}",
+        url: "{!! route('admins.purchaseCustomer.delete') !!}",
         method: "GET",
-        data: {},
+        data: {
+          'id' : aData[1],
+        },
         dataType : 'json',
         success : function(result){
           oTable.row(nRow).remove().draw();
