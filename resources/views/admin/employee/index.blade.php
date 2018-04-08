@@ -58,7 +58,6 @@ Employee
 						<th>Gender</th>
 						<th>Address</th>
 						<th>Phone</th>
-						<th>Department</th>
 						<th style="width: 160px;" class="no-sort">Actions</th>
 					</tr>
 				</thead>
@@ -66,7 +65,9 @@ Employee
 					@foreach($list as $obj)
 					<tr class="odd gradeX">
 						<td>{!! $obj->id !!}</td>
-						<td>{!! $obj->name !!}</td>
+						<td>
+							<a href="{!! route('admins.employee.detail', ['employee_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $obj->name !!}</a>
+						</td>
 						<td>
 							@if($obj->gender==0)
 							Nam
@@ -76,7 +77,6 @@ Employee
 						</td>
 						<td>{!! $obj->address !!}</td>
 						<td>{!! $obj->phone !!}</td>
-						<td>{!! $obj->district->name !!}</td>
 						<td class="actions"><a role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
 					</tr>
 					@endforeach

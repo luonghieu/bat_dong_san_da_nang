@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Category;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Models\CatNew;
@@ -33,6 +34,8 @@ class ProductCreateRequest extends FormRequest
             'direction_note' => 'nullable|max:255',
             'cat_id' => ['required', Rule::in($list)],
             'image' => 'nullable|image|max: 1000',
+            'area' => 'numeric',
+            'price' => 'numeric',
         ];
     }
 
@@ -52,6 +55,8 @@ class ProductCreateRequest extends FormRequest
             'cat_id.in'  => 'Category not exist.',
             'image.image' => 'Image must in png, jpg, jpeg.',
             'image.max' => 'Image not greater than 1000kb.',
+            'area.numeric' => 'Area must be number.',
+            'price.numeric' => 'Price must be number.',
         ];
     }
 }

@@ -1,6 +1,6 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.customer.postCustomer.css')
+@include('admin.product.sale.css')
 @endsection
 @section('title')
 Detail Product

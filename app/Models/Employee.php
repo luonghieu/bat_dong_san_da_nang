@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Employee extends Model
 {
-    const TYPETRANSACTION = [
+    const GENDER = [
         'male' => 0,
         'female' => 1,
     ];
@@ -14,18 +14,10 @@ class Employee extends Model
     protected $table = 'employees';
 
 	protected $fillable = [
-        'name', 'gender', 'address', 'phone', 'district_id', 'user_id'
+        'name', 'gender', 'address', 'phone', 'user_id'
     ];
 
     public $timestamps=false;
-
-    /**
-     * Get type district relationship
-     */
-    public function district()
-    {
-        return $this->belongsTo('App\Models\District', 'district_id', 'id');
-    }
 
     /**
      * Get user relationship

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductCreateRequest;
+use App\Models\AssignTask;
 use Illuminate\Http\Request;
 use App\Http\Requests\EmployeeCreateRequest;
 use App\Http\Requests\NewsCreateRequest;
@@ -17,7 +19,8 @@ use App\Models\District;
 use App\Models\Village;
 use App\Models\Street;
 use Carbon;
- 
+use PurchaseTransaction;
+
 class AdminController extends Controller
 {
     // =======leader management========
@@ -118,11 +121,18 @@ class AdminController extends Controller
     	}
     }
 
+    // detail
+    public function detailEmployee($employeeId)
+    {
+        $obj = Employee::find($employeeId);
+        return view('admin.employee.detail', ['obj' => $obj]);
+    }
+
     // ==========post customer management=============
     // list
     public function listPostCustomer()
     {
-        $list  = Customer::where('type_customer',Customer::TYPECUSTOMER['post'])->get();
+        $list  = Customer::where('type_customer',Customer::TYPECUSTOMER['post'])->orWhere('type_customer',Customer::TYPECUSTOMER['both'])->get();
         return view('admin.customer.postCustomer.index', ['list' => $list]);
     }
 
@@ -262,7 +272,7 @@ class AdminController extends Controller
     // list
     public function listPurchaseCustomer()
     {
-        $list  = Customer::where('type_customer',Customer::TYPECUSTOMER['purchase'])->get();
+        $list  = Customer::where('type_customer',Customer::TYPECUSTOMER['purchase'])->orWhere('type_customer',Customer::TYPECUSTOMER['both'])->get();
         return view('admin.customer.purchaseCustomer.index', ['list' => $list]);
     }
 
@@ -379,6 +389,14 @@ class AdminController extends Controller
 
         }
         
+    }
+
+    // detail Customer
+    // detail
+    public function detailCustomer($customerId)
+    {
+        $obj = Customer::find($customerId);
+        return view('admin.customer.detail', ['obj' => $obj]);
     }
 
     // ==========purchase customer management=============
@@ -504,23 +522,33 @@ class AdminController extends Controller
     }
 
     // =========Products=============
+    // =========Sale Products=============
 
-    // products
-    public function listProducts()
+    // sale products
+    public function listSaleProducts()
     {
-        $list  = Product::all();
-        return view('admin.product.index', ['list' => $list]);
+        $list  = Product::select('products.*')->join('categories','products.cat_id','categories.id')->where('categories.type_transaction',1)->get();
+        return view('admin.product.sale.index', ['list' => $list]);
     }
 
-    // edit
-    public function createProduct()
+
+    // status
+    public function statusSaleProduct(Request $request)
     {
-       $listCat = Category::all();
+        $objUpdate = Product::find($request->id);
+        $objUpdate->update(['status' => $request->status]);
+        echo json_encode('ok');
+    }
+
+    // sale edit
+    public function createSaleProduct()
+    {
+       $listCat = Category::all()->where('type_transaction',1);
        $villages = Village::all();
        $streets = Street::all();
        $districts = District::all();
        $direction = Product::DIRECTION;
-       return view('admin.product.add', [
+       return view('admin.product.sale.add', [
             'listCat' => $listCat,
             'villages' => $villages,
             'streets' => $streets,
@@ -529,63 +557,73 @@ class AdminController extends Controller
         ]);
     }
 
-    // // store
-    // public function storeNews(NewsCreateRequest $request)
-    // {
-    //     $data = $request->all();
-    //     $data['created_at'] = Carbon\Carbon::now();;
+     // store
+     public function storeSaleProduct(ProductCreateRequest $request)
+     {
+         $data = $request->all();
 
-    //     if ($request->hasFile('image')) {
-    //         $path = "images/news/";
-    //         $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-    //         $request->image->move($path, $fileName);
-    //         $data['image'] = $path . $fileName;
-    //     } else {
-    //         $data['image'] = "";
-    //     }
+         if ($request->hasFile('image')) {
+             $path = "images/products/";
+             $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+             $request->image->move($path, $fileName);
+             $data['image'] = $path . $fileName;
+         } else {
+             $data['image'] = "";
+         }
+
+        if (Product::create($data)) {
+             return redirect()->route('admins.product.sale.list')->with('success', 'Success');
+         } else {
+             return redirect()->back()->withInput()->with('error', 'Fail');
+         }
+     }
+
+     // edit
+     public function editSaleProduct($id)
+     {
+         $listCat = Category::all()->where('type_transaction',1);
+         $villages = Village::all();
+         $streets = Street::all();
+         $districts = District::all();
+         $direction = Product::DIRECTION;
+         $obj = Product::find($id);
+         return view('admin.product.sale.edit', [
+             'listCat' => $listCat,
+             'villages' => $villages,
+             'streets' => $streets,
+             'districts' => $districts,
+             'direction' => $direction,
+             'obj' => $obj
+         ]);
+     }
+
+     // update
+     public function updateSaleProduct(ProductCreateRequest $request, $id)
+     {
+         $oldObj = Product::find($id);
+         $data = $request->all();
+
+         if ($request->hasFile('image')) {
+             if (!empty($oldObj->image)) {
+                 unlink($oldObj->image);
+             }
+             $path = "images/news/";
+             $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+             $request->image->move($path, $fileName);
+             $data['image'] = $path . $fileName;
+         } else {
+             $data['image'] = $oldObj->image;
+         }
         
-    //    if (News::create($data)) {
-    //         return redirect()->route('admins.news.list')->with('success', 'Success');
-    //     } else {
-    //         return redirect()->back()->withInput()->with('error', 'Fail');
-    //     }
-    // }
-
-    // // create or edit
-    // public function editNews($id)
-    // {
-    //     $listCat = CatNew::where('active',1)->get();
-    //     $obj = News::find($id);
-    //     return view('admin.news.edit', ['obj' => $obj, 'listCat' => $listCat]);
-    // }
-
-    // // update
-    // public function updateNews(NewsCreateRequest $request, $id)
-    // {
-    //     $oldObj = News::find($id);
-    //     $data = $request->all();
-
-    //     if ($request->hasFile('image')) {
-    //         if (!empty($oldObj->image)) {
-    //             unlink($oldObj->image);
-    //         }
-    //         $path = "images/news/";
-    //         $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-    //         $request->image->move($path, $fileName);
-    //         $data['image'] = $path . $fileName;
-    //     } else {
-    //         $data['image'] = $oldObj->image;
-    //     }
-        
-    //    if ($oldObj->update($data)) {
-    //         return redirect()->route('admins.news.list')->with('success', 'Success');
-    //     } else {
-    //         return redirect()->back()->withInput()->with('error', 'Fail');
-    //     }
-    // }
+        if ($oldObj->update($data)) {
+             return redirect()->route('admins.product.sale.list')->with('success', 'Success');
+         } else {
+             return redirect()->back()->withInput()->with('error', 'Fail');
+         }
+     }
 
     //delete
-    public function deleteProduct($id)
+    public function deleteSaleProduct($id)
     {
         $obj = Product::find($id);
         if ($obj->delete()) {
@@ -598,52 +636,296 @@ class AdminController extends Controller
         }
     }
 
-    // // apply action
-    // public function action(Request $request)
-    // {
-    //     $listObj = News::whereIn('id', $request->selected)->get();
-    //     if (!empty($listObj)) {
-    //         switch ($request->option) {
-    //         case 1:
-    //             foreach ($listObj as $item) {
-    //                 if (!empty($item->image)) {
-    //                     unlink($item->image);
-    //                 }
-    //                 $item->delete();
-    //             }
-    //             break;
-    //         case 2:
-    //             foreach ($listObj as $item) {
-    //                 $item->update(['active' => 1]);
-    //             }
-    //             break;
-    //         case 3:
-    //             foreach ($listObj as $item) {
-    //                 $item->update(['active' => 0]);
-    //             }
-    //             break;
-    //     }
-    //         return redirect()->route('admins.news.list')->with('success', 'Success');
-    //     } else {
+     // apply action
+     public function actionSaleProduct(Request $request)
+     {
+         $listObj = Product::whereIn('id', $request->selected)->get();
+         if (!empty($listObj)) {
+             switch ($request->option) {
+             case 1:
+                 foreach ($listObj as $item) {
+                     if (!empty($item->image)) {
+                         unlink($item->image);
+                     }
+                     ProductTransaction::where('product_id', $item->id)->delete();
+                     PurchaseTransaction::where('product_id', $item->id)->delete();
+                     $item->delete();
+                 }
+                 break;
+             }
+             return redirect()->route('admins.product.sale.list')->with('success', 'Success');
+         } else {
 
-    //     }
+         }
         
-    // }
+     }
 
-    // // active
-    // public function active(Request $request)
-    // {
-    //     $objUpdate = News::find($request->id);
-    //     $objUpdate->update(['active' => !($objUpdate->active)]);
-    //     echo json_encode('ok');
-    // }
-    
+    // =========Lease Products=============
+
+    // lease products
+    public function listLeaseProducts()
+    {
+        $list  = Product::select('products.*')->join('categories','products.cat_id','categories.id')->where('categories.type_transaction',2)->get();
+        return view('admin.product.lease.index', ['list' => $list]);
+    }
+
+
+    // status
+    public function statusLeaseProduct(Request $request)
+    {
+        $objUpdate = Product::find($request->id);
+        $objUpdate->update(['status' => $request->status]);
+        echo json_encode('ok');
+    }
+
+    // sale edit
+    public function createLeaseProduct()
+    {
+        $listCat = Category::all()->where('type_transaction',2);
+        $villages = Village::all();
+        $streets = Street::all();
+        $districts = District::all();
+        $direction = Product::DIRECTION;
+        return view('admin.product.sale.add', [
+            'listCat' => $listCat,
+            'villages' => $villages,
+            'streets' => $streets,
+            'districts' => $districts,
+            'direction' => $direction
+        ]);
+    }
+
+    // store
+    public function storeLeaseProduct(ProductCreateRequest $request)
+    {
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            $path = "images/products/";
+            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move($path, $fileName);
+            $data['image'] = $path . $fileName;
+        } else {
+            $data['image'] = "";
+        }
+
+        if (Product::create($data)) {
+            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    // edit
+    public function editLeaseProduct($id)
+    {
+        $listCat = Category::all()->where('type_transaction',1);
+        $villages = Village::all();
+        $streets = Street::all();
+        $districts = District::all();
+        $direction = Product::DIRECTION;
+        $obj = Product::find($id);
+        return view('admin.product.sale.edit', [
+            'listCat' => $listCat,
+            'villages' => $villages,
+            'streets' => $streets,
+            'districts' => $districts,
+            'direction' => $direction,
+            'obj' => $obj
+        ]);
+    }
+
+    // update
+    public function updateLeaseProduct(ProductCreateRequest $request, $id)
+    {
+        $oldObj = Product::find($id);
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            if (!empty($oldObj->image)) {
+                unlink($oldObj->image);
+            }
+            $path = "images/news/";
+            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move($path, $fileName);
+            $data['image'] = $path . $fileName;
+        } else {
+            $data['image'] = $oldObj->image;
+        }
+
+        if ($oldObj->update($data)) {
+            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    //delete
+    public function deleteLeaseProduct($id)
+    {
+        $obj = Product::find($id);
+        if ($obj->delete()) {
+            if (!empty($obj->image)) {
+                unlink($obj->image);
+            }
+            ProductTransaction::where('product_id', $obj->id)->delete();
+            PurchaseTransaction::where('product_id', $obj->id)->delete();
+            echo json_encode('ok');
+        }
+    }
+
+    // apply action
+    public function actionLeaseProduct(Request $request)
+    {
+        $listObj = Product::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+                case 1:
+                    foreach ($listObj as $item) {
+                        if (!empty($item->image)) {
+                            unlink($item->image);
+                        }
+                        ProductTransaction::where('product_id', $item->id)->delete();
+                        PurchaseTransaction::where('product_id', $item->id)->delete();
+                        $item->delete();
+                    }
+                    break;
+            }
+            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
+        } else {
+
+        }
+
+    }
+
     // detail product transaction
     public function detailProduct($product_id)
     {
         $obj = Product::find($product_id);
         return view('admin.product.detail', ['obj' => $obj]);
     }
+
+    // ==========assign task management=============
+    // assign
+    public function listAssignTask()
+    {
+        $list  = AssignTask::all();
+        return view('admin.assign.index', ['list' => $list]);
+    }
+
+//    // edit
+//    public function createNews()
+//    {
+//        $listCat = CatNew::where('active',1)->get();
+//        return view('admin.news.add', ['listCat' => $listCat]);
+//    }
+//
+//    // store
+//    public function storeNews(NewsCreateRequest $request)
+//    {
+//        $data = $request->all();
+//        $data['created_at'] = Carbon\Carbon::now();;
+//
+//        if ($request->hasFile('image')) {
+//            $path = "images/news/";
+//            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+//            $request->image->move($path, $fileName);
+//            $data['image'] = $path . $fileName;
+//        } else {
+//            $data['image'] = "";
+//        }
+//
+//        if (News::create($data)) {
+//            return redirect()->route('admins.news.list')->with('success', 'Success');
+//        } else {
+//            return redirect()->back()->withInput()->with('error', 'Fail');
+//        }
+//    }
+//
+//    // create or edit
+//    public function editNews($id)
+//    {
+//        $listCat = CatNew::where('active',1)->get();
+//        $obj = News::find($id);
+//        return view('admin.news.edit', ['obj' => $obj, 'listCat' => $listCat]);
+//    }
+//
+//    // update
+//    public function updateNews(NewsCreateRequest $request, $id)
+//    {
+//        $oldObj = News::find($id);
+//        $data = $request->all();
+//
+//        if ($request->hasFile('image')) {
+//            if (!empty($oldObj->image)) {
+//                unlink($oldObj->image);
+//            }
+//            $path = "images/news/";
+//            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+//            $request->image->move($path, $fileName);
+//            $data['image'] = $path . $fileName;
+//        } else {
+//            $data['image'] = $oldObj->image;
+//        }
+//
+//        if ($oldObj->update($data)) {
+//            return redirect()->route('admins.news.list')->with('success', 'Success');
+//        } else {
+//            return redirect()->back()->withInput()->with('error', 'Fail');
+//        }
+//    }
+//
+//    //delete
+//    public function deleteNews($id)
+//    {
+//        $obj = News::find($id);
+//        if ($obj->delete()) {
+//            if (!empty($obj->image)) {
+//                unlink($obj->image);
+//            }
+//            echo json_encode('ok');
+//        }
+//    }
+//
+//    // apply action
+//    public function action(Request $request)
+//    {
+//        $listObj = News::whereIn('id', $request->selected)->get();
+//        if (!empty($listObj)) {
+//            switch ($request->option) {
+//                case 1:
+//                    foreach ($listObj as $item) {
+//                        if (!empty($item->image)) {
+//                            unlink($item->image);
+//                        }
+//                        $item->delete();
+//                    }
+//                    break;
+//                case 2:
+//                    foreach ($listObj as $item) {
+//                        $item->update(['active' => 1]);
+//                    }
+//                    break;
+//                case 3:
+//                    foreach ($listObj as $item) {
+//                        $item->update(['active' => 0]);
+//                    }
+//                    break;
+//            }
+//            return redirect()->route('admins.news.list')->with('success', 'Success');
+//        } else {
+//
+//        }
+//
+//    }
+//
+//    // active
+//    public function active(Request $request)
+//    {
+//        $objUpdate = News::find($request->id);
+//        $objUpdate->update(['active' => !($objUpdate->active)]);
+//        echo json_encode('ok');
+//    }
 
 
 }
