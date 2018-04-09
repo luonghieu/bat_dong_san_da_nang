@@ -45,7 +45,7 @@ Post Customer
 	<!-- /tile header -->
 
 	<!-- tile body -->
-	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.postCustomer.action') !!}">
+	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.poster.action') !!}">
 		<input type="hidden" name="_token" value="{{csrf_token()}}" />
 		<div class="tile-body">
 			<div class="table-responsive">
@@ -68,7 +68,7 @@ Post Customer
 							<th>Email</th>
 							<th>Phone</th>
 							<th>Number of post</th>
-							<th>Product transaction</th>
+							<th>Posts</th>
 							<th>Active</th>
 							<th>Created at</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
@@ -85,9 +85,9 @@ Post Customer
 							<td>{!! $obj->address !!}</td>
 							<td>{!! $obj->user->email !!}</td>
 							<td>{!! $obj->phone !!}</td>
-							<td>{!! $obj->productTransaction->count() !!}</td>
+							<td>{!! $obj->posts->count() !!}</td>
 							<td>
-								<a href="{!! route('admins.postCustomer.detail', ['customer_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
+								<a href="{!! route('admins.poster.detail', ['poster_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
 							</td>
 							<td>
 								@if ($obj->active == 0) 
@@ -148,7 +148,7 @@ Post Customer
 
 	function active(id) {
 		$.ajax({
-			url: "{!! route('admins.postCustomer.active') !!}",
+			url: "{!! route('admins.poster.active') !!}",
 			method: "GET",
 			data: {
 				'id' : id

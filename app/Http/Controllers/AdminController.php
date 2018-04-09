@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductCreateRequest;
 use App\Models\AssignTask;
+use App\Models\Post;
+use App\Models\Poster;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Http\Requests\EmployeeCreateRequest;
@@ -237,145 +239,356 @@ class AdminController extends Controller
         return view('admin.employee.detail', ['obj' => $obj]);
     }
 
-//    // ==========post customer management=============
-//    // list
-//    public function listPostCustomer()
-//    {
-//        $list  = Customer::where('type_customer',Customer::TYPECUSTOMER['post'])->orWhere('type_customer',Customer::TYPECUSTOMER['both'])->get();
-//        return view('admin.customer.postCustomer.index', ['list' => $list]);
-//    }
-//
-//    // apply action
-//    public function actionPostCustomer(Request $request)
-//    {
-//        $listObj = Customer::whereIn('id', $request->selected)->get();
-//        if (!empty($listObj)) {
-//            switch ($request->option) {
-//            case 1:
-//                foreach ($listObj as $item) {
-//                    if ($item->delete()) {
-//                        User::find($item->user_id)->delete();
-//                    }
-//                }
-//                break;
-//            case 2:
-//                foreach ($listObj as $item) {
-//                    $item->update(['active' => 1]);
-//                }
-//                break;
-//            case 3:
-//                foreach ($listObj as $item) {
-//                    $item->update(['active' => 0]);
-//                }
-//                break;
-//        }
-//            return redirect()->route('admins.postCustomer.list')->with('success', 'Success');
-//        } else {
-//
-//        }
-//
-//    }
-//
-//    // active
-//    public function activePostCustomer(Request $request)
-//    {
-//        $objUpdate = Customer::find($request->id);
-//        $objUpdate->update(['active' => !($objUpdate->active)]);
-//        echo json_encode('ok');
-//    }
-//
-//    //delete
-//    public function deletePostCustomer(Request $request)
-//    {
-//    	$obj = Customer::find($request->id);
-//    	if ($obj->delete()) {
-//    		if (User::find($obj->user_id)->delete()) {
-//    			echo json_encode('ok');
-//    		}
-//    	}
-//    }
-//
-//    // detail product transaction
-//    public function detailProductTransaction($customer_id)
-//    {
-//        $list = Customer::find($customer_id)->productTransaction()->get();
-//        return view('admin.customer.postCustomer.detail', ['list' => $list, 'customer_id' => $customer_id]);
-//    }
-//
-//    public function activeProductTransaction(Request $request)
-//    {
-//        $objUpdate = ProductTransaction::find($request->id);
-//        $objUpdate->update(['active' => !($objUpdate->active)]);
-//        echo json_encode('ok');
-//    }
-//
-//    public function activePaidProductTransaction(Request $request)
-//    {
-//        $objUpdate = ProductTransaction::find($request->id);
-//        $objUpdate->update(['payed' => !($objUpdate->payed)]);
-//        echo json_encode('ok');
-//    }
-//
-//     //delete
-//    public function deleteProductTransaction(Request $request)
-//    {
-//        $obj = ProductTransaction::find($request->id);
-//        if ($obj->delete()) {
-//            $deleteProduct = Product::find($obj->product_id);
-//            if ($deleteProduct->delete()) {
-//                if (!empty($deleteProduct->image)) {
-//                    unlink($deleteProduct->image);
-//                }
-//                echo json_encode('ok');
-//            }
-//        }
-//    }
-//
-//    // apply action
-//    public function actionProductTransaction(Request $request)
-//    {
-//        $listObj = ProductTransaction::whereIn('id', $request->selected)->get();
-//        if (!empty($listObj)) {
-//            switch ($request->option) {
-//            case 1:
-//                foreach ($listObj as $item) {
-//                    if ($item->delete()) {
-//                        $deleteProduct = Product::find($item->product_id);
-//                        if ($deleteProduct->delete()) {
-//                            if (!empty($deleteProduct->image)) {
-//                                unlink($deleteProduct->image);
-//                            }
-//                        }
-//                    }
-//                }
-//                break;
-//            case 2:
-//                foreach ($listObj as $item) {
-//                    $item->update(['active' => 1]);
-//                }
-//                break;
-//            case 3:
-//                foreach ($listObj as $item) {
-//                    $item->update(['active' => 0]);
-//                }
-//                break;
-//            case 4:
-//                foreach ($listObj as $item) {
-//                    $item->update(['payed' => 0]);
-//                }
-//                break;
-//            case 5:
-//                foreach ($listObj as $item) {
-//                    $item->update(['payed' => 0]);
-//                }
-//                break;
-//        }
-//            return redirect()->route('admins.postCustomer.detail',['customer_id' => $request->customer_id])->with('success', 'Success');
-//        } else {
-//
-//        }
-//
-//    }
+    // ==========poster management=============
+    // list
+    public function listPoster()
+    {
+        $list  = Poster::all();
+        return view('admin.post.poster.index', ['list' => $list]);
+    }
+
+    // apply action
+    public function actionPoster(Request $request)
+    {
+        $listObj = Poster::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+            case 1:
+                foreach ($listObj as $item) {
+                    if ($item->delete()) {
+                        User::find($item->user_id)->delete();
+                        Poster::where('poster_id', $item->id)->delete();
+                    }
+                }
+                break;
+            case 2:
+                foreach ($listObj as $item) {
+                    $item->user->update(['active' => 1]);
+                }
+                break;
+            case 3:
+                foreach ($listObj as $item) {
+                    $item->user->update(['active' => 0]);
+                }
+                break;
+        }
+            return redirect()->route('admins.post.poster.list')->with('success', 'Success');
+        } else {
+
+        }
+
+    }
+
+    // active
+    public function activePoster(Request $request)
+    {
+        $objUpdate = Poster::find($request->id)->user;
+        $objUpdate->update(['active' => !($objUpdate->active)]);
+        echo json_encode('ok');
+    }
+
+    //delete
+    public function deletePoster(Request $request)
+    {
+    	$obj = Poster::find($request->id);
+    	if ($obj->delete()) {
+            Poster::where('poster_id', $obj->id)->delete();
+    		if (User::find($obj->user_id)->delete()) {
+    			echo json_encode('ok');
+    		}
+    	}
+    }
+
+    // detail product transaction
+    public function detailPosts($poster_id)
+    {
+        $list = Post::where('poster_id', $poster_id)->get();
+        return view('admin.post.posts.index', ['list' => $list]);
+    }
+
+    // =========Products=============
+    // =========Sale Products=============
+
+    // sale products
+    public function listSaleProducts()
+    {
+        $list  = Product::select('products.*')->join('categories','products.cat_id','categories.id')->where('categories.type_transaction',1)->get();
+        return view('admin.product.sale.index', ['list' => $list]);
+    }
+
+
+    // status
+    public function statusSaleProduct(Request $request)
+    {
+        $objUpdate = Product::find($request->id);
+        $objUpdate->update(['status' => $request->status]);
+        echo json_encode('ok');
+    }
+
+    // sale edit
+    public function createSaleProduct()
+    {
+        $listCat = Category::all()->where('type_transaction',1);
+        $villages = Village::all();
+        $streets = Street::all();
+        $districts = District::all();
+        $direction = Product::DIRECTION;
+        return view('admin.product.sale.add', [
+            'listCat' => $listCat,
+            'villages' => $villages,
+            'streets' => $streets,
+            'districts' => $districts,
+            'direction' => $direction
+        ]);
+    }
+
+    // store
+    public function storeSaleProduct(ProductCreateRequest $request)
+    {
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            $path = "images/products/";
+            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move($path, $fileName);
+            $data['image'] = $path . $fileName;
+        } else {
+            $data['image'] = "";
+        }
+
+        if (Product::create($data)) {
+            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    // edit
+    public function editSaleProduct($id)
+    {
+        $listCat = Category::all()->where('type_transaction',1);
+        $villages = Village::all();
+        $streets = Street::all();
+        $districts = District::all();
+        $direction = Product::DIRECTION;
+        $obj = Product::find($id);
+        return view('admin.product.sale.edit', [
+            'listCat' => $listCat,
+            'villages' => $villages,
+            'streets' => $streets,
+            'districts' => $districts,
+            'direction' => $direction,
+            'obj' => $obj
+        ]);
+    }
+
+    // update
+    public function updateSaleProduct(ProductCreateRequest $request, $id)
+    {
+        $oldObj = Product::find($id);
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            if (!empty($oldObj->image)) {
+                unlink($oldObj->image);
+            }
+            $path = "images/news/";
+            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move($path, $fileName);
+            $data['image'] = $path . $fileName;
+        } else {
+            $data['image'] = $oldObj->image;
+        }
+
+        if ($oldObj->update($data)) {
+            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    //delete
+    public function deleteSaleProduct($id)
+    {
+        $obj = Product::find($id);
+        if ($obj->delete()) {
+            if (!empty($obj->image)) {
+                unlink($obj->image);
+            }
+            ProductTransaction::where('product_id', $obj->id)->delete();
+            PurchaseTransaction::where('product_id', $obj->id)->delete();
+            echo json_encode('ok');
+        }
+    }
+
+    // apply action
+    public function actionSaleProduct(Request $request)
+    {
+        $listObj = Product::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+                case 1:
+                    foreach ($listObj as $item) {
+                        if (!empty($item->image)) {
+                            unlink($item->image);
+                        }
+                        ProductTransaction::where('product_id', $item->id)->delete();
+                        PurchaseTransaction::where('product_id', $item->id)->delete();
+                        $item->delete();
+                    }
+                    break;
+            }
+            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
+        } else {
+
+        }
+
+    }
+
+    // =========Post=============
+
+    // lease products
+    public function listPost()
+    {
+        $direction = Post::DIRECTION;
+        $list  = Post::all();
+        return view('admin.post.posts.index', ['list' => $list, 'direction' => $direction]);
+    }
+
+
+    // status
+    public function statusPost(Request $request)
+    {
+        $objUpdate = Product::find($request->id);
+        $objUpdate->update(['status' => $request->status]);
+        echo json_encode('ok');
+    }
+
+    // sale edit
+    public function createLeaseProduct()
+    {
+        $listCat = Category::all()->where('type_transaction',2);
+        $villages = Village::all();
+        $streets = Street::all();
+        $districts = District::all();
+        $direction = Product::DIRECTION;
+        return view('admin.product.sale.add', [
+            'listCat' => $listCat,
+            'villages' => $villages,
+            'streets' => $streets,
+            'districts' => $districts,
+            'direction' => $direction
+        ]);
+    }
+
+    // store
+    public function storeLeaseProduct(ProductCreateRequest $request)
+    {
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            $path = "images/products/";
+            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move($path, $fileName);
+            $data['image'] = $path . $fileName;
+        } else {
+            $data['image'] = "";
+        }
+
+        if (Product::create($data)) {
+            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    // edit
+    public function editLeaseProduct($id)
+    {
+        $listCat = Category::all()->where('type_transaction',1);
+        $villages = Village::all();
+        $streets = Street::all();
+        $districts = District::all();
+        $direction = Product::DIRECTION;
+        $obj = Product::find($id);
+        return view('admin.product.sale.edit', [
+            'listCat' => $listCat,
+            'villages' => $villages,
+            'streets' => $streets,
+            'districts' => $districts,
+            'direction' => $direction,
+            'obj' => $obj
+        ]);
+    }
+
+    // update
+    public function updateLeaseProduct(ProductCreateRequest $request, $id)
+    {
+        $oldObj = Product::find($id);
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            if (!empty($oldObj->image)) {
+                unlink($oldObj->image);
+            }
+            $path = "images/news/";
+            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move($path, $fileName);
+            $data['image'] = $path . $fileName;
+        } else {
+            $data['image'] = $oldObj->image;
+        }
+
+        if ($oldObj->update($data)) {
+            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    //delete
+    public function deletePost($id)
+    {
+        $obj = Post::find($id);
+        if ($obj->delete()) {
+            if (!empty($obj->image)) {
+                unlink($obj->image);
+            }
+            echo json_encode('ok');
+        }
+    }
+
+    // apply action
+    public function actionPost(Request $request)
+    {
+        $listObj = Post::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+                case 1:
+                    foreach ($listObj as $item) {
+                        if (!empty($item->image)) {
+                            unlink($item->image);
+                        }
+                        $item->update(['deleted_at', Carbon::now()]);
+                    }
+                    break;
+                case 2:
+                    foreach ($listObj as $item) {
+                        $item->update(['status', Post::STATUS['processed']]);
+                    }
+                    break;
+                case 3:
+                    foreach ($listObj as $item) {
+                        $item->update(['status', Post::STATUS['cancel']]);
+                    }
+                    break;
+            }
+            return redirect()->route('admins.post.posts.list')->with('success', 'Success');
+        } else {
+
+        }
+
+    }
 
     // ========== customer management=============
     // list
@@ -480,7 +693,7 @@ class AdminController extends Controller
         return view('admin.customer.detail', ['obj' => $obj]);
     }
 
-    // ==========purchase customer management=============
+    // ==========News management=============
     // news
     public function listNews()
     {
@@ -600,290 +813,6 @@ class AdminController extends Controller
         $objUpdate = News::find($request->id);
         $objUpdate->update(['active' => !($objUpdate->active)]);
         echo json_encode('ok');
-    }
-
-    // =========Products=============
-    // =========Sale Products=============
-
-    // sale products
-    public function listSaleProducts()
-    {
-        $list  = Product::select('products.*')->join('categories','products.cat_id','categories.id')->where('categories.type_transaction',1)->get();
-        return view('admin.product.sale.index', ['list' => $list]);
-    }
-
-
-    // status
-    public function statusSaleProduct(Request $request)
-    {
-        $objUpdate = Product::find($request->id);
-        $objUpdate->update(['status' => $request->status]);
-        echo json_encode('ok');
-    }
-
-    // sale edit
-    public function createSaleProduct()
-    {
-       $listCat = Category::all()->where('type_transaction',1);
-       $villages = Village::all();
-       $streets = Street::all();
-       $districts = District::all();
-       $direction = Product::DIRECTION;
-       return view('admin.product.sale.add', [
-            'listCat' => $listCat,
-            'villages' => $villages,
-            'streets' => $streets,
-            'districts' => $districts,
-            'direction' => $direction
-        ]);
-    }
-
-     // store
-     public function storeSaleProduct(ProductCreateRequest $request)
-     {
-         $data = $request->all();
-
-         if ($request->hasFile('image')) {
-             $path = "images/products/";
-             $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-             $request->image->move($path, $fileName);
-             $data['image'] = $path . $fileName;
-         } else {
-             $data['image'] = "";
-         }
-
-        if (Product::create($data)) {
-             return redirect()->route('admins.product.sale.list')->with('success', 'Success');
-         } else {
-             return redirect()->back()->withInput()->with('error', 'Fail');
-         }
-     }
-
-     // edit
-     public function editSaleProduct($id)
-     {
-         $listCat = Category::all()->where('type_transaction',1);
-         $villages = Village::all();
-         $streets = Street::all();
-         $districts = District::all();
-         $direction = Product::DIRECTION;
-         $obj = Product::find($id);
-         return view('admin.product.sale.edit', [
-             'listCat' => $listCat,
-             'villages' => $villages,
-             'streets' => $streets,
-             'districts' => $districts,
-             'direction' => $direction,
-             'obj' => $obj
-         ]);
-     }
-
-     // update
-     public function updateSaleProduct(ProductCreateRequest $request, $id)
-     {
-         $oldObj = Product::find($id);
-         $data = $request->all();
-
-         if ($request->hasFile('image')) {
-             if (!empty($oldObj->image)) {
-                 unlink($oldObj->image);
-             }
-             $path = "images/news/";
-             $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-             $request->image->move($path, $fileName);
-             $data['image'] = $path . $fileName;
-         } else {
-             $data['image'] = $oldObj->image;
-         }
-        
-        if ($oldObj->update($data)) {
-             return redirect()->route('admins.product.sale.list')->with('success', 'Success');
-         } else {
-             return redirect()->back()->withInput()->with('error', 'Fail');
-         }
-     }
-
-    //delete
-    public function deleteSaleProduct($id)
-    {
-        $obj = Product::find($id);
-        if ($obj->delete()) {
-            if (!empty($obj->image)) {
-                unlink($obj->image);
-            }
-            ProductTransaction::where('product_id', $obj->id)->delete();
-            PurchaseTransaction::where('product_id', $obj->id)->delete();
-            echo json_encode('ok');
-        }
-    }
-
-     // apply action
-     public function actionSaleProduct(Request $request)
-     {
-         $listObj = Product::whereIn('id', $request->selected)->get();
-         if (!empty($listObj)) {
-             switch ($request->option) {
-             case 1:
-                 foreach ($listObj as $item) {
-                     if (!empty($item->image)) {
-                         unlink($item->image);
-                     }
-                     ProductTransaction::where('product_id', $item->id)->delete();
-                     PurchaseTransaction::where('product_id', $item->id)->delete();
-                     $item->delete();
-                 }
-                 break;
-             }
-             return redirect()->route('admins.product.sale.list')->with('success', 'Success');
-         } else {
-
-         }
-        
-     }
-
-    // =========Lease Products=============
-
-    // lease products
-    public function listLeaseProducts()
-    {
-        $list  = Product::select('products.*')->join('categories','products.cat_id','categories.id')->where('categories.type_transaction',2)->get();
-        return view('admin.product.lease.index', ['list' => $list]);
-    }
-
-
-    // status
-    public function statusLeaseProduct(Request $request)
-    {
-        $objUpdate = Product::find($request->id);
-        $objUpdate->update(['status' => $request->status]);
-        echo json_encode('ok');
-    }
-
-    // sale edit
-    public function createLeaseProduct()
-    {
-        $listCat = Category::all()->where('type_transaction',2);
-        $villages = Village::all();
-        $streets = Street::all();
-        $districts = District::all();
-        $direction = Product::DIRECTION;
-        return view('admin.product.sale.add', [
-            'listCat' => $listCat,
-            'villages' => $villages,
-            'streets' => $streets,
-            'districts' => $districts,
-            'direction' => $direction
-        ]);
-    }
-
-    // store
-    public function storeLeaseProduct(ProductCreateRequest $request)
-    {
-        $data = $request->all();
-
-        if ($request->hasFile('image')) {
-            $path = "images/products/";
-            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-            $request->image->move($path, $fileName);
-            $data['image'] = $path . $fileName;
-        } else {
-            $data['image'] = "";
-        }
-
-        if (Product::create($data)) {
-            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
-    }
-
-    // edit
-    public function editLeaseProduct($id)
-    {
-        $listCat = Category::all()->where('type_transaction',1);
-        $villages = Village::all();
-        $streets = Street::all();
-        $districts = District::all();
-        $direction = Product::DIRECTION;
-        $obj = Product::find($id);
-        return view('admin.product.sale.edit', [
-            'listCat' => $listCat,
-            'villages' => $villages,
-            'streets' => $streets,
-            'districts' => $districts,
-            'direction' => $direction,
-            'obj' => $obj
-        ]);
-    }
-
-    // update
-    public function updateLeaseProduct(ProductCreateRequest $request, $id)
-    {
-        $oldObj = Product::find($id);
-        $data = $request->all();
-
-        if ($request->hasFile('image')) {
-            if (!empty($oldObj->image)) {
-                unlink($oldObj->image);
-            }
-            $path = "images/news/";
-            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-            $request->image->move($path, $fileName);
-            $data['image'] = $path . $fileName;
-        } else {
-            $data['image'] = $oldObj->image;
-        }
-
-        if ($oldObj->update($data)) {
-            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
-    }
-
-    //delete
-    public function deleteLeaseProduct($id)
-    {
-        $obj = Product::find($id);
-        if ($obj->delete()) {
-            if (!empty($obj->image)) {
-                unlink($obj->image);
-            }
-            ProductTransaction::where('product_id', $obj->id)->delete();
-            PurchaseTransaction::where('product_id', $obj->id)->delete();
-            echo json_encode('ok');
-        }
-    }
-
-    // apply action
-    public function actionLeaseProduct(Request $request)
-    {
-        $listObj = Product::whereIn('id', $request->selected)->get();
-        if (!empty($listObj)) {
-            switch ($request->option) {
-                case 1:
-                    foreach ($listObj as $item) {
-                        if (!empty($item->image)) {
-                            unlink($item->image);
-                        }
-                        ProductTransaction::where('product_id', $item->id)->delete();
-                        PurchaseTransaction::where('product_id', $item->id)->delete();
-                        $item->delete();
-                    }
-                    break;
-            }
-            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
-        } else {
-
-        }
-
-    }
-
-    // detail product transaction
-    public function detailProduct($product_id)
-    {
-        $obj = Product::find($product_id);
-        return view('admin.product.detail', ['obj' => $obj]);
     }
 
     // ==========assign task management=============
