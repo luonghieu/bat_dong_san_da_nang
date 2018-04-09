@@ -1,9 +1,9 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.product.sale.css')
+@include('admin.assign.css')
 @endsection
 @section('title')
-Sale Product
+Assign Task
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +11,7 @@ Sale Product
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Sale Product</strong></h1>
+		<h1 class="custom-font"><strong>Assign Task</strong></h1>
 		<ul class="controls">
 			<li>
 				<a role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
@@ -54,164 +54,33 @@ Sale Product
 			<p>{{ session('error') }}</p>
 		</div>
 		@endif
-		<form class="form-horizontal" role="form" id="form-add" method="post" action="{!! route('admins.product.sale.store') !!}" enctype="multipart/form-data">
+		<form class="form-horizontal" role="form" id="form-add" method="post" action="{!! route('admins.assign.store') !!}">
 			<input type="hidden" name="_token" value="{{csrf_token()}}" />
 			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+				<label for="inputEmail3" class="col-sm-2 control-label">Employee</label>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" id="inputEmail3" name="name" placeholder="Title">
-					@if ($errors->has('name'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('name') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="inputPassword3" class="col-sm-2 control-label">Describe</label>
-				<div class="col-sm-10">
-					<input type="text" name="feature" class="form-control" id="inputPassword3" placeholder="Describe">
-					@if ($errors->has('feature'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('feature') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="inputPassword3" class="col-sm-2 control-label">Link</label>
-				<div class="col-sm-10">
-					<input type="text" name="link" class="form-control" id="inputPassword3" placeholder="Link">
-					@if ($errors->has('link'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('link') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Category</label>
-				<div class="col-sm-10">
-					<select class="form-control mb-10" name="cat_new_id">
-						@foreach($listCat as $obj)
-						<option value="{!! $obj->id !!}">{!! $obj->name !!}</option>
+					<select class="form-control mb-10" name="employee_id">
+						@foreach($employees as $item)
+							<option value="{!! $item->id !!}">{!! $item->name !!}</option>
 						@endforeach
 					</select>
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-2 control-label">District</label>
+				<label for="inputEmail3" class="col-sm-2 control-label">Customer</label>
 				<div class="col-sm-10">
-					<select class="form-control mb-10" name="district_id" id="district">
-						<option value="0">===Selected===</option>
-						@foreach($districts as $obj)
-						<option value="{!! $obj->id !!}">{!! $obj->name !!}</option>
+					<select class="form-control mb-10" name="customer_id">
+						@foreach($customers as $item)
+							<option value="{!! $item->id !!}">{!! $item->name !!}</option>
 						@endforeach
 					</select>
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-2 control-label">Village</label>
+				<label class="col-sm-2 control-label">Description</label>
 				<div class="col-sm-10">
-					<select class="form-control mb-10" name="village_id" id="village" disabled>
-						<option value="0">Khong xac dinh</option>
-						@foreach($villages as $obj)
-						<option value="{!! $obj->id !!}">{!! $obj->name !!}</option>
-						@endforeach
-					</select>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Street</label>
-				<div class="col-sm-10">
-					<select class="form-control mb-10" name="street_id" id="street" disabled>
-						<option value="0">Khong xac dinh</option>
-						@foreach($streets as $obj)
-						<option value="{!! $obj->id !!}">{!! $obj->name !!}</option>
-						@endforeach
-					</select>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Direction</label>
-				<div class="col-sm-10">
-					<select class="form-control mb-10" name="direction">
-						@foreach($direction as $key => $value)
-						<option value="{!! $key !!}">{!! $value !!}</option>
-						@endforeach
-					</select>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Direction note</label>
-				<div class="col-sm-10">
-					<textarea id="directionNote" name="direction_note"></textarea>
-					@ckeditor('directionNote')
-					@if ($errors->has('direction_note'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('direction_note') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Image</label>
-				<div class="col-sm-10">
-					<input type="file" name="image" class="filestyle" data-buttonText="Find file" data-iconName="fa fa-inbox">
-					@if ($errors->has('image'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('image') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Area</label>
-				<div class="col-sm-10">
-					<label class="checkbox checkbox-custom-alt">
-						<input type="checkbox" value="0" id="checkArea" name="checkArea" checked><i></i> Khong xac dinh
-					</label>
-					<input type="text" name="area" class="filestyle" data-buttonText="Find file" data-iconName="fa fa-inbox" disabled>
-					@if ($errors->has('area'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('area') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Price</label>
-				<div class="col-sm-10">
-					<label class="checkbox checkbox-custom-alt">
-						<input type="checkbox" value="0" id="checkPrice" name="checkPrice" checked><i></i> Gia thoa thuan sau
-					</label>
-					<input type="text" name="price" class="filestyle" data-buttonText="Find file" data-iconName="fa fa-inbox" disabled>
-					@if ($errors->has('price'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('price') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Detail</label>
-				<div class="col-sm-10">
-					<textarea id="detail" name="detail"></textarea>
+					<textarea id="description" name="description"></textarea>
 					@ckeditor('detail', ['height' => 500])
-					@if ($errors->has('detail'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('detail') !!}</strong>
-					</div>
-					@endif
 				</div>
 			</div>
 			<div class="form-group">
@@ -228,61 +97,5 @@ Sale Product
 @endsection
 
 @section('script')
-@include('admin.product.sale.script')
-<script>
-	$( document ).ready(function() {
-		$('#add-entry').click(function (e) {
-			$('#form-add').submit();
-		});
-
-        $('#district').change(function (e) {
-            $("#village").removeAttr("disabled");
-            $("#street").removeAttr("disabled");
-            id = $('#district').val();
-
-            $.ajax({
-                url: "{!! route('common.getItemByDistrict') !!}",
-                method: "GET",
-                data: {
-                    'id' : id
-                },
-                dataType : 'json',
-                success : function(result){
-                    villages = result['villages'];
-                    streets = result['streets'];
-
-                    htmlVillage = '<option value="0">Khong xac dinh</option>';
-                    $.each (villages, function (key, item){
-                        htmlVillage += '<option value="' + item.id + '">' + item.name + '</option>';
-                    });
-
-                    htmlStreet = '<option value="0">Khong xac dinh</option>';
-                    $.each (streets, function (key, item){
-                        htmlStreet += '<option value="' + item.id + '">' + item.name + '</option>';
-                    });
-                    $("#village").html(htmlVillage);
-                    $("#street").html(htmlStreet);
-                }
-            });
-        });
-	});
-
-    $('#checkArea').change(function (e) {
-        if ($(this).is(":checked")) {
-            $('input[name="area"]').attr('disabled', true);
-		} else {
-            $('input[name="area"]').removeAttr("disabled");
-		}
-    });
-
-    $('#checkPrice').change(function (e) {
-        if ($(this).is(":checked")) {
-            $('input[name="price"]').attr('disabled', true);
-        } else {
-            $('input[name="price"]').removeAttr("disabled");
-        }
-    });
-
-	//
-</script>
+@include('admin.assign.script')
 @endsection

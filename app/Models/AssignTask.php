@@ -9,7 +9,7 @@ class AssignTask extends Model
 	protected $table = 'assign_task';
 
 	protected $fillable = [
-        'employee_id', 'customer_id', 'created_at', 'assigner_id', 'assigner_role'
+        'employee_id', 'customer_id', 'created_at', 'assigner_id', 'assigner_role', 'description'
     ];
 
     public $timestamps=false;

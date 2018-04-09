@@ -1,6 +1,6 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.product.sale.css')
+@include('admin.assign.css')
 @endsection
 @section('title')
 Assign Task
@@ -71,8 +71,7 @@ Assign Task
 							<th>Assigner</th>
 							<th>Assigner Role</th>
 							<th>Assign date</th>
-							<th>Customer service</th>
-							<th>Chat</th>
+							<th>Description</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
 						</tr>
 					</thead>
@@ -88,12 +87,7 @@ Assign Task
 							<td>{!! $obj->created_at !!}</td>
 							<td>{{ (!empty($obj->assigner_role)) ? (($obj->assigner_role == 1) ? $obj->assignedByAdmin->name : $obj->assignedByLeader->name) : 'No data' }}</td>
 							<td>{{ (!empty($obj->assigner_role)) ? (($obj->assigner_role == 1) ? 'Admin' : 'Leader') : 'No data'  }}</td>
-							<td>
-								<a href="" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
-							</td>
-							<td>
-								<a href="" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
-							</td>
+							<td>{!! $obj->description !!}</td>
 							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
 						</tr>
 						@endforeach
@@ -121,7 +115,7 @@ Assign Task
 @endsection
 
 @section('script')
-@include('admin.product.sale.script')
+@include('admin.assign.script')
 <script>
 	// $( document ).ready(function() {
 	$('#select-all').change(function() {
@@ -141,21 +135,6 @@ Assign Task
 		return true;
 	});
 
-    function changeStatus(id) {
-        status = $('select[name = "status-' + id + '"]').val();
-        $.ajax({
-            url: "{!! route('admins.product.sale.status') !!}",
-            method: "GET",
-            data: {
-                'id' : id,
-				'status' : status
-            },
-            dataType : 'json',
-            success : function(result){
-                alert('Action success!');
-            }
-        });
-    }
 // });
 	</script>
 	@endsection

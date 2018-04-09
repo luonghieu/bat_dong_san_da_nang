@@ -823,119 +823,76 @@ class AdminController extends Controller
         return view('admin.assign.index', ['list' => $list]);
     }
 
-//    // edit
-//    public function createNews()
-//    {
-//        $listCat = CatNew::where('active',1)->get();
-//        return view('admin.news.add', ['listCat' => $listCat]);
-//    }
-//
-//    // store
-//    public function storeNews(NewsCreateRequest $request)
-//    {
-//        $data = $request->all();
-//        $data['created_at'] = Carbon\Carbon::now();;
-//
-//        if ($request->hasFile('image')) {
-//            $path = "images/news/";
-//            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-//            $request->image->move($path, $fileName);
-//            $data['image'] = $path . $fileName;
-//        } else {
-//            $data['image'] = "";
-//        }
-//
-//        if (News::create($data)) {
-//            return redirect()->route('admins.news.list')->with('success', 'Success');
-//        } else {
-//            return redirect()->back()->withInput()->with('error', 'Fail');
-//        }
-//    }
-//
-//    // create or edit
-//    public function editNews($id)
-//    {
-//        $listCat = CatNew::where('active',1)->get();
-//        $obj = News::find($id);
-//        return view('admin.news.edit', ['obj' => $obj, 'listCat' => $listCat]);
-//    }
-//
-//    // update
-//    public function updateNews(NewsCreateRequest $request, $id)
-//    {
-//        $oldObj = News::find($id);
-//        $data = $request->all();
-//
-//        if ($request->hasFile('image')) {
-//            if (!empty($oldObj->image)) {
-//                unlink($oldObj->image);
-//            }
-//            $path = "images/news/";
-//            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-//            $request->image->move($path, $fileName);
-//            $data['image'] = $path . $fileName;
-//        } else {
-//            $data['image'] = $oldObj->image;
-//        }
-//
-//        if ($oldObj->update($data)) {
-//            return redirect()->route('admins.news.list')->with('success', 'Success');
-//        } else {
-//            return redirect()->back()->withInput()->with('error', 'Fail');
-//        }
-//    }
-//
-//    //delete
-//    public function deleteNews($id)
-//    {
-//        $obj = News::find($id);
-//        if ($obj->delete()) {
-//            if (!empty($obj->image)) {
-//                unlink($obj->image);
-//            }
-//            echo json_encode('ok');
-//        }
-//    }
-//
-//    // apply action
-//    public function action(Request $request)
-//    {
-//        $listObj = News::whereIn('id', $request->selected)->get();
-//        if (!empty($listObj)) {
-//            switch ($request->option) {
-//                case 1:
-//                    foreach ($listObj as $item) {
-//                        if (!empty($item->image)) {
-//                            unlink($item->image);
-//                        }
-//                        $item->delete();
-//                    }
-//                    break;
-//                case 2:
-//                    foreach ($listObj as $item) {
-//                        $item->update(['active' => 1]);
-//                    }
-//                    break;
-//                case 3:
-//                    foreach ($listObj as $item) {
-//                        $item->update(['active' => 0]);
-//                    }
-//                    break;
-//            }
-//            return redirect()->route('admins.news.list')->with('success', 'Success');
-//        } else {
-//
-//        }
-//
-//    }
-//
-//    // active
-//    public function active(Request $request)
-//    {
-//        $objUpdate = News::find($request->id);
-//        $objUpdate->update(['active' => !($objUpdate->active)]);
-//        echo json_encode('ok');
-//    }
+    // create
+    public function createAssign()
+    {
+        $employees = Employee::join('users', 'employee.user_id', 'users.id')->where('users.role', User::ROLE['sale'])->select(['employees.id', 'employees.name'])->get();
+        $customerIds = AssignTask::select('customer_id')->get()->toArray();
+        $customers = Customer::whereNotIn('id', $customerIds)->select(['customers.id', 'customers.name'])->get();
+        return view('admin.news.add', ['employees' => $employees, 'customers' => $customers]);
+    }
+
+    // store
+    public function storeAssign(Request $request)
+    {
+        $data = $request->all();
+        if (AssignTask::create($data)) {
+            return redirect()->route('admins.assign.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    // edit
+    public function editAssign($id)
+    {
+        $obj = AssignTask::find($id);
+        $employees = Employee::join('users', 'employee.user_id', 'users.id')->where('users.role', User::ROLE['sale'])->select(['employees.id', 'employees.name'])->get();
+        $customer = Customer::find($obj->customer_id);
+        $employee = Employee::find($obj->employee_id);
+        return view('admin.assign.edit', ['obj' => $obj, 'employees' => $employees, 'customer' => $customer, 'employee' => $employee]);
+    }
+
+    // update
+    public function updateAssign(Request $request, $id)
+    {
+        $oldObj = Assign::find($id);
+        $data = $request->all();
+
+        if ($oldObj->update($data)) {
+            return redirect()->route('admins.assign.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    //delete
+    public function deleteAssign($id)
+    {
+        $obj = Assign::find($id);
+        if ($obj->delete()) {
+            echo json_encode('ok');
+        }
+    }
+
+    // apply action
+    public function actionAssign(Request $request)
+    {
+        $listObj = Assign::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+                case 1:
+                    foreach ($listObj as $item) {
+                        $item->delete();
+                    }
+                    break;
+            }
+            return redirect()->route('admins.assign.list')->with('success', 'Success');
+        } else {
+
+        }
+
+    }
 
 
 }
