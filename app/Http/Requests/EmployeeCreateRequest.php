@@ -31,7 +31,6 @@ class EmployeeCreateRequest extends FormRequest
             'name' => 'required|min:3|max:20',
             'address' => 'required|min:3|max:255',
             'phone' => 'required|numeric',
-            'district_id' => ['required', Rule::in($district)],
             'gender' => ['required', Rule::in(['0', '1'])],
         ];
     }
@@ -39,8 +38,15 @@ class EmployeeCreateRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'Tên không được bỏ trống.',
-            'name.max' => 'Tên tối da 255 kí tự',
+            'name.required' => 'Name is required.',
+            'name.min' => 'Name is not less than 3 character',
+            'name.max' => 'Name is not greater than 20 character',
+            'address.required' => 'Address is required.',
+            'address.min' => 'Address is not less than 3 character',
+            'address.max' => 'Address is not greater than 255 character',
+            'Phone.required' => 'Phone is required.',
+            'Phone.numeric' => 'Phone must be number.',
+            'gender.required' => 'Gender is required.',
         ];
     }
 }

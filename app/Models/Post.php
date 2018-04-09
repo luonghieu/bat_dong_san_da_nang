@@ -27,7 +27,7 @@ class Post extends Model
     protected $table = 'posts';
 
 	protected $fillable = [
-        'name', 'description', 'detail', 'direction', 'cat_id', 'image', 'status', 'village_id', 'street_id', 'district_id', 'project_id', 'area', 'view', 'price', 'unit_price_id', 'start_date', 'end_date', 'frontispiece', 'road_ahead', 'number_of_floor', 'number_of_room', 'number_of_toilet', 'furniture', 'poster_id', 'deleted_at'
+        'name', 'description', 'detail', 'direction', 'cat_id', 'image', 'status', 'village_id', 'street_id', 'district_id', 'project_id', 'area', 'view', 'price', 'unit_price_id', 'type_post_id', 'frontispiece', 'road_ahead', 'number_of_floor', 'number_of_room', 'number_of_toilet', 'furniture', 'poster_id', 'deleted_at'
     ];
 
     public $timestamps=false;
@@ -78,6 +78,14 @@ class Post extends Model
     public function unitPrice()
     {
         return $this->belongsTo('App\Models\UnitPrice', 'unit_price_id', 'id');
+    }
+
+     /**
+     * Get street relationship
+     */
+    public function typePost()
+    {
+        return $this->belongsTo('App\Models\TypePost', 'type_post_id', 'id');
     }
 
     /**

@@ -1,9 +1,9 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.customer.purchaseCustomer.css')
+@include('admin.customer.postCustomer.css')
 @endsection
 @section('title')
-Post Customer
+Transaction
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +11,7 @@ Post Customer
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Customer</strong></h1>
+		<h1 class="custom-font"><strong>Transaction</strong></h1>
 		<ul class="controls">
 			<li class="dropdown">
 
@@ -45,13 +45,14 @@ Post Customer
 	<!-- /tile header -->
 
 	<!-- tile body -->
-	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.postCustomer.action') !!}">
+	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.customer.actionTransaction') !!}">
 		<input type="hidden" name="_token" value="{{csrf_token()}}" />
+		<input type="hidden" name="customer_id" value="{!! $customer_id !!}" />
 		<div class="tile-body">
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>Add success!</strong></p>
+					<p><strong>success!</strong></p>
 				</div>
 				@endif
 				<table class="table table-custom" id="editable-usage">
@@ -63,14 +64,12 @@ Post Customer
 								</label>
 							</th>
 							<th>Id</th>
-							<th>Name</th>
-							<th>Address</th>
-							<th>Email</th>
-							<th>Phone</th>
-							<th>Number of purchase</th>
-							<th>Purchase transaction</th>
-							<th>Active</th>
+							<th>Project</th>
+							<th>Block</th>
+							<th>Floor</th>
+							<th>Status</th>
 							<th>Created at</th>
+							<th>Description</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
 						</tr>
 					</thead>
@@ -81,21 +80,21 @@ Post Customer
 								<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0"><input type="checkbox" class="selectMe" name="selected[]" value="{!! $obj->id !!}" ><i></i></label>
 							</td>
 							<td>{!! $obj->id !!}</td>
-							<td>{!! $obj->name !!}</td>
-							<td>{!! $obj->address !!}</td>
-							<td>{!! $obj->user->email !!}</td>
-							<td>{!! $obj->phone !!}</td>
-							<td>{!! $obj->purchaseTransaction->count() !!}</td>
 							<td>
-								<a href="{!! route('admins.purchaseCustomer.detail', ['customer_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
+								<a href="{!! route('admins.project.detail',['project_id' => $obj->product->project->id]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $obj->product->name !!}</a>
+							</td>
+							<td>{!! $obj->block !!}</td>
+							<td>{!! $obj->floor !!}</td>
+							<td>
+								<select class="form-control mb-10" name="status" onchange="status({!! $obj->id !!})">
+									@foreach ($status as $key => $value)
+										<option {{($obj->status == $value)? 'selected="selected"' : ''}} value="{!! $value !!}">{!! $key !!}</option>
+									@endforeach
+								</select>
 							</td>
 							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
 							<td>
-								@if ($obj->active == 0) 
-								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
-								@else
-								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
-								@endif
+								<textarea>{!! $obj->description !!}</textarea>
 							</td>
 							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
 						</tr>
@@ -112,8 +111,9 @@ Post Customer
 				<div class="col-sm-5 hidden-xs">
 					<select class="input-sm form-control w-sm inline" name="option">
 						<option value="1">Delete selected</option>
-						<option value="2">Active selected</option>
-						<option value="3">Non-active selected</option>
+						<option value="2">Change to registered status</option>
+						<option value="3">Change to deposit status</option>
+						<option value="4">Change to payment status</option>
 					</select>
 					<input type="submit" id="apply" class="btn btn-sm btn-default" value="Apply">
 				</div>
@@ -126,7 +126,7 @@ Post Customer
 @endsection
 
 @section('script')
-@include('admin.customer.purchaseCustomer.script')
+@include('admin.customer.postCustomer.scriptDetail')
 <script>
 // $( document ).ready(function() {
 	$('#select-all').change(function() {
@@ -146,18 +146,20 @@ Post Customer
 		return true;
 	});
 
-	function active(id) {
-		$.ajax({
-			url: "{!! route('admins.purchaseCustomer.active') !!}",
-			method: "GET",
-			data: {
-				'id' : id
-			},
-			dataType : 'json',
-			success : function(result){
-				alert('Action success!');
-			}
-		});
+	function status (id) {
+        var status = $('input[name="status"]').val();
+        $.ajax({
+            url: "{!! route('admins.customer.status') !!}",
+            method: "GET",
+            data: {
+                'id' : id,
+                'status' : status
+            },
+            dataType : 'json',
+            success : function(result){
+                alert('Action success!');
+            }
+        });
 	}
 
 // });

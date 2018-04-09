@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductCreateRequest;
 use App\Models\AssignTask;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Http\Requests\EmployeeCreateRequest;
 use App\Http\Requests\NewsCreateRequest;
@@ -13,7 +14,6 @@ use App\Models\User;
 use App\Models\News;
 use App\Models\CatNew;
 use App\Models\Product;
-use App\Models\ProductTransaction;
 use App\Models\Category;
 use App\Models\District;
 use App\Models\Village;
@@ -29,6 +29,19 @@ class AdminController extends Controller
     {
         $list  = Employee::select('employees.*')->join('users','user_id','users.id')->where('role',User::ROLE['leader'])->get();
         return view('admin.employee.index', ['list' => $list]);
+    }
+
+    // create
+    public function createLeader()
+    {
+        return view('admin.employee.leader.add');
+    }
+
+    // edit
+    public function editLeader($id)
+    {
+        $obj = Employee::find($id);
+        return view('admin.employee.leader.edit', ['obj' => $obj]);
     }
 
     // create or edit
@@ -61,15 +74,55 @@ class AdminController extends Controller
         }
     }
 
-    // delete
-    public function deleteLeader(Request $request)
+     // delete
+     public function deleteLeader(Request $request)
+     {
+     	$obj = Employee::find($request->id);
+     	if ($obj->delete()) {
+     		if (User::find($obj->user_id)->delete()) {
+     			echo json_encode('ok');
+     		}
+     	}
+     }
+
+    // apply action
+    public function actionLeader(Request $request)
     {
-    	$obj = Employee::find($request->id);
-    	if ($obj->delete()) {
-    		if (User::find($obj->user_id)->delete()) {
-    			echo json_encode('ok');
-    		}
-    	}
+        $listObj = Employee::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+                case 1:
+                    foreach ($listObj as $item) {
+                        User::find($item->user_id)->delete();
+                        $item->delete();
+                    }
+                    break;
+                case 2:
+                    foreach ($listObj as $item) {
+                        User::find($item->user_id)->update(['active' => 1]);
+                    }
+                    break;
+                case 3:
+                    foreach ($listObj as $item) {
+                        User::find($item->user_id)->update(['active' => 0]);
+                    }
+                    break;
+            }
+            return redirect()->route('admins.employee.leader.list')->with('success', 'Success');
+        } else {
+
+        }
+
+    }
+
+    // active
+    public function activeLeader(Request $request)
+    {
+        $obj = Employee::find($request->id);
+
+        $objUpdate = User::find($obj->user_id);
+        $objUpdate->update(['active' => !($objUpdate->active)]);
+        echo json_encode('ok');
     }
 
     // ==========sale management=============
@@ -78,6 +131,19 @@ class AdminController extends Controller
     {
         $list  = Employee::select('employees.*')->join('users','user_id','users.id')->where('role',User::ROLE['sale'])->get();
         return view('admin.employee.index', ['list' => $list]);
+    }
+
+    // create
+    public function createSale()
+    {
+        return view('admin.employee.sale.add');
+    }
+
+    // edit
+    public function editSale($id)
+    {
+        $obj = Employee::find($id);
+        return view('admin.employee.sale.edit', ['obj' => $obj]);
     }
 
     // create or edit
@@ -113,12 +179,55 @@ class AdminController extends Controller
     //delete
     public function deleteSale(Request $request)
     {
-    	$obj = Employee::find($request->id);
-    	if ($obj->delete()) {
-    		if (User::find($obj->user_id)->delete()) {
-    			echo json_encode('ok');
-    		}
-    	}
+        $obj = Employee::find($request->id);
+
+        if ($obj->delete()) {
+            AssignTask::where('employee_id', $obj->id)->delete();
+            if (User::find($obj->user_id)->delete()) {
+                echo json_encode('ok');
+            }
+        }
+    }
+
+    // apply action
+    public function actionSale(Request $request)
+    {
+        $listObj = Employee::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+                case 1:
+                    foreach ($listObj as $item) {
+                        AssignTask::where('employee_id', $item->id)->delete();
+                        User::find($item->user_id)->delete();
+                        $item->delete();
+                    }
+                    break;
+                case 2:
+                    foreach ($listObj as $item) {
+                        User::find($item->user_id)->update(['active' => 1]);
+                    }
+                    break;
+                case 3:
+                    foreach ($listObj as $item) {
+                        User::find($item->user_id)->update(['active' => 0]);
+                    }
+                    break;
+            }
+            return redirect()->route('admins.employee.sale.index')->with('success', 'Success');
+        } else {
+
+        }
+
+    }
+
+    // active
+    public function activeSale(Request $request)
+    {
+        $obj = Employee::find($request->id);
+
+        $objUpdate = User::find($obj->user_id);
+        $objUpdate->update(['active' => !($objUpdate->active)]);
+        echo json_encode('ok');
     }
 
     // detail
@@ -128,156 +237,156 @@ class AdminController extends Controller
         return view('admin.employee.detail', ['obj' => $obj]);
     }
 
-    // ==========post customer management=============
+//    // ==========post customer management=============
+//    // list
+//    public function listPostCustomer()
+//    {
+//        $list  = Customer::where('type_customer',Customer::TYPECUSTOMER['post'])->orWhere('type_customer',Customer::TYPECUSTOMER['both'])->get();
+//        return view('admin.customer.postCustomer.index', ['list' => $list]);
+//    }
+//
+//    // apply action
+//    public function actionPostCustomer(Request $request)
+//    {
+//        $listObj = Customer::whereIn('id', $request->selected)->get();
+//        if (!empty($listObj)) {
+//            switch ($request->option) {
+//            case 1:
+//                foreach ($listObj as $item) {
+//                    if ($item->delete()) {
+//                        User::find($item->user_id)->delete();
+//                    }
+//                }
+//                break;
+//            case 2:
+//                foreach ($listObj as $item) {
+//                    $item->update(['active' => 1]);
+//                }
+//                break;
+//            case 3:
+//                foreach ($listObj as $item) {
+//                    $item->update(['active' => 0]);
+//                }
+//                break;
+//        }
+//            return redirect()->route('admins.postCustomer.list')->with('success', 'Success');
+//        } else {
+//
+//        }
+//
+//    }
+//
+//    // active
+//    public function activePostCustomer(Request $request)
+//    {
+//        $objUpdate = Customer::find($request->id);
+//        $objUpdate->update(['active' => !($objUpdate->active)]);
+//        echo json_encode('ok');
+//    }
+//
+//    //delete
+//    public function deletePostCustomer(Request $request)
+//    {
+//    	$obj = Customer::find($request->id);
+//    	if ($obj->delete()) {
+//    		if (User::find($obj->user_id)->delete()) {
+//    			echo json_encode('ok');
+//    		}
+//    	}
+//    }
+//
+//    // detail product transaction
+//    public function detailProductTransaction($customer_id)
+//    {
+//        $list = Customer::find($customer_id)->productTransaction()->get();
+//        return view('admin.customer.postCustomer.detail', ['list' => $list, 'customer_id' => $customer_id]);
+//    }
+//
+//    public function activeProductTransaction(Request $request)
+//    {
+//        $objUpdate = ProductTransaction::find($request->id);
+//        $objUpdate->update(['active' => !($objUpdate->active)]);
+//        echo json_encode('ok');
+//    }
+//
+//    public function activePaidProductTransaction(Request $request)
+//    {
+//        $objUpdate = ProductTransaction::find($request->id);
+//        $objUpdate->update(['payed' => !($objUpdate->payed)]);
+//        echo json_encode('ok');
+//    }
+//
+//     //delete
+//    public function deleteProductTransaction(Request $request)
+//    {
+//        $obj = ProductTransaction::find($request->id);
+//        if ($obj->delete()) {
+//            $deleteProduct = Product::find($obj->product_id);
+//            if ($deleteProduct->delete()) {
+//                if (!empty($deleteProduct->image)) {
+//                    unlink($deleteProduct->image);
+//                }
+//                echo json_encode('ok');
+//            }
+//        }
+//    }
+//
+//    // apply action
+//    public function actionProductTransaction(Request $request)
+//    {
+//        $listObj = ProductTransaction::whereIn('id', $request->selected)->get();
+//        if (!empty($listObj)) {
+//            switch ($request->option) {
+//            case 1:
+//                foreach ($listObj as $item) {
+//                    if ($item->delete()) {
+//                        $deleteProduct = Product::find($item->product_id);
+//                        if ($deleteProduct->delete()) {
+//                            if (!empty($deleteProduct->image)) {
+//                                unlink($deleteProduct->image);
+//                            }
+//                        }
+//                    }
+//                }
+//                break;
+//            case 2:
+//                foreach ($listObj as $item) {
+//                    $item->update(['active' => 1]);
+//                }
+//                break;
+//            case 3:
+//                foreach ($listObj as $item) {
+//                    $item->update(['active' => 0]);
+//                }
+//                break;
+//            case 4:
+//                foreach ($listObj as $item) {
+//                    $item->update(['payed' => 0]);
+//                }
+//                break;
+//            case 5:
+//                foreach ($listObj as $item) {
+//                    $item->update(['payed' => 0]);
+//                }
+//                break;
+//        }
+//            return redirect()->route('admins.postCustomer.detail',['customer_id' => $request->customer_id])->with('success', 'Success');
+//        } else {
+//
+//        }
+//
+//    }
+
+    // ========== customer management=============
     // list
-    public function listPostCustomer()
+    public function listCustomer()
     {
-        $list  = Customer::where('type_customer',Customer::TYPECUSTOMER['post'])->orWhere('type_customer',Customer::TYPECUSTOMER['both'])->get();
-        return view('admin.customer.postCustomer.index', ['list' => $list]);
-    }
-
-    // apply action
-    public function actionPostCustomer(Request $request)
-    {
-        $listObj = Customer::whereIn('id', $request->selected)->get();
-        if (!empty($listObj)) {
-            switch ($request->option) {
-            case 1:
-                foreach ($listObj as $item) {
-                    if ($item->delete()) {
-                        User::find($item->user_id)->delete();
-                    }
-                }
-                break;
-            case 2:
-                foreach ($listObj as $item) {
-                    $item->update(['active' => 1]);
-                }
-                break;
-            case 3:
-                foreach ($listObj as $item) {
-                    $item->update(['active' => 0]);
-                }
-                break;
-        }
-            return redirect()->route('admins.postCustomer.list')->with('success', 'Success');
-        } else {
-
-        }
-        
-    }
-
-    // active
-    public function activePostCustomer(Request $request)
-    {
-        $objUpdate = Customer::find($request->id);
-        $objUpdate->update(['active' => !($objUpdate->active)]);
-        echo json_encode('ok');
-    }
-
-    //delete
-    public function deletePostCustomer(Request $request)
-    {
-    	$obj = Customer::find($request->id);
-    	if ($obj->delete()) {
-    		if (User::find($obj->user_id)->delete()) {
-    			echo json_encode('ok');
-    		}
-    	}
-    }
-
-    // detail product transaction
-    public function detailProductTransaction($customer_id)
-    {
-        $list = Customer::find($customer_id)->productTransaction()->get();
-        return view('admin.customer.postCustomer.detail', ['list' => $list, 'customer_id' => $customer_id]);
-    }
-
-    public function activeProductTransaction(Request $request)
-    {
-        $objUpdate = ProductTransaction::find($request->id);
-        $objUpdate->update(['active' => !($objUpdate->active)]);
-        echo json_encode('ok');
-    }
-
-    public function activePaidProductTransaction(Request $request)
-    {
-        $objUpdate = ProductTransaction::find($request->id);
-        $objUpdate->update(['payed' => !($objUpdate->payed)]);
-        echo json_encode('ok');
-    }
-
-     //delete
-    public function deleteProductTransaction(Request $request)
-    {
-        $obj = ProductTransaction::find($request->id);
-        if ($obj->delete()) {
-            $deleteProduct = Product::find($obj->product_id);
-            if ($deleteProduct->delete()) {
-                if (!empty($deleteProduct->image)) {
-                    unlink($deleteProduct->image);
-                }
-                echo json_encode('ok');
-            }
-        }
-    }
-
-    // apply action
-    public function actionProductTransaction(Request $request)
-    {
-        $listObj = ProductTransaction::whereIn('id', $request->selected)->get();
-        if (!empty($listObj)) {
-            switch ($request->option) {
-            case 1:
-                foreach ($listObj as $item) {
-                    if ($item->delete()) {
-                        $deleteProduct = Product::find($item->product_id);
-                        if ($deleteProduct->delete()) {
-                            if (!empty($deleteProduct->image)) {
-                                unlink($deleteProduct->image);
-                            }
-                        }
-                    }
-                }
-                break;
-            case 2:
-                foreach ($listObj as $item) {
-                    $item->update(['active' => 1]);
-                }
-                break;
-            case 3:
-                foreach ($listObj as $item) {
-                    $item->update(['active' => 0]);
-                }
-                break;
-            case 4:
-                foreach ($listObj as $item) {
-                    $item->update(['payed' => 0]);
-                }
-                break;
-            case 5:
-                foreach ($listObj as $item) {
-                    $item->update(['payed' => 0]);
-                }
-                break;
-        }
-            return redirect()->route('admins.postCustomer.detail',['customer_id' => $request->customer_id])->with('success', 'Success');
-        } else {
-
-        }
-        
-    }
-
-    // ==========purchase customer management=============
-    // list
-    public function listPurchaseCustomer()
-    {
-        $list  = Customer::where('type_customer',Customer::TYPECUSTOMER['purchase'])->orWhere('type_customer',Customer::TYPECUSTOMER['both'])->get();
+        $list  = Customer::all;
         return view('admin.customer.purchaseCustomer.index', ['list' => $list]);
     }
 
     // apply action
-    public function actionPurchaseCustomer(Request $request)
+    public function actionCustomer(Request $request)
     {
         $listObj = Customer::whereIn('id', $request->selected)->get();
         if (!empty($listObj)) {
@@ -287,75 +396,45 @@ class AdminController extends Controller
                     $item->delete();
                 }
                 break;
-            case 2:
-                foreach ($listObj as $item) {
-                    $item->update(['active' => 1]);
-                }
-                break;
-            case 3:
-                foreach ($listObj as $item) {
-                    $item->update(['active' => 0]);
-                }
-                break;
         }
-            return redirect()->route('admins.purchaseCustomer.list')->with('success', 'Success');
+            return redirect()->route('admins.customer.list')->with('success', 'Success');
         } else {
 
         }
         
     }
 
-    // activeDeposit
-    public function activePurchaseCustomer(Request $request)
-    {
-        $objUpdate = Customer::find($request->id);
-        $objUpdate->update(['active' => !($objUpdate->active)]);
-        echo json_encode('ok');
-    }
-
     //delete
-    public function deletePurchaseCustomer(Request $request)
+    public function deleteCustomer(Request $request)
     {
         $obj = Customer::find($request->id);
         if ($obj->delete()) {
+            Transaction::where('customer_id', $request->id)->delete();
             echo json_encode('ok');
         }
     }
 
     // detail purchase transaction
-    public function detailPurchaseTransaction($customer_id)
+    public function detailTransaction($customer_id)
     {
-        $list = Customer::find($customer_id)->purchaseTransaction()->get();
-        return view('admin.customer.purchaseCustomer.detail', ['list' => $list, 'customer_id' => $customer_id]);
-    }
-
-    public function activeDepositPurchaseTransaction(Request $request)
-    {
-        $objUpdate = PurchaseTransaction::find($request->id);
-        $objUpdate->update(['deposit' => !($objUpdate->active)]);
-        echo json_encode('ok');
-    }
-
-    public function activePaymentProductTransaction(Request $request)
-    {
-        $objUpdate = PurchaseTransaction::find($request->id);
-        $objUpdate->update(['payment' => !($objUpdate->payed)]);
-        echo json_encode('ok');
+        $status = Transaction::STATUS;
+        $list = Customer::find($customer_id)->transaction()->get();
+        return view('admin.customer.detail', ['list' => $list, 'status' => $status, 'customer_id' => $customer_id]);
     }
 
      //delete
-    public function deletePurchaseTransaction(Request $request)
+    public function deleteTransaction(Request $request)
     {
-        $obj = PurchaseTransaction::find($request->id);
+        $obj = Transaction::find($request->id);
         if ($obj->delete()) {
             echo json_encode('ok');
         }
     }
 
     // apply action
-    public function actionPurchaseTransaction(Request $request)
+    public function actionTransaction(Request $request)
     {
-        $listObj = PurchaseTransaction::whereIn('id', $request->selected)->get();
+        $listObj = Transaction::whereIn('id', $request->selected)->get();
         if (!empty($listObj)) {
             switch ($request->option) {
             case 1:
@@ -365,30 +444,32 @@ class AdminController extends Controller
                 break;
             case 2:
                 foreach ($listObj as $item) {
-                    $item->update(['deposit' => 1]);
+                    $item->update(['status' => Transaction::STATUS['registered']]);
                 }
                 break;
             case 3:
                 foreach ($listObj as $item) {
-                    $item->update(['deposit' => 0]);
+                    $item->update(['status' => Transaction::STATUS['deposit']]);
                 }
                 break;
             case 4:
                 foreach ($listObj as $item) {
-                    $item->update(['payment' => 0]);
-                }
-                break;
-            case 5:
-                foreach ($listObj as $item) {
-                    $item->update(['payment' => 0]);
+                    $item->update(['status' => Transaction::STATUS['payment']]);
                 }
                 break;
         }
-            return redirect()->route('admins.purchaseCustomer.detail',['customer_id' => $request->customer_id])->with('success', 'Success');
+            return redirect()->route('admins.customer.detail',['customer_id' => $request->customer_id])->with('success', 'Success');
         } else {
 
         }
         
+    }
+
+    // apply action
+    public function statusTransaction(Request $request)
+    {
+        $obj = Transaction::find($request->id)->update(['status' => $request->status]);
+        echo json_encode('ok');
     }
 
     // detail Customer
@@ -514,7 +595,7 @@ class AdminController extends Controller
     }
 
     // active
-    public function active(Request $request)
+    public function activeNews(Request $request)
     {
         $objUpdate = News::find($request->id);
         $objUpdate->update(['active' => !($objUpdate->active)]);

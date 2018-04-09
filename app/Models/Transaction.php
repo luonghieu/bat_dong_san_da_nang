@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Transaction extends Model
 {
     const STATUS = [
-        'register' => 1,
+        'processing' => 0, //ky gui
+        'registered' => 1, //ky gui
         'deposit' => 2,
         'payment' => 3,
     ];

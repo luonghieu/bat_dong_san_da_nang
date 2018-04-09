@@ -1,9 +1,9 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.customer.postCustomer.css')
+@include('admin.customer.css')
 @endsection
 @section('title')
-Purchase Customer
+Customer
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +11,7 @@ Purchase Customer
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Purchase Customer</strong></h1>
+		<h1 class="custom-font"><strong>Customer</strong></h1>
 		<ul class="controls">
 			<li class="dropdown">
 
@@ -45,14 +45,13 @@ Purchase Customer
 	<!-- /tile header -->
 
 	<!-- tile body -->
-	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.purchaseCustomer.actionPurchaseTransaction') !!}">
+	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.customer.action') !!}">
 		<input type="hidden" name="_token" value="{{csrf_token()}}" />
-		<input type="hidden" name="customer_id" value="{!! $customer_id !!}" />
 		<div class="tile-body">
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>success!</strong></p>
+					<p><strong>Add success!</strong></p>
 				</div>
 				@endif
 				<table class="table table-custom" id="editable-usage">
@@ -65,9 +64,13 @@ Purchase Customer
 							</th>
 							<th>Id</th>
 							<th>Name</th>
+							<th>Address</th>
+							<th>Email</th>
+							<th>Phone</th>
+							<th>Number of purchase</th>
+							<th>Purchase transaction</th>
+							<th>Active</th>
 							<th>Created at</th>
-							<th>Deposit</th>
-							<th>Payment</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
 						</tr>
 					</thead>
@@ -78,22 +81,20 @@ Purchase Customer
 								<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0"><input type="checkbox" class="selectMe" name="selected[]" value="{!! $obj->id !!}" ><i></i></label>
 							</td>
 							<td>{!! $obj->id !!}</td>
+							<td>{!! $obj->name !!}</td>
+							<td>{!! $obj->address !!}</td>
+							<td>{!! $obj->user->email !!}</td>
+							<td>{!! $obj->phone !!}</td>
+							<td>{!! $obj->purchaseTransaction->count() !!}</td>
 							<td>
-								<a href="{!! route('admins.product.detail',['product_id' => $obj->product->id]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $obj->product->name !!}</a>
+								<a href="{!! route('admins.customer.detail', ['customer_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
 							</td>
 							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
 							<td>
-								@if ($obj->deposit == 0) 
-								<span onclick="activeDeposit({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
+								@if ($obj->active == 0) 
+								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
 								@else
-								<span onclick="activeDeposit({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
-								@endif
-							</td>
-							<td>
-								@if ($obj->payment == 0) 
-								<span onclick="activePayment({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
-								@else
-								<span onclick="activePayment({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
+								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
 								@endif
 							</td>
 							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
@@ -111,10 +112,8 @@ Purchase Customer
 				<div class="col-sm-5 hidden-xs">
 					<select class="input-sm form-control w-sm inline" name="option">
 						<option value="1">Delete selected</option>
-						<option value="2">Active deposit selected</option>
-						<option value="3">Non-active deposit selected</option>
-						<option value="4">Active payment selected</option>
-						<option value="5">Non-active payment selected</option>
+						<option value="2">Active selected</option>
+						<option value="3">Non-active selected</option>
 					</select>
 					<input type="submit" id="apply" class="btn btn-sm btn-default" value="Apply">
 				</div>
@@ -127,7 +126,7 @@ Purchase Customer
 @endsection
 
 @section('script')
-@include('admin.customer.postCustomer.scriptDetail')
+@include('admin.customer.script')
 <script>
 // $( document ).ready(function() {
 	$('#select-all').change(function() {
@@ -147,9 +146,9 @@ Purchase Customer
 		return true;
 	});
 
-	function activeDeposit(id) {
+	function active(id) {
 		$.ajax({
-			url: "{!! route('admins.purchaseCustomer.activeDepositPurchaseTransaction') !!}",
+			url: "{!! route('admins.customer.active') !!}",
 			method: "GET",
 			data: {
 				'id' : id
@@ -160,21 +159,6 @@ Purchase Customer
 			}
 		});
 	}
-
-	function activePayment(id) {
-		$.ajax({
-			url: "{!! route('admins.purchaseCustomer.activePaymentPurchaseTransaction') !!}",
-			method: "GET",
-			data: {
-				'id' : id
-			},
-			dataType : 'json',
-			success : function(result){
-				alert('Action success!');
-			}
-		});
-	}
-
 
 // });
 </script>

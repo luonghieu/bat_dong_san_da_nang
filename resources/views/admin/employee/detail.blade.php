@@ -64,8 +64,8 @@ Detail Employee
 			<dd>{!! $obj->address !!}</dd>
 			<dt>Phone</dt>
 			<dd>{!! $obj->phone !!}</dd>
-			<dt>Department</dt>
-			<dd>{!! $obj->district->name !!}</dd>
+			<dt>Email</dt>
+			<dd>{!! $obj->user->email !!}</dd>
 			<dt>Role</dt>
 			<dd>
 				{{ ($obj->user->role == 2) ? 'Leader' : 'Sale' }}

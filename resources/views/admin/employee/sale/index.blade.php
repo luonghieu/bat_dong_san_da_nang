@@ -1,6 +1,6 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.employee.css')
+@include('admin.employee.sale.css')
 @endsection
 @section('title')
 Employee
@@ -58,6 +58,7 @@ Employee
 						<th>Gender</th>
 						<th>Address</th>
 						<th>Phone</th>
+						<th>Active</th>
 						<th style="width: 160px;" class="no-sort">Actions</th>
 					</tr>
 				</thead>
@@ -77,6 +78,13 @@ Employee
 						</td>
 						<td>{!! $obj->address !!}</td>
 						<td>{!! $obj->phone !!}</td>
+						<td>
+							@if ($obj->user->active == 0)
+								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
+							@else
+								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
+							@endif
+						</td>
 						<td class="actions"><a role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
 					</tr>
 					@endforeach
@@ -90,5 +98,41 @@ Employee
 <!-- /tile -->
 @endsection
 @section('script')
-@include('admin.employee.script')
+@include('admin.employee.sale.script')
+<script>
+    // $( document ).ready(function() {
+    $('#select-all').change(function() {
+        if ($(this).is(":checked")) {
+            $('#editable-usage .selectMe').prop('checked', true);
+        } else {
+            $('#editable-usage .selectMe').prop('checked', false);
+        }
+    });
+
+    $('#apply').click(function() {
+        var list = $('input[name="selected[]"]:checked');
+        if (list.length == 0) {
+            alert('No obj is selected!');
+            return false;
+        }
+        return true;
+    });
+
+    function active(id) {
+        $.ajax({
+            url: "{!! route('admins.sale.active') !!}",
+            method: "GET",
+            data: {
+                'id' : id
+            },
+            dataType : 'json',
+            success : function(result){
+                alert('Action success!');
+            }
+        });
+    }
+
+
+    // });
+</script>
 @endsection
