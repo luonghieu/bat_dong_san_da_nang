@@ -9,7 +9,7 @@ class Introduce extends Model
     protected $table = 'employees';
 
 	protected $fillable = [
-        'name', 'describe', 'detail', 'image', 'created_at'
+        'name', 'description', 'active', 'created_at'
     ];
 
     public $timestamps=false;

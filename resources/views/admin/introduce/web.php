@@ -96,14 +96,9 @@ Route::group(['prefix' => 'managements'], function () {
 
      // contact
     Route::group(['prefix' => 'introduce'], function () {
-        Route::get('list', 'AdminController@listIntroduce')->name('admins.introduce.list');
-        Route::get('create', 'AdminController@createIntroduce')->name('admins.introduce.create');
-        Route::post('create', 'AdminController@storeIntroduce')->name('admins.introduce.store');
-        Route::get('{id}/edit', 'AdminController@editIntroduce')->name('admins.introduce.edit');
-        Route::post('{id}/update', 'AdminController@updateIntroduce')->name('admins.introduce.update');
-        Route::get('delete', 'AdminController@deleteIntroduce')->name('admins.introduce.delete');
-        Route::post('action', 'AdminController@actionIntroduce')->name('admins.introduce.action');
-        Route::get('active', 'AdminController@activeIntroduce')->name('admins.introduce.active');
+        Route::get('', 'AdminController@introduce')->name('admins.introduce');
+        Route::get('edit', 'AdminController@editIntroduce')->name('admins.introduce.edit');
+        Route::post('update', 'AdminController@editIntroduce')->name('admins.introduce.update');
     });
 
 });

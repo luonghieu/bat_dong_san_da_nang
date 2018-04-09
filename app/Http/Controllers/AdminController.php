@@ -10,6 +10,8 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Http\Requests\EmployeeCreateRequest;
 use App\Http\Requests\NewsCreateRequest;
+use App\Http\Requests\ProductCreateRequest;
+use App\Http\Requests\IntroduceCreateRequest;
 use App\Models\Employee;
 use App\Models\Customer;
 use App\Models\User;
@@ -20,6 +22,8 @@ use App\Models\Category;
 use App\Models\District;
 use App\Models\Village;
 use App\Models\Street;
+use App\Models\Contact;
+use App\Models\Introduce;
 use Carbon;
 use PurchaseTransaction;
 
@@ -894,5 +898,144 @@ class AdminController extends Controller
 
     }
 
+    // ==========contact management=============
+    // contact
+    public function listContact()
+    {
+        $list  = Contact::all();
+        return view('admin.contact.index', ['list' => $list]);
+    }
+
+    //delete
+    public function deleteContact($id)
+    {
+        $obj = Contact::find($id);
+        if ($obj->delete()) {
+            echo json_encode('ok');
+        }
+    }
+
+    // apply action
+    public function actionContact(Request $request)
+    {
+        $listObj = Assign::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+                case 1:
+                    foreach ($listObj as $item) {
+                        $item->delete();
+                    }
+                    break;
+                case 2:
+                foreach ($listObj as $item) {
+                    $item->update(['is_reply', 1]);
+                }
+                break;
+            }
+            return redirect()->route('admins.contact.list')->with('success', 'Success');
+        } else {
+
+        }
+
+    }
+
+    //active
+    public function activeContact(Request $request)
+    {
+        $objUpdate = Contact::find($request->id);
+        $objUpdate->update(['active' => !($objUpdate->active)]);
+        echo json_encode('ok');
+    }
+
+    // ==========News management=============
+    // news
+    public function listIntroduce()
+    {
+        $list  = Introduce::all();
+        return view('admin.introduce.index', ['list' => $list]);
+    }
+
+    // edit
+    public function createIntroduce()
+    {
+       return view('admin.introduce.add');
+    }
+
+    // store
+    public function storeIntroduce(IntroduceCreateRequest $request)
+    {
+        $data = $request->all();
+        $data['created_at'] = Carbon\Carbon::now();;
+
+       if (Introduce::create($data)) {
+            return redirect()->route('admins.introduce.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    // create or edit
+    public function editIntroduce($id)
+    {
+        $obj = Introduce::find($id);
+        return view('admin.introduce.edit', ['obj' => $obj]);
+    }
+
+    // update
+    public function updateIntroduce(IntroduceCreateRequest $request, $id)
+    {
+        $oldObj = Introduce::find($id);
+        $data = $request->all();
+
+       if ($oldObj->update($data)) {
+            return redirect()->route('admins.introduce.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    //delete
+    public function deleteIntroduce($id)
+    {
+        $obj = Introduce::find($id)->delete();
+        echo json_encode('ok');
+    }
+
+    // apply action
+    public function actionIntroduce(Request $request)
+    {
+        $listObj = Introduce::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+            case 1:
+                foreach ($listObj as $item) {
+                    $item->delete();
+                }
+                break;
+            case 2:
+                foreach ($listObj as $item) {
+                    $item->update(['active' => 1]);
+                }
+                break;
+            case 3:
+                foreach ($listObj as $item) {
+                    $item->update(['active' => 0]);
+                }
+                break;
+        }
+            return redirect()->route('admins.introduce.list')->with('success', 'Success');
+        } else {
+
+        }
+        
+    }
+
+    // active
+    public function activeIntroduce(Request $request)
+    {
+        $objUpdate = Introduce::find($request->id);
+        $objUpdate->update(['active' => !($objUpdate->active)]);
+        echo json_encode('ok');
+    }
 
 }
