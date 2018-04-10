@@ -94,7 +94,7 @@ Route::group(['prefix' => 'managements'], function () {
         Route::post('action', 'AdminController@actionContact')->name('admins.contact.action');
     });
 
-     // contact
+     // introduce
     Route::group(['prefix' => 'introduce'], function () {
         Route::get('list', 'AdminController@listIntroduce')->name('admins.introduce.list');
         Route::get('create', 'AdminController@createIntroduce')->name('admins.introduce.create');
@@ -104,6 +104,30 @@ Route::group(['prefix' => 'managements'], function () {
         Route::get('delete', 'AdminController@deleteIntroduce')->name('admins.introduce.delete');
         Route::post('action', 'AdminController@actionIntroduce')->name('admins.introduce.action');
         Route::get('active', 'AdminController@activeIntroduce')->name('admins.introduce.active');
+    });
+
+     // schedule
+    Route::group(['prefix' => 'schedule'], function () {
+        Route::get('list', 'AdminController@listSchedule')->name('admins.schedule.list');
+        Route::get('create', 'AdminController@createSchedule')->name('admins.schedule.create');
+        Route::post('create', 'AdminController@storeSchedule')->name('admins.schedule.store');
+        Route::get('{id}/edit', 'AdminController@editSchedule')->name('admins.schedule.edit');
+        Route::post('{id}/update', 'AdminController@updateSchedule')->name('admins.schedule.update');
+        Route::get('delete', 'AdminController@deleteSchedule')->name('admins.schedule.delete');
+        Route::post('action', 'AdminController@actionSchedule')->name('admins.schedule.action');
+        Route::get('active', 'AdminController@activeSchedule')->name('admins.schedule.active');
+    });
+
+     // project
+    Route::group(['prefix' => 'project'], function () {
+        Route::get('list', 'AdminController@listProject')->name('admins.project.list');
+        Route::get('create', 'AdminController@createProject')->name('admins.project.create');
+        Route::post('create', 'AdminController@storeProject')->name('admins.project.store');
+        Route::get('{id}/edit', 'AdminController@editProject')->name('admins.project.edit');
+        Route::post('{id}/update', 'AdminController@updateProject')->name('admins.project.update');
+        Route::get('delete', 'AdminController@deleteProject')->name('admins.project.delete');
+        Route::post('action', 'AdminController@actionProject')->name('admins.project.action');
+        Route::get('active', 'AdminController@activeProject')->name('admins.project.active');
     });
 
 });

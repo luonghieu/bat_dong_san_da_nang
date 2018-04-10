@@ -1,9 +1,9 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.project.css')
+@include('admin.schedule.css')
 @endsection
 @section('title')
-Project
+Schedule
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,10 +11,10 @@ Project
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Project</strong></h1>
+		<h1 class="custom-font"><strong>Schedule</strong></h1>
 		<ul class="controls">
 			<li>
-				<a href="{!! route('admins.project.create') !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
+				<a href="{!! route('admins.introduce.create') !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
 			</li>
 			<li class="dropdown">
 
@@ -48,7 +48,7 @@ Project
 	<!-- /tile header -->
 
 	<!-- tile body -->
-	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.project.action') !!}">
+	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.schedule.action') !!}">
 		<input type="hidden" name="_token" value="{{csrf_token()}}" />
 		<div class="tile-body">
 			<div class="table-responsive">
@@ -66,12 +66,10 @@ Project
 								</label>
 							</th>
 							<th>Id</th>
-							<th>Name</th>
-							<th>Detail</th>
-							<th>View</th>
-							<th>Status</th>
-							<th>Image</th>
-							<th>Created at</th>
+							<th>Employee</th>
+							<th>Content</th>
+							<th>Time</th>
+							<th>Done</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
 						</tr>
 					</thead>
@@ -81,24 +79,17 @@ Project
 							<td>
 								<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0"><input type="checkbox" class="selectMe" name="selected[]" value="{!! $obj->id !!}" ><i></i></label>
 							</td>
-							<td>{!! $obj->id !!}</td>
-							<td>{!! $obj->name !!}</td>
+							<td>{!! $obj->employee->name !!}</td>
+							<td>{!! $obj->content !!}</td>
+							<td>{!! date( "d/m/Y", strtotime($obj->time)) !!}</td>
 							<td>
-								<a href="{!! route('admins.project.detail', ['id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
+								@if ($obj->done == 0) 
+								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
+								@else
+								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
+								@endif
 							</td>
-							<td>{!! $obj->view !!}</td>
-							<td>
-								<select class="form-control mb-10" name="status">
-									@foreach($status as $key => $value)
-									<option {{ ($obj->status == $value) ? 'selected="selected"' : ''}} value="{!! $value !!}">{!! $key !!}</option>
-									@endforeach
-								</select>
-							</td>
-							<td>
-								<img src="{!! asset((empty($obj->image)) ? '/images/default.jpg' : $obj->image ) !!}" class="img-responsive text-center" />
-							</td>
-							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
-							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
+							<td class="actions"><a href="{!! route('admins.schedule.edit',['id' => $obj->id]) !!}" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
 						</tr>
 						@endforeach
 					</tbody>
@@ -113,8 +104,8 @@ Project
 				<div class="col-sm-5 hidden-xs">
 					<select class="input-sm form-control w-sm inline" name="option">
 						<option value="1">Delete selected</option>
-						<option value="2">Change to processed status</option>
-						<option value="3">Change to cancel status</option>
+						<option value="2">Active selected</option>
+						<option value="3">Non-active selected</option>
 					</select>
 					<input type="submit" id="apply" class="btn btn-sm btn-default" value="Apply">
 				</div>
@@ -127,7 +118,7 @@ Project
 @endsection
 
 @section('script')
-@include('admin.project.script')
+@include('admin.schedule.script')
 <script>
 	// $( document ).ready(function() {
 	$('#select-all').change(function() {
@@ -147,21 +138,20 @@ Project
 		return true;
 	});
 
-    function changeStatus(id) {
-        status = $('select[name = "status-' + id + '"]').val();
-        $.ajax({
-            url: "{!! route('admins.post.status') !!}",
-            method: "GET",
-            data: {
-                'id' : id,
-				'status' : status
-            },
-            dataType : 'json',
-            success : function(result){
-                alert('Action success!');
-            }
-        });
-    }
+
+	function active(id) {
+		$.ajax({
+			url: "{!! route('admins.schedule.active') !!}",
+			method: "GET",
+			data: {
+				'id' : id
+			},
+			dataType : 'json',
+			success : function(result){
+				alert('Action success!');
+			}
+		});
+	}
 // });
 	</script>
 	@endsection

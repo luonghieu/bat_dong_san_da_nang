@@ -12,6 +12,8 @@ use App\Http\Requests\EmployeeCreateRequest;
 use App\Http\Requests\NewsCreateRequest;
 use App\Http\Requests\ProductCreateRequest;
 use App\Http\Requests\IntroduceCreateRequest;
+use App\Http\Requests\ScheduleCreateRequest;
+use App\Http\Requests\ProjectCreateRequest;
 use App\Models\Employee;
 use App\Models\Customer;
 use App\Models\User;
@@ -24,6 +26,7 @@ use App\Models\Village;
 use App\Models\Street;
 use App\Models\Contact;
 use App\Models\Introduce;
+use App\Models\DetailProject;
 use Carbon;
 use PurchaseTransaction;
 
@@ -1034,6 +1037,193 @@ class AdminController extends Controller
     public function activeIntroduce(Request $request)
     {
         $objUpdate = Introduce::find($request->id);
+        $objUpdate->update(['active' => !($objUpdate->active)]);
+        echo json_encode('ok');
+    }
+
+
+    // ==========Schedule management=============
+    // schedule
+    public function listSchedule()
+    {
+        $list  = Schedule::orderBy('time', 'DESC')->get();
+        return view('admin.schedule.index', ['list' => $list]);
+    }
+
+    // edit
+    public function createSchedule()
+    {
+       return view('admin.schedule.add');
+    }
+
+    // store
+    public function storeSchedule(ScheduleCreateRequest $request)
+    {
+        // get user login
+        $data = $request->all();
+
+       if (Schedule::create($data)) {
+            return redirect()->route('admins.schedule.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    // create or edit
+    public function editSchedule($id)
+    {
+        $obj = Schedule::find($id);
+        return view('admin.schedule.edit', ['obj' => $obj]);
+    }
+
+    // update
+    public function updateSchedule(ScheduleCreateRequest $request, $id)
+    {
+        $oldObj = Schedule::find($id);
+        $data = $request->all();
+
+       if ($oldObj->update($data)) {
+            return redirect()->route('admins.schedule.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    //delete
+    public function deleteSchedule($id)
+    {
+        $obj = Schedule::find($id)->delete();
+        echo json_encode('ok');
+    }
+
+    // apply action
+    public function actionSchedule(Request $request)
+    {
+        $listObj = Schedule::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+            case 1:
+                foreach ($listObj as $item) {
+                    $item->delete();
+                }
+                break;
+            case 2:
+                foreach ($listObj as $item) {
+                    $item->update(['is_done' => 1]);
+                }
+                break;
+            case 3:
+                foreach ($listObj as $item) {
+                    $item->update(['is_done' => 0]);
+                }
+                break;
+        }
+            return redirect()->route('admins.schedule.list')->with('success', 'Success');
+        } else {
+
+        }
+        
+    }
+
+    // active
+    public function activeSchedule(Request $request)
+    {
+        $objUpdate = Schedule::find($request->id);
+        $objUpdate->update(['active' => !($objUpdate->active)]);
+        echo json_encode('ok');
+    }
+
+    // ==========project management=============
+    // schedule
+    public function listProject()
+    {
+        $status = Project::STATUS;
+        $list  = Project::orderBy('time', 'DESC')->get();
+        return view('admin.project.index', ['list' => $list, 'status' => $status]);
+    }
+
+    // edit
+    public function createProject()
+    {
+       return view('admin.project.add');
+    }
+
+    // store
+    public function storeProject(ProjectCreateRequest $request)
+    {
+        // get user login
+        $data = $request->all();
+
+       if (Project::create($data)) {
+            return redirect()->route('admins.Project.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    // create or edit
+    public function editProject($id)
+    {
+        $obj = Project::find($id);
+        $detail = DetailProject::find($obj->detail_project_id);
+        $products = Product::where('project_id', $obj->id)->get();
+
+        return view('admin.project.edit', ['obj' => $obj, 'detail' => $detail, 'products' => $products]);
+    }
+
+    // update
+    public function updateProject(ProjectCreateRequest $request, $id)
+    {
+        $oldObj = Project::find($id);
+        $data = $request->all();
+
+       if ($oldObj->update($data)) {
+            return redirect()->route('admins.Project.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    //delete
+    public function deleteProject($id)
+    {
+        $obj = Project::find($id)->delete();
+        echo json_encode('ok');
+    }
+
+    // apply action
+    public function actionProject(Request $request)
+    {
+        $listObj = Project::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+            case 1:
+                foreach ($listObj as $item) {
+                    $item->delete();
+                }
+                break;
+            case 2:
+                foreach ($listObj as $item) {
+                    $item->update(['is_done' => 1]);
+                }
+                break;
+            case 3:
+                foreach ($listObj as $item) {
+                    $item->update(['is_done' => 0]);
+                }
+                break;
+        }
+            return redirect()->route('admins.Project.list')->with('success', 'Success');
+        } else {
+
+        }
+        
+    }
+
+    // active
+    public function activeProject(Request $request)
+    {
+        $objUpdate = Project::find($request->id);
         $objUpdate->update(['active' => !($objUpdate->active)]);
         echo json_encode('ok');
     }
