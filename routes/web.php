@@ -23,7 +23,7 @@ Route::group(['prefix' => 'managements'], function () {
 
         Route::get('detail/{employee_id}', 'AdminController@detailEmployee')->name('admins.employee.detail');
 
-    });
+    }); 
     // customer
     Route::group(['prefix' => 'customer'], function () {
         // purchase-Admin

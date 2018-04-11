@@ -39,6 +39,7 @@
 
     <!-- ===Modernizr=== -->
     <script src="{!! asset('admin_asset/js/vendor/modernizr/modernizr-2.8.3-respond-1.4.2.min.js') !!}"></script>
+    
     <!--/ modernizr -->
 
 </head>

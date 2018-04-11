@@ -69,7 +69,6 @@ Customer
 							<th>Phone</th>
 							<th>Number of purchase</th>
 							<th>Purchase transaction</th>
-							<th>Active</th>
 							<th>Created at</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
 						</tr>
@@ -90,13 +89,6 @@ Customer
 								<a href="{!! route('admins.customer.detail', ['customer_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
 							</td>
 							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
-							<td>
-								@if ($obj->active == 0) 
-								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
-								@else
-								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
-								@endif
-							</td>
 							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
 						</tr>
 						@endforeach
@@ -112,8 +104,6 @@ Customer
 				<div class="col-sm-5 hidden-xs">
 					<select class="input-sm form-control w-sm inline" name="option">
 						<option value="1">Delete selected</option>
-						<option value="2">Active selected</option>
-						<option value="3">Non-active selected</option>
 					</select>
 					<input type="submit" id="apply" class="btn btn-sm btn-default" value="Apply">
 				</div>
@@ -146,19 +136,6 @@ Customer
 		return true;
 	});
 
-	function active(id) {
-		$.ajax({
-			url: "{!! route('admins.customer.active') !!}",
-			method: "GET",
-			data: {
-				'id' : id
-			},
-			dataType : 'json',
-			success : function(result){
-				alert('Action success!');
-			}
-		});
-	}
 
 // });
 </script>

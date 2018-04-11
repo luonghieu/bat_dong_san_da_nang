@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProductCreateRequest;
 use App\Models\AssignTask;
 use App\Models\Post;
 use App\Models\Poster;
@@ -27,6 +26,7 @@ use App\Models\Street;
 use App\Models\Contact;
 use App\Models\Introduce;
 use App\Models\DetailProject;
+use App\Models\Project;
 use Carbon;
 use PurchaseTransaction;
 
@@ -601,8 +601,8 @@ class AdminController extends Controller
     // list
     public function listCustomer()
     {
-        $list  = Customer::all;
-        return view('admin.customer.purchaseCustomer.index', ['list' => $list]);
+        $list  = Customer::all();
+        return view('admin.customer.index', ['list' => $list]);
     }
 
     // apply action
@@ -1138,7 +1138,7 @@ class AdminController extends Controller
     public function listProject()
     {
         $status = Project::STATUS;
-        $list  = Project::orderBy('time', 'DESC')->get();
+        $list  = Project::all();
         return view('admin.project.index', ['list' => $list, 'status' => $status]);
     }
 

@@ -28,7 +28,7 @@
       var aData = oTable.row(nRow).data();
 
       $.ajax({
-        url: "{!! route('admins.product.lease.delete') !!}",
+        url: "{!! route('admins.project.delete') !!}",
         method: "GET",
         data: {
           'id' : aData[1]
