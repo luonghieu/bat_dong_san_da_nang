@@ -1259,6 +1259,29 @@ class AdminController extends Controller
        return view('admin.product.add', ['projectId' => $projectId]);
     }
 
+    // update
+    public function updateProduct(Request $request)
+    {
+        $listObj = Product::whereIn('id', $request->productId)->get();
+        foreach ($listObj as $obj) {
+            $block = 'block-' . $obj->id;
+            $floor = 'floor-' . $obj->id;
+            $area = 'area-' . $obj->id;
+            $price = 'price-' . $obj->id;
+            $description = 'description-' . $obj->id;
+            $data = [
+                'block' => $request->$block;
+                'floor' => $request->$floor;
+                'area' => $request->$area;
+                'price' => $request->$price;
+                'description' => $request->$description;
+            ];
+
+            $obj->update($data);
+        }
+
+    }
+
     //delete
     public function deleteProduct($id)
     {

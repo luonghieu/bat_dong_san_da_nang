@@ -72,22 +72,46 @@ Detail Project
                 	 <div class="alert alert-big alert-lightred alert-dismissable fade in">
                         <button type="button" value="{!! $product->id !!}" class="close" data-dismiss="alert" aria-hidden="true">×</button>
 	                	 <div class="row">
-	                	 	<input type="hidden" value="{!! $product->id !!}">
+	                	 	<input type="hidden" name="productId[]" value="{!! $product->id !!}">
 						    <div class="col-sm-2">
 						    	<label for="">Block</label>
 	                        	<input type="text" class="form-control" placeholder="Block" name="block-{!! $product->id !!}" value="{!! $product->block !!}">
+	                        	@if ($errors->has('block'))
+								<div class="alert alert-lightred alert-dismissable fade in">
+									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+									<strong>{!! $errors->first('block') !!}</strong>
+								</div>
+								@endif
 						    </div>
 						    <div class="col-sm-2">
 						    	<label for="">Floor</label>
 	                        	<input type="text" class="form-control" placeholder="Floor" name="floor-{!! $product->id !!}" value="{!! $product->floor !!}">
+	                        	@if ($errors->has('floor'))
+								<div class="alert alert-lightred alert-dismissable fade in">
+									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+									<strong>{!! $errors->first('floor') !!}</strong>
+								</div>
+								@endif
 						    </div>
 						    <div class="col-sm-2">
 						    	<label for="">Price</label>
 	                        	<input type="text" class="form-control" placeholder="Price" name="price-{!! $product->id !!}" value="{!! $product->price !!}">
+	                        	@if ($errors->has('price'))
+								<div class="alert alert-lightred alert-dismissable fade in">
+									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+									<strong>{!! $errors->first('price') !!}</strong>
+								</div>
+								@endif
 						    </div>
 						    <div class="col-sm-2">
 						    	<label for="">Area</label>
 	                        	<input type="text" class="form-control" placeholder="Area" name="area-{!! $product->id !!}" value="{!! $product->area !!}">
+	                        	@if ($errors->has('area'))
+								<div class="alert alert-lightred alert-dismissable fade in">
+									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+									<strong>{!! $errors->first('area') !!}</strong>
+								</div>
+								@endif
 						    </div>
 						  </div>
 						  <div>
