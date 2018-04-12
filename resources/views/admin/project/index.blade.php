@@ -84,7 +84,7 @@ Project
 							<td>{!! $obj->id !!}</td>
 							<td>{!! $obj->name !!}</td>
 							<td>
-								<a href="{!! route('admins.project.edit', ['id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
+								<a href="{!! route('admins.project.detail', ['id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
 							</td>
 							<td>{!! $obj->view !!}</td>
 							<td>

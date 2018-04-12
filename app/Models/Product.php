@@ -10,7 +10,7 @@ class Product extends Model
     protected $table = 'products';
 
 	protected $fillable = [
-        'project_id', 'block', 'floor', 'price', 'area'
+        'project_id', 'block', 'floor', 'price', 'area', 'description'
     ];
 
     public $timestamps=false;

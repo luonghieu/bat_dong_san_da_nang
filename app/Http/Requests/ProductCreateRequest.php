@@ -26,34 +26,23 @@ class ProductCreateRequest extends FormRequest
     {
         $list = Category::all(['id'])->pluck('id')->toArray();
         return [
-            'name' => 'required|max:255',
-            'feature' => 'required|min:3|max:255',
-            'detail' => 'required|min:6|max:255',
-            'direction_note' => 'nullable|max:255',
-            'cat_id' => ['required', Rule::in($list)],
-            'image' => 'nullable|image|max: 1000',
-            'area' => 'numeric',
-            'price' => 'numeric',
+            'block' => 'required|numeric',
+            'floor' => 'required|numeric',
+            'area' => 'required|numeric',
+            'price' => 'required|numeric',
         ];
     }
 
     public function messages()
     {
         return [
-            'name.required' => 'Title is required.',
-            'name.max' => 'Title not greater than 255 character.',
-            'feature.required' => 'Desribe is required.',
-            'feature.min' => 'Desribe not less than 3 character.',
-            'feature.max' => 'Desribe not grater than 255 character.',
-            'detail.required' => 'Detail is required.',
-            'detail.min' => 'Detail not less than 6 character.',
-            'detail.max' => 'Detail not grater than 255 character.',
-            'direction_note.max' => 'Link not greater than 255 character.',
-            'cat_id.required' => 'Category is required.',
-            'cat_id.in'  => 'Category not exist.',
-            'image.image' => 'Image must in png, jpg, jpeg.',
-            'image.max' => 'Image not greater than 1000kb.',
+            'block.required' => 'Block is required.',
+            'block.numeric' => 'Block must be number.',
+            'floor.required' => 'floor is required.',
+            'floor.numeric' => 'Floor must be number.',
+            'area.required' => 'Area is required.',
             'area.numeric' => 'Area must be number.',
+            'price.required' => 'Price is required.',
             'price.numeric' => 'Price must be number.',
         ];
     }

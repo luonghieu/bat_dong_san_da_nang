@@ -14,7 +14,7 @@ Detail Project
 		<h1 class="custom-font"><strong>{!! $obj->name !!}</strong></h1>
 		<ul class="controls">
 			<li>
-				<a role="button" tabindex="0"><i class="fa fa-plus mr-5"></i> Edit</a>
+				<a id="edit" role="button" tabindex="0"><i class="fa fa-plus mr-5"></i> Edit</a>
 			</li>
 			<li class="dropdown">
 
@@ -54,53 +54,58 @@ Detail Project
 			<p>{{ session('error') }}</p>
 		</div>
 		@endif
-		<form role="form" id="form-add" method="post" action="{!! route('admins.news.store') !!}" enctype="multipart/form-data">
-			<input type="hidden" name="_token" value="{{csrf_token()}}" />
-			<div class="form-group">
+			<div>
                 <div class="tile-header dvd dvd-btm">
                     <h1 class="custom-font"><strong>Products </strong></h1>
                     <ul class="controls">
                         <li>
-							<a role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i></a>
+							<a href="{!! route('admins.product.create', ['id' => $project->id]) !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i></a>
 						</li>
                     </ul>
                 </div>
                 <!-- /tile header -->
                 <!-- tile body -->
+                <form role="form" id="form-product" method="post" action="{!! route('admins.product.update') !!}" enctype="multipart/form-data">
+				<input type="hidden" name="_token" value="{{csrf_token()}}" />
                 <div class="tile-body" id = "products">
                 	@foreach($products as $product)
                 	 <div class="alert alert-big alert-lightred alert-dismissable fade in">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <button type="button" value="{!! $product->id !!}" class="close" data-dismiss="alert" aria-hidden="true">×</button>
 	                	 <div class="row">
+	                	 	<input type="hidden" value="{!! $product->id !!}">
 						    <div class="col-sm-2">
 						    	<label for="">Block</label>
-	                        	<input type="text" class="form-control" placeholder="Block" value="{!! $product->block !!}">
+	                        	<input type="text" class="form-control" placeholder="Block" name="block-{!! $product->id !!}" value="{!! $product->block !!}">
 						    </div>
 						    <div class="col-sm-2">
 						    	<label for="">Floor</label>
-	                        	<input type="text" class="form-control" placeholder="Floor" value="{!! $product->floor !!}">
+	                        	<input type="text" class="form-control" placeholder="Floor" name="floor-{!! $product->id !!}" value="{!! $product->floor !!}">
 						    </div>
 						    <div class="col-sm-2">
 						    	<label for="">Price</label>
-	                        	<input type="text" class="form-control" placeholder="Price" value="{!! $product->price !!}">
+	                        	<input type="text" class="form-control" placeholder="Price" name="price-{!! $product->id !!}" value="{!! $product->price !!}">
 						    </div>
 						    <div class="col-sm-2">
 						    	<label for="">Area</label>
-	                        	<input type="text" class="form-control" placeholder="Area" value="{!! $product->area !!}">
+	                        	<input type="text" class="form-control" placeholder="Area" name="area-{!! $product->id !!}" value="{!! $product->area !!}">
 						    </div>
+						  </div>
+						  <div>
+							  <label for="">Description</label>
+							  <textarea name="txtContent" class="form-control" name="description-{!! $product->id !!}" id="editor1">{!! $product->description !!}</textarea>
 						  </div>
 					</div>
                     @endforeach
                 </div>
+            </form>
 			</div>
+			<form role="form" id="form-project" method="post" action="{!! route('admins.project.update', ['id' => $project->id]) !!}" enctype="multipart/form-data">
+			<input type="hidden" name="_token" value="{{csrf_token()}}" />
 			<div class="form-group">
 				<label for="inputPassword3">introduce</label>
 				<div>
-					<!-- <textarea id="introduce" name="introduce"></textarea>
- 					@ckeditor('introduce', ['height' => 500])
- -->					
-<textarea name="txtContent" class="form-control " id="editor1"></textarea>
- @if ($errors->has('introduce'))
+					<textarea name="introduce" class="form-control" id="editor1">{!! $project->introduce !!}</textarea>
+					@if ($errors->has('introduce'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
 						<strong>{!! $errors->first('introduce') !!}</strong>
@@ -111,8 +116,9 @@ Detail Project
 			<div class="form-group">
 				<label for="inputPassword3">overview</label>
 				<div>
+					<textarea name="overview" class="form-control " id="editor1">{!! $project->overview !!}</textarea><!-- 
 					<textarea id="overview" name="overview"></textarea>
- 					@ckeditor('overview', ['height' => 500])
+ 					@ckeditor('overview', ['height' => 500]) -->
 					@if ($errors->has('overview'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -124,7 +130,7 @@ Detail Project
 			<div class="form-group">
 				<label for="inputPassword3">position</label>
 				<div>
-					<textarea id="position" name="position"></textarea>
+					<textarea id="position" name="position">{!! $project->position !!}</textarea>
  					@ckeditor('position', ['height' => 500])
 					@if ($errors->has('position'))
 					<div class="alert alert-lightred alert-dismissable fade in">
@@ -137,7 +143,7 @@ Detail Project
 			<div class="form-group">
 				<label for="inputPassword3">utilities</label>
 				<div>
-					<textarea id="utilities" name="utilities"></textarea>
+					<textarea id="utilities" name="utilities">{!! $project->utilities !!}</textarea>
  					@ckeditor('utilities', ['height' => 500])
 					@if ($errors->has('utilities'))
 					<div class="alert alert-lightred alert-dismissable fade in">
@@ -150,7 +156,7 @@ Detail Project
 			<div class="form-group">
 				<label for="inputPassword3">progress</label>
 				<div>
-					<textarea id="progress" name="progress"></textarea>
+					<textarea id="progress" name="progress">{!! $project->progress !!}</textarea>
  					@ckeditor('progress', ['height' => 500])
 					@if ($errors->has('progress'))
 					<div class="alert alert-lightred alert-dismissable fade in">
@@ -163,7 +169,7 @@ Detail Project
 			<div class="form-group">
 				<label for="inputPassword3">Price and Payment</label>
 				<div>
-					<textarea id="price_payment" name="price_payment"></textarea>
+					<textarea id="price_payment" name="price_payment">{!! $project->price_payment !!}</textarea>
  					@ckeditor('price_payment', ['height' => 500])
 					@if ($errors->has('price_payment'))
 					<div class="alert alert-lightred alert-dismissable fade in">
@@ -185,29 +191,30 @@ Detail Project
 @include('admin.news.script')
 <script>
 	$( document ).ready(function() {
-		$('#add-entry').click(function (e) {
-			html = '<div class="alert alert-big alert-lightred alert-dismissable fade in">' + 
-                        '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>' + 
-	                	 '<div class="row">' +
-						    '<div class="col-sm-2">' +
-						    	'<label for="">Block</label>' + 
-	                        	'<input type="text" class="form-control" placeholder="Block" value="">' + 
-						    '</div>' + 
-						    '<div class="col-sm-2">' + 
-						    	'<label for="">Floor</label>' + 
-	                        	'<input type="text" class="form-control" placeholder="Floor" value="">' + 
-						    '</div>' +
-						    '<div class="col-sm-2">' +
-						    	'<label for="">Price</label>' + 
-	                        	'<input type="text" class="form-control" placeholder="Price" value="">' + 
-						    '</div>' + 
-						    '<div class="col-sm-2">' +
-						    	'<label for="">Area</label>' + 
-	                        	'<input type="text" class="form-control" placeholder="Area" value="">' +
-						    '</div>' + 
-						  '</div>' +
-					'</div>';
-			$('#products').append(html);
+		$('.close').click(function (){
+			if (confirm('Are you sure?')) {
+				id = $(this).val();
+				$.ajax({
+		            url: "{!! route('admins.product.delete') !!}",
+		            method: "GET",
+		            data: {
+		                'id' : id,
+						'status' : status
+		            },
+		            dataType : 'json',
+		            success : function(result){
+		                alert('Delete success!');
+		            }
+	        	});
+	        	return true;
+			}
+
+			return false;
+		});
+
+		$('#edit').click(function(){
+			$('#form-product').submit();
+			$('#form-project').submit();
 		});
 	});
 </script>

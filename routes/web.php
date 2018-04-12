@@ -121,6 +121,7 @@ Route::group(['prefix' => 'managements'], function () {
      // project
     Route::group(['prefix' => 'project'], function () {
         Route::get('list', 'AdminController@listProject')->name('admins.project.list');
+        Route::get('detail/{id}', 'AdminController@detailProject')->name('admins.project.detail');
         Route::get('create', 'AdminController@createProject')->name('admins.project.create');
         Route::post('create', 'AdminController@storeProject')->name('admins.project.store');
         Route::get('{id}/edit', 'AdminController@editProject')->name('admins.project.edit');
@@ -128,6 +129,16 @@ Route::group(['prefix' => 'managements'], function () {
         Route::get('delete', 'AdminController@deleteProject')->name('admins.project.delete');
         Route::post('action', 'AdminController@actionProject')->name('admins.project.action');
         Route::get('active', 'AdminController@activeProject')->name('admins.project.active');
+    });
+
+     // product
+    Route::group(['prefix' => 'product'], function () {
+        Route::get('list', 'AdminController@listProduct')->name('admins.project.list');
+        Route::get('create', 'AdminController@createProduct')->name('admins.product.create');
+        Route::post('create', 'AdminController@storeProduct')->name('admins.product.store');
+        Route::get('{id}/edit', 'AdminController@editProduct')->name('admins.product.edit');
+        Route::post('{id}/update', 'AdminController@updateProduct')->name('admins.product.update');
+        Route::get('delete', 'AdminController@deleteProduct')->name('admins.product.delete');
     });
 
 });

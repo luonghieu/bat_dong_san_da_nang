@@ -1142,6 +1142,16 @@ class AdminController extends Controller
         return view('admin.project.index', ['list' => $list, 'status' => $status]);
     }
 
+    // detail
+    public function detailProject($id)
+    {
+        $obj = Project::find($id);
+        $detail = DetailProject::find($obj->detail_project_id);
+        $products = Product::where('project_id', $obj->id)->get();
+
+        return view('admin.project.edit', ['obj' => $obj, 'detail' => $detail, 'products' => $products]);
+    }
+
     // edit
     public function createProject()
     {
@@ -1164,11 +1174,11 @@ class AdminController extends Controller
     // create or edit
     public function editProject($id)
     {
-        $obj = Project::find($id);
+        $project = Project::find($id);
         $detail = DetailProject::find($obj->detail_project_id);
         $products = Product::where('project_id', $obj->id)->get();
 
-        return view('admin.project.edit', ['obj' => $obj, 'detail' => $detail, 'products' => $products]);
+        return view('admin.project.edit', ['project' => $project, 'detail' => $detail, 'products' => $products]);
     }
 
     // update
@@ -1225,6 +1235,35 @@ class AdminController extends Controller
     {
         $objUpdate = Project::find($request->id);
         $objUpdate->update(['active' => !($objUpdate->active)]);
+        echo json_encode('ok');
+    }
+
+    //=====product====
+
+    // store
+    public function storeProduct(ProductCreateRequest $request, $projectId)
+    {
+        // get user login
+        $data = $request->all();
+        $data['project_id'] = $projectId;
+       if (Product::create($data)) {
+            return redirect()->route('admins.project.detail', ['projectId' => $projectId])->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    // edit
+    public function createProduct($projectId)
+    {
+       return view('admin.product.add', ['projectId' => $projectId]);
+    }
+
+    //delete
+    public function deleteProduct($id)
+    {
+        $obj = Product::find($id)->delete();
+        Transaction::where('product_id', $id)->delete();
         echo json_encode('ok');
     }
 
