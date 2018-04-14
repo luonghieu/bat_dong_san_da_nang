@@ -1319,7 +1319,7 @@ class AdminController extends Controller
             $data['image'] = "";
         }
         
-       if (News::create($data)) {
+       if (Slider::create($data)) {
             return redirect()->route('admins.slider.list')->with('success', 'Success');
         } else {
             return redirect()->back()->withInput()->with('error', 'Fail');
