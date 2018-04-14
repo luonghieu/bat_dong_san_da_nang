@@ -136,10 +136,23 @@ Route::group(['prefix' => 'managements'], function () {
         Route::get('list', 'AdminController@listProduct')->name('admins.project.list');
         Route::get('create', 'AdminController@createProduct')->name('admins.product.create');
         Route::post('create', 'AdminController@storeProduct')->name('admins.product.store');
-        Route::get('{id}/edit', 'AdminController@editProduct')->name('admins.product.edit');
         Route::post('{id}/update', 'AdminController@updateProduct')->name('admins.product.update');
         Route::get('delete', 'AdminController@deleteProduct')->name('admins.product.delete');
     });
+
+     // slider
+    Route::group(['prefix' => 'slider'], function () {
+        // post-Admin
+        Route::get('list', 'AdminController@listSlider')->name('admins.slider.list');
+        Route::get('create', 'AdminController@createSlider')->name('admins.slider.create');
+        Route::post('create', 'AdminController@storeSlider')->name('admins.slider.store');
+        Route::get('{id}/edit', 'AdminController@editSlider')->name('admins.slider.edit');
+        Route::post('{id}/update', 'AdminController@updateSlider')->name('admins.slider.update');
+        Route::get('delete', 'AdminController@deleteSlider')->name('admins.slider.delete');
+        Route::post('action', 'AdminController@actionSlider')->name('admins.slider.action');
+        Route::get('active', 'AdminController@activeSlider')->name('admins.slider.active');
+
+   });
 
 });
 
@@ -147,5 +160,20 @@ Route::group(['prefix' => 'common'], function () {
     // Skill - Admin
         Route::get('listDistrict', 'CommonController@listDistricts')->name('common.district.list');
         Route::get('getItemByDistrict', 'CommonController@getItemByDistrict')->name('common.getItemByDistrict');
+
+});
+
+// =====================public=========================
+Route::group(['prefix' => 'batdongsan'], function () {
+    // index
+        Route::get('', 'PublicController@index')->name('public.index');
+        Route::get('gioithieu', 'PublicController@gioithieu')->name('public.gioithieu');
+        Route::get('duan', 'PublicController@duan')->name('public.duan');
+        Route::get('chitietduan', 'PublicController@chitietduan')->name('public.chitietduan');
+        Route::get('sangiaodich', 'PublicController@sangiaodich')->name('public.sangiaodich');
+        Route::get('chitietsanbatdongsan', 'PublicController@chitietsanbatdongsan')->name('public.chitietsanbatdongsan');
+        Route::get('lienhe', 'PublicController@lienhe')->name('public.lienhe');
+        Route::get('tintuc', 'PublicController@tintuc')->name('public.tintuc');
+        Route::get('tuyendung', 'PublicController@tuyendung')->name('public.tuyendung');
 
 });

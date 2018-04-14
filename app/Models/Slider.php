@@ -9,7 +9,7 @@ class Slider extends Model
     protected $table = 'sliders';
 
 	protected $fillable = [
-        'name', 'link', 'image', 'active', 'created_at'
+        'name', 'link', 'image', 'active', 'created_at', 'description'
     ];
 
     public $timestamps=false;

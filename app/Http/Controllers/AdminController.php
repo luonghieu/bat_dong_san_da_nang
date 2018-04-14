@@ -538,7 +538,7 @@ class AdminController extends Controller
             if (!empty($oldObj->image)) {
                 unlink($oldObj->image);
             }
-            $path = "images/news/";
+            $path = "images/products/";
             $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
             $request->image->move($path, $fileName);
             $data['image'] = $path . $fileName;
@@ -1289,5 +1289,126 @@ class AdminController extends Controller
         Transaction::where('product_id', $id)->delete();
         echo json_encode('ok');
     }
+
+    // ==========Slider management=============
+    // news
+    public function listSlider()
+    {
+        $list  = Slider::all();
+        return view('admin.slider.index', ['list' => $list]);
+    }
+
+    // edit
+    public function createSlider()
+    {
+       return view('admin.slider.add');
+    }
+
+    // store
+    public function storeSlider(SliderCreateRequest $request)
+    {
+        $data = $request->all();
+        $data['created_at'] = Carbon\Carbon::now();;
+
+        if ($request->hasFile('image')) {
+            $path = "images/sliders/";
+            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move($path, $fileName);
+            $data['image'] = $path . $fileName;
+        } else {
+            $data['image'] = "";
+        }
+        
+       if (News::create($data)) {
+            return redirect()->route('admins.slider.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    // create or edit
+    public function editSlider($id)
+    {
+        $obj = Slider::find($id);
+        return view('admin.slider.edit', ['obj' => $obj]);
+    }
+
+    // update
+    public function updateSlider(SliderCreateRequest $request, $id)
+    {
+        $oldObj = Slider::find($id);
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            if (!empty($oldObj->image)) {
+                unlink($oldObj->image);
+            }
+            $path = "images/sliders/";
+            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move($path, $fileName);
+            $data['image'] = $path . $fileName;
+        } else {
+            $data['image'] = $oldObj->image;
+        }
+        
+       if ($oldObj->update($data)) {
+            return redirect()->route('admins.slider.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    //delete
+    public function deleteSlider($id)
+    {
+        $obj = Slider::find($id);
+        if ($obj->delete()) {
+            if (!empty($obj->image)) {
+                unlink($obj->image);
+            }
+            echo json_encode('ok');
+        }
+    }
+
+    // apply action
+    public function action(Request $request)
+    {
+        $listObj = Slider::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+            case 1:
+                foreach ($listObj as $item) {
+                    if (!empty($item->image)) {
+                        unlink($item->image);
+                    }
+                    $item->delete();
+                }
+                break;
+            case 2:
+                foreach ($listObj as $item) {
+                    $item->update(['active' => 1]);
+                }
+                break;
+            case 3:
+                foreach ($listObj as $item) {
+                    $item->update(['active' => 0]);
+                }
+                break;
+        }
+            return redirect()->route('admins.slider.list')->with('success', 'Success');
+        } else {
+
+        }
+        
+    }
+
+    // active
+    public function activeSlider(Request $request)
+    {
+        $objUpdate = Slider::find($request->id);
+        $objUpdate->update(['active' => !($objUpdate->active)]);
+        echo json_encode('ok');
+    }
+
 
 }
