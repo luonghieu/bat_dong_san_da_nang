@@ -10,7 +10,7 @@ class TypePost extends Model
     protected $table = 'type_post';
 
 	protected $fillable = [
-        'name', 'start_time', 'end_time', 'price'
+        'name', 'price'
     ];
 
     public $timestamps=false;

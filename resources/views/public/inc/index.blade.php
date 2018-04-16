@@ -45,6 +45,11 @@
 	<link type="text/css" rel="stylesheet" href="{!! asset('public_asset/menureponsive/demo.css') !!}" />
 
 	<link href="{!! asset('public_asset/css/common.css') !!}" rel="stylesheet" type="text/css" />
+	<link href="{!! asset('public_asset/css/theme.min.css') !!}" rel="stylesheet" type="text/css" />
+	<link href="{!! asset('public_asset/css/fix.min.css') !!}" rel="stylesheet" type="text/css" />
+	
+	<link href="{!! asset('public_asset/css/jquery-ui.min.css') !!}" rel="stylesheet" type="text/css" />
+	<link href="{!! asset('public_asset/css/jquery.selectbox.css') !!}" rel="stylesheet" type="text/css" />
 	<script>
 		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

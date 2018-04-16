@@ -90,8 +90,8 @@ Posts
 							<th>Number of room</th>
 							<th>Number of toilet</th>
 							<th>Furniture</th>
+							<th>Infomation contact</th>
 							<th>Posted by</th>
-							<th>Created at</th>
 							<th>Deleted at</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
 						</tr>
@@ -139,8 +139,8 @@ Posts
 							<td>{!! $obj->price !!}</td>
 							<td>{!! $obj->unitPrice->name !!}</td>
 							<td>{!! $obj->typePost->name !!}</td>
-							<td>{!! date( "d/m/Y", strtotime($obj->typePost->start_time)) !!}</td>
-							<td>{!! date( "d/m/Y", strtotime($obj->typePost->end_time)) !!}</td>
+							<td>{!! date( "d/m/Y", strtotime($obj->start_time)) !!}</td>
+							<td>{!! date( "d/m/Y", strtotime($obj->end_time)) !!}</td>
 							<td>{!! $obj->typePost->price !!}</td>
 							<td>{!! $obj->frontispiece !!}</td>
 							<td>{!! $obj->road_ahead !!}</td>
@@ -148,8 +148,8 @@ Posts
 							<td>{!! $obj->number_of_room !!}</td>
 							<td>{!! $obj->number_of_toilet !!}</td>
 							<td>{!! $obj->furniture !!}</td>
+							<td>{!! $obj->info_contact !!}</td>
 							<td>{!! $obj->poster->name !!}</td>
-							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
 							<td>{!! date( "d/m/Y", strtotime($obj->deleted_at)) !!}</td>
 							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
 						</tr>

@@ -6,6 +6,8 @@ use App\Models\Street;
 use App\Models\Village;
 use Illuminate\Http\Request;
 use App\Models\District;
+use App\Models\Category;
+use App\Models\UnitPrice;
 
 class CommonController extends Controller
 {
@@ -19,7 +21,7 @@ class CommonController extends Controller
     // getItemByDistrict
     public function getItemByDistrict(Request $request)
     {
-        $districtId = $request->id;
+        $districtId = $request->districtId;
 
         $listVillages = Village::all()->where('district_id',$districtId);
         $listStreets = Street::all()->where('district_id',$districtId);
@@ -29,4 +31,16 @@ class CommonController extends Controller
             'streets' => $listStreets
         ]);
     }
+
+    // gioithieu
+    public function getLoaiNhaDat(Request $request)
+    {
+        $cat = Category::where('type_transaction', $request->type)->get();
+        $unitPrice = UnitPrice::where('type_transaction', $request->type)->get();
+        echo json_encode([
+            'cat' => $cat,
+            'unitPrice' => $unitPrice
+        ]);
+    }
+
 }

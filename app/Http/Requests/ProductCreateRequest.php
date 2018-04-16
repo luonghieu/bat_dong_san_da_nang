@@ -24,7 +24,6 @@ class ProductCreateRequest extends FormRequest
      */
     public function rules()
     {
-        $list = Category::all(['id'])->pluck('id')->toArray();
         return [
             'block' => 'required|numeric',
             'floor' => 'required|numeric',
