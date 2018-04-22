@@ -154,6 +154,32 @@ Route::group(['prefix' => 'managements'], function () {
 
     });
 
+    // announcement
+    Route::group(['prefix' => 'announcement'], function () {
+        // post-Admin
+        Route::get('list', 'AdminController@listAnnouncement')->name('admins.announcement.list');
+        Route::get('create', 'AdminController@createAnnouncement')->name('admins.announcement.create');
+        Route::post('create', 'AdminController@storeAnnouncement')->name('admins.announcement.store');
+        Route::get('{id}/edit', 'AdminController@editAnnouncement')->name('admins.announcement.edit');
+        Route::post('{id}/update', 'AdminController@updateAnnouncement')->name('admins.announcement.update');
+        Route::get('delete', 'AdminController@deleteAnnouncement')->name('admins.announcement.delete');
+        Route::post('action', 'AdminController@actionAnnouncement')->name('admins.announcement.action');
+        Route::get('active', 'AdminController@activeAnnouncement')->name('admins.announcement.active');
+    });
+
+    // notification
+    Route::group(['prefix' => 'notification'], function () {
+        // post-Admin
+        Route::get('list', 'AdminController@listNotification')->name('admins.notification.list');
+        Route::get('create', 'AdminController@createNotification')->name('admins.notification.create');
+        Route::post('create', 'AdminController@storeNotification')->name('admins.notification.store');
+        Route::get('{id}/edit', 'AdminController@editNotification')->name('admins.notification.edit');
+        Route::post('{id}/update', 'AdminController@updateNotification')->name('admins.notification.update');
+        Route::get('delete', 'AdminController@deleteNotification')->name('admins.notification.delete');
+        Route::post('action', 'AdminController@actionNotification')->name('admins.notification.action');
+        Route::get('active', 'AdminController@activeNotification')->name('admins.notification.active');
+    });
+
 });
 
 Route::group(['prefix' => 'common'], function () {
@@ -188,5 +214,24 @@ Route::group(['prefix' => 'batdongsan'], function () {
 
         //=======ajax==========
 
+// Route::group(['prefix' => 'notification_schedules', 'as' => 'notification_schedules.'], function () {
 
+//             Route::get('/', ['as' => 'index', 'uses' => 'NotificationScheduleController@index']);
+//             Route::get('/create', ['as' => 'create', 'uses' => 'NotificationScheduleController@create']);
+//             Route::post('/{notificationSchedule}/confirm', ['as' => 'confirm', 'uses' => 'NotificationScheduleController@confirmNotificationSchedule'])
+//                 ->where('notificationSchedule', '[0-9]+');
+//             Route::post('/confirm_create', ['as' => 'confirm_create', 'uses' => 'NotificationScheduleController@confirmCreateNotificationSchedule']);
+//             Route::post('/create_draft_notification_schedule', ['as' => 'create_draft', 'uses' => 'NotificationScheduleController@createDraftNotificationSchedules']);
+//             Route::post('/create_notification_schedule', ['as' => 'create_notification_schedule', 'uses' => 'NotificationScheduleController@createNotification']);
+//             Route::get('/{notificationSchedule}', ['as' => 'show', 'uses' => 'NotificationScheduleController@show'])
+//                 ->where('notificationSchedule', '[0-9]+');
+//             Route::post('/{id}/destroy', ['as' => 'destroy', 'uses' => 'NotificationScheduleController@destroy'])
+//                 ->where('id', '[0-9]+');
+//             Route::get('/{notificationSchedule}/edit', ['as' => 'edit', 'uses' => 'NotificationScheduleController@edit'])
+//                 ->where('notificationSchedule', '[0-9]+');
+//             Route::post('/{notificationSchedule}/draft', ['as' => 'draft', 'uses' => 'NotificationScheduleController@draftNotificationSchedules'])
+//                 ->where('notificationSchedule', '[0-9]+');
+//             Route::post('/{notificationSchedule}/update', ['as' => 'update', 'uses' => 'NotificationScheduleController@updateNotificationSchedules'])
+//                 ->where('notificationSchedule', '[0-9]+');
+//         });
 });

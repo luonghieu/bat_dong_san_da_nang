@@ -29,6 +29,9 @@ use App\Models\DetailProject;
 use App\Models\Project;
 use Carbon;
 use PurchaseTransaction;
+use App\Models\Announcement;
+use App\Models\NotificationSchedule;
+use App\Models\AnnouncementRecieves;
 
 class AdminController extends Controller
 {
@@ -1270,11 +1273,11 @@ class AdminController extends Controller
             $price = 'price-' . $obj->id;
             $description = 'description-' . $obj->id;
             $data = [
-                'block' => $request->$block;
-                'floor' => $request->$floor;
-                'area' => $request->$area;
-                'price' => $request->$price;
-                'description' => $request->$description;
+                'block' => $request->$block,
+                'floor' => $request->$floor,
+                'area' => $request->$area,
+                'price' => $request->$price,
+                'description' => $request->$description,
             ];
 
             $obj->update($data);
@@ -1291,7 +1294,7 @@ class AdminController extends Controller
     }
 
     // ==========Slider management=============
-    // news
+    // sliders
     public function listSlider()
     {
         $list  = Slider::all();
@@ -1371,7 +1374,7 @@ class AdminController extends Controller
     }
 
     // apply action
-    public function action(Request $request)
+    public function actionSlider(Request $request)
     {
         $listObj = Slider::whereIn('id', $request->selected)->get();
         if (!empty($listObj)) {
@@ -1410,5 +1413,174 @@ class AdminController extends Controller
         echo json_encode('ok');
     }
 
+    // ==========Announcement management=============
+    // announcements
+    public function listAnnouncement()
+    {
+        $list  = Announcement::where('is_send_all', 'true')->get();
+        return view('admin.announcement.index', ['list' => $list]);
+    }
 
+    // edit
+    public function createAnnouncement()
+    {
+       return view('admin.announcement.add');
+    }
+
+    // store
+    public function storeAnnouncement(AnnouncementCreateRequest $request)
+    {
+        $data = $request->all();
+        $data['created_at'] = Carbon\Carbon::now();
+
+        if (Announcement::create($data)) {
+            return redirect()->route('admins.announcement.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    // create or edit
+    public function editAnnouncement($id)
+    {
+        $obj = Announcement::find($id);
+        return view('admin.announcement.edit', ['obj' => $obj]);
+    }
+
+    // update
+    public function updateAnnouncement(AnnouncementCreateRequest $request, $id)
+    {
+        $oldObj = Announcement::find($id);
+        $data = $request->all();
+
+       if ($oldObj->update($data)) {
+            return redirect()->route('admins.announcement.list')->with('success', 'Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+
+    //delete
+    public function deleteAnnouncement($id)
+    {
+        $obj = Announcement::find($id);
+        if ($obj->delete()) {
+            AnnouncementRecieves::where('announcement_id', $id)->delete();
+            echo json_encode('ok');
+        }
+    }
+
+    // apply action
+    public function actionAnnouncement(Request $request)
+    {
+        $listObj = Announcement::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+            case 1:
+                foreach ($listObj as $item) {
+                    $item->delete();
+                }
+                break;
+            case 2:
+                foreach ($listObj as $item) {
+                    $item->update(['active' => 1]);
+                }
+                break;
+            case 3:
+                foreach ($listObj as $item) {
+                    $item->update(['active' => 0]);
+                }
+                break;
+        }
+            return redirect()->route('admins.announcement.list')->with('success', 'Success');
+        } else {
+
+        }
+        
+    }
+
+    // active
+    public function activeAnnouncement(Request $request)
+    {
+        $objUpdate = Announcement::find($request->id);
+        $objUpdate->update(['active' => !($objUpdate->active)]);
+        echo json_encode('ok');
+    }
+
+    // ==========Notification management=============
+    // notification
+    public function listNotification()
+    {
+        $list  = NotificationSchedule::all();
+        return view('admin.notification.index', ['list' => $list]);
+    }
+
+    edit
+    public function createNotification()
+    {
+       return view('admin.notification.add');
+    }
+
+    // // store
+    // public function storeNotification(NotificationCreateRequest $request)
+    // {
+    //     $data = $request->all();
+    //     $data['created_at'] = Carbon\Carbon::now();
+
+    //     if (Notification::create($data)) {
+    //         return redirect()->route('admins.Notification.list')->with('success', 'Success');
+    //     } else {
+    //         return redirect()->back()->withInput()->with('error', 'Fail');
+    //     }
+    // }
+
+    // // create or edit
+    // public function editNotification($id)
+    // {
+    //     $obj = Notification::find($id);
+    //     return view('admin.Notification.edit', ['obj' => $obj]);
+    // }
+
+    // // update
+    // public function updateNotification(NotificationCreateRequest $request, $id)
+    // {
+    //     $oldObj = Notification::find($id);
+    //     $data = $request->all();
+
+    //    if ($oldObj->update($data)) {
+    //         return redirect()->route('admins.Notification.list')->with('success', 'Success');
+    //     } else {
+    //         return redirect()->back()->withInput()->with('error', 'Fail');
+    //     }
+    // }
+
+    //delete
+    public function deleteNotification($id)
+    {
+        $obj = Notification::find($id);
+        if ($obj->delete()) {
+            NotificationRecieves::where('notification_id', $id)->delete();
+            echo json_encode('ok');
+        }
+    }
+
+    // apply action
+    public function actionNotification(Request $request)
+    {
+        $listObj = Notification::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+            case 1:
+                foreach ($listObj as $item) {
+                    NotificationRecieves::where('notification_id', $item->id)->delete();
+                    $item->delete();
+                }
+                break;
+        }
+            return redirect()->route('admins.notification.list')->with('success', 'Success');
+        } else {
+
+        }
+        
+    }
 }
