@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Street;
 use App\Models\Village;
+use App\Models\AssignTask;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use App\Models\District;
 use App\Models\Category;
@@ -41,6 +43,13 @@ class CommonController extends Controller
             'cat' => $cat,
             'unitPrice' => $unitPrice
         ]);
+    }
+
+    public function getCustomerByUserLogin(Request $request)
+    {
+        $objId = Session::get('obj')->id;
+        $customer = AssignTask::join('customer', 'assign_task.customer_id','customer.id')->where('employee_id', $objId)->get()->pluck('customer.name', 'customer_id');
+        echo json_encode($customer);
     }
 
 }

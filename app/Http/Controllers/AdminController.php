@@ -30,7 +30,7 @@ use App\Models\Project;
 use Carbon;
 use PurchaseTransaction;
 use App\Models\Announcement;
-use App\Models\NotificationSchedule;
+
 use App\Models\AnnouncementRecieves;
 
 class AdminController extends Controller
@@ -1509,17 +1509,17 @@ class AdminController extends Controller
 
     // ==========Notification management=============
     // notification
-    public function listNotification()
-    {
-        $list  = NotificationSchedule::all();
-        return view('admin.notification.index', ['list' => $list]);
-    }
-
-    edit
-    public function createNotification()
-    {
-       return view('admin.notification.add');
-    }
+//    public function listNotification()
+//    {
+//        $list  = NotificationSchedule::all();
+//        return view('admin.notification.index', ['list' => $list]);
+//    }
+//
+////    create
+//    public function createNotification()
+//    {
+//       return view('admin.notification.add');
+//    }
 
     // // store
     // public function storeNotification(NotificationCreateRequest $request)

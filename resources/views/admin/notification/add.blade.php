@@ -3,7 +3,7 @@
 @include('admin.news.css')
 @endsection
 @section('title')
-News
+Notification
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +11,7 @@ News
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>News</strong></h1>
+		<h1 class="custom-font"><strong>Notification</strong></h1>
 		<ul class="controls">
 			<li>
 				<a role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
@@ -54,79 +54,144 @@ News
 			<p>{{ session('error') }}</p>
 		</div>
 		@endif
-		<form class="form-horizontal" role="form" id="form-add" method="post" action="{!! route('admins.news.store') !!}" enctype="multipart/form-data">
+		<form class="form-horizontal" role="form" id="form-add" method="post" action="{!! route('admins.notification.store') !!}" enctype="multipart/form-data">
 			<input type="hidden" name="_token" value="{{csrf_token()}}" />
 			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-2 control-label">Name</label>
-				<div class="col-sm-10">
-					<input type="text" class="form-control" id="inputEmail3" name="name" placeholder="Title">
-					@if ($errors->has('name'))
+				<label class="col-sm-2 control-label">Type</label>
+				<div class="col-sm-1 col-sm-offset-2">
+					<input type="radio" name="type" value="1" > User
+				</div>
+				<div class="col-sm-1">
+					<input type="radio" name="type" value="2" > Staff
+				</div>
+				@if ($errors->has('type'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('name') !!}</strong>
+						<strong>{!! $errors->first('type') !!}</strong>
+					</div>
+				@endif
+				<div id="customer"></div>
+			</div>
+			<div class="form-group">
+				<label for="inputEmail3" class="col-sm-2 control-label">Title</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="inputEmail3" name="title" placeholder="Title">
+					@if ($errors->has('title'))
+					<div class="alert alert-lightred alert-dismissable fade in">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<strong>{!! $errors->first('title') !!}</strong>
 					</div>
 					@endif
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="inputPassword3" class="col-sm-2 control-label">Describe</label>
+				<label class="col-sm-2 control-label">Content</label>
 				<div class="col-sm-10">
-					<input type="text" name="feature" class="form-control" id="inputPassword3" placeholder="Describe">
-					@if ($errors->has('feature'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('feature') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="inputPassword3" class="col-sm-2 control-label">Link</label>
-				<div class="col-sm-10">
-					<input type="text" name="link" class="form-control" id="inputPassword3" placeholder="Link">
-					@if ($errors->has('link'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('link') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Category</label>
-				<div class="col-sm-10">
-					<select class="form-control mb-10" name="cat_new_id">
-						@foreach($listCat as $obj)
-						<option value="{!! $obj->id !!}">{!! $obj->name !!}</option>
-						@endforeach
-					</select>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Image</label>
-				<div class="col-sm-10">
-					<input type="file" name="image" class="filestyle" data-buttonText="Find file" data-iconName="fa fa-inbox">
-					@if ($errors->has('image'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('image') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Detail</label>
-				<div class="col-sm-10">
-					<textarea id="summernote" name="detail">
+					<textarea id="summernote" name="content">
 					</textarea>
 					@if ($errors->has('detail'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('detail') !!}</strong>
+						<strong>{!! $errors->first('content') !!}</strong>
 					</div>
 					@endif
 				</div>
 			</div>
+
+			<div class="form-group">
+				<label class="col-sm-2 col-sm-offset-2 control-label">Send time:</label>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 col-sm-offset-2 recurring">
+					<input type="radio" name="recurring" value='3'> Hàng tháng
+				</div>
+				<div class="col-sm-1">
+					<select id="" name="day_of_month" class="form-control select-time">
+						@foreach (range(01,31) as $day_of_month)
+							<option value="{{ $day_of_month }}" >Ngày {{ $day_of_month }}</option>
+						@endforeach
+					</select>
+				</div>
+				<div class="col-sm-1">
+					<input type="number" name="month_hour" min="00" max="24"
+						   value ="">
+				</div>
+				<div class="col-sm-1 ">
+					<input type="number" name="month_minute" min="00" max="59" value="">
+				</div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 col-sm-offset-2 recurring">
+					<input type="radio" name="recurring" value="2"> Hàng tuần
+				</div>
+				<div class="col-sm-1">
+					<select id="" name="date_of_week" class="form-control select-time">
+						@foreach (['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm','Thứ sáu','Thứ bảy'] as $key => $date)
+							<option value="{{ $key }}"  >{{ $date }}</option>
+						@endforeach
+					</select>
+				</div>
+				<div class="col-sm-1">
+					<input type="number" name="week_hour" min="00" max="24" value ="">
+				</div>
+				<div class="col-sm-1 ">
+					<input type="number" name="week_minute" min="00" max="59" value="">
+				</div>
+				<div class="col-sm-4"></div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 col-sm-offset-2 recurring">
+					<input type="radio" name="recurring" value="1"> Mỗi ngày
+				</div>
+				<div class="col-sm-1">
+					<input type="number" name="daily_hour" min="00" max="24"  value="" >
+				</div>
+				<div class="col-sm-1 ">
+					<input type="number" name="daily_minute" min="00" max="59"  value="" >
+				</div>
+				<div class="col-sm-5"></div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 col-sm-offset-2 recurring">
+					<input type="radio" name="recurring" value="0"> Chỉ định ngày
+				</div>
+				<div class="col-sm-1">
+					<select id="" name="date" class="form-control select-time">
+						@foreach (range(01,31) as $date)
+							<option value="{{ $date }}" >Ngày {{ $date }}</option>
+						@endforeach
+					</select>
+				</div>
+				<div class="col-sm-1 ">
+					<select id="" name="send_month" class="form-control select-time">
+						@foreach (range(01,12) as $month)
+							<option value="{{ $month }}" >Tháng {{ $month }}</option>
+						@endforeach
+					</select>
+				</div>
+				<div class="col-sm-1">
+					<select id="" name="send_year" class="form-control select-time">
+						@foreach (range(2018,2025) as $year)
+							<option value="{{ $year }}" >Năm {{ $year }}</option>
+						@endforeach
+					</select>
+				</div>
+				<div class="col-sm-1">
+					<input type="number" name="send_hour" min="00" max="24"  value="">
+				</div>
+				<div class="col-sm-1 ">
+					<input type="number" name="send_minute" min="00" max="59" value="">
+				</div>
+				<div class="col-sm-2"></div>
+			</div>
+			@if ($errors->has('recurring'))
+				<div class="alert alert-lightred alert-dismissable fade in">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+					<strong>{!! $errors->first('recurring') !!}</strong>
+				</div>
+			@endif
+
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-10">
 					<button type="submit" class="btn btn-rounded btn-primary btn-sm">Cancel</button>
@@ -148,5 +213,26 @@ News
 			$('#form-add').submit();
 		});
 	});
+
+    $('input[name="type"]').change(function() {
+        type = $(this).val();
+        if (type == 1) {
+            $.ajax({
+                url: "{!! route('common.getCustomerByUserLogin') !!}",
+                method: "GET",
+                data: {
+                    'type' : type
+                },
+                dataType : 'json',
+                success : function(result){
+                    html = '';
+                    $.each(result, function(key, value){
+                        html += '<input type="radio" name="type" value="'+ key +'" > '+ value;
+                    });
+                    $('#customer').html(html);
+                }
+            });
+		}
+    });
 </script>
 @endsection

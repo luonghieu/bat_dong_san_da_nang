@@ -170,14 +170,14 @@ Route::group(['prefix' => 'managements'], function () {
     // notification
     Route::group(['prefix' => 'notification'], function () {
         // post-Admin
-        Route::get('list', 'AdminController@listNotification')->name('admins.notification.list');
-        Route::get('create', 'AdminController@createNotification')->name('admins.notification.create');
-        Route::post('create', 'AdminController@storeNotification')->name('admins.notification.store');
-        Route::get('{id}/edit', 'AdminController@editNotification')->name('admins.notification.edit');
-        Route::post('{id}/update', 'AdminController@updateNotification')->name('admins.notification.update');
-        Route::get('delete', 'AdminController@deleteNotification')->name('admins.notification.delete');
-        Route::post('action', 'AdminController@actionNotification')->name('admins.notification.action');
-        Route::get('active', 'AdminController@activeNotification')->name('admins.notification.active');
+        Route::get('list', 'NotificationScheduleController@listNotification')->name('admins.notification.list');
+        Route::get('create', 'NotificationScheduleController@createNotification')->name('admins.notification.create');
+        Route::post('create', 'NotificationScheduleController@storeNotification')->name('admins.notification.store');
+        Route::get('{id}/edit', 'NotificationScheduleController@editNotification')->name('admins.notification.edit');
+        Route::post('{id}/update', 'NotificationScheduleController@updateNotification')->name('admins.notification.update');
+        Route::get('delete', 'NotificationScheduleController@deleteNotification')->name('admins.notification.delete');
+        Route::post('action', 'NotificationScheduleController@actionNotification')->name('admins.notification.action');
+        Route::get('active', 'NotificationScheduleController@activeNotification')->name('admins.notification.active');
     });
 
 });
@@ -188,6 +188,7 @@ Route::group(['prefix' => 'common'], function () {
     Route::get('getItemByDistrict', 'CommonController@getItemByDistrict')->name('common.getItemByDistrict');
 
     Route::get('getLoaiNhaDat', 'CommonController@getLoaiNhaDat')->name('common.getLoaiNhaDat');
+    Route::get('getCustomerByUserLogin', 'CommonController@getCustomerByUserLogin')->name('common.getCustomerByUserLogin');
 
 });
 

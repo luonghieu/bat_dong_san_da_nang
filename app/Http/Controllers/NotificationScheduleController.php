@@ -1,48 +1,62 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Adminer;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\NotificationSchedule;
-use App\User;
+use App\Models\NotificationSchedule;
+use App\Models\User;
+use App\Models\Customer;
+use App\Models\Assigntask;
 use Carbon\Carbon;
+
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class NotificationScheduleController extends Controller
 {
-    public function index(Request $request)
+//    public function index(Request $request)
+//    {
+//        $keyword = $request->search;
+//        $fromDate = $request->from_date;
+//        $toDate = $request->to_date;
+//
+//        $notificationSchedules = NotificationSchedule::query();
+//
+//        if (isset($fromDate) && isset($toDate)) {
+//            $fromDate = Carbon::parse($fromDate)->startOfDay();
+//            $toDate = Carbon::parse($toDate)->endOfDay();
+//
+//            $notificationSchedules->where(function ($query) use ($fromDate, $toDate) {
+//                $query->whereBetween('created_at', [$fromDate, $toDate]);
+//            });
+//        }
+//
+//        if (isset($keyword)) {
+//            $notificationSchedules = $notificationSchedules->where(function ($query) use ($keyword) {
+//                $query->where('id', 'like', "%" . $keyword . "%");
+//                $query->orWhere('title', 'like', "%" . $keyword . "%");
+//            });
+//        }
+//
+//        $notificationSchedules = $notificationSchedules->orderBy('id', 'DESC')->paginate($request->limit ?: 10);
+//
+//        return view('admin.adminer.notification_schedules.index', compact('notificationSchedules'));
+//    }
+    public function listNotification()
     {
-        $keyword = $request->search;
-        $fromDate = $request->from_date;
-        $toDate = $request->to_date;
-
-        $notificationSchedules = NotificationSchedule::query();
-
-        if (isset($fromDate) && isset($toDate)) {
-            $fromDate = Carbon::parse($fromDate)->startOfDay();
-            $toDate = Carbon::parse($toDate)->endOfDay();
-
-            $notificationSchedules->where(function ($query) use ($fromDate, $toDate) {
-                $query->whereBetween('created_at', [$fromDate, $toDate]);
-            });
-        }
-
-        if (isset($keyword)) {
-            $notificationSchedules = $notificationSchedules->where(function ($query) use ($keyword) {
-                $query->where('id', 'like', "%" . $keyword . "%");
-                $query->orWhere('title', 'like', "%" . $keyword . "%");
-            });
-        }
-
-        $notificationSchedules = $notificationSchedules->orderBy('id', 'DESC')->paginate($request->limit ?: 10);
-
-        return view('admin.adminer.notification_schedules.index', compact('notificationSchedules'));
+        $list  = NotificationSchedule::all();
+        return view('admin.notification.index', ['list' => $list]);
     }
 
-    public function create()
+//    create
+    public function createNotification()
     {
-        return view('admin.adminer.notification_schedules.create');
+        return view('admin.notification.add');
     }
+
+//    public function create()
+//    {
+//        return view('admin.adminer.notification_schedules.create');
+//    }
 
     public function validateDateTime($request)
     {
