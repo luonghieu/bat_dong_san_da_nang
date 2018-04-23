@@ -68,10 +68,10 @@ class NotificationScheduleController extends Controller
                 'recurring' => 'required',
             ],
             [
-                'title.required' => 'タイトルが空ではありません。',
-                'content.required' => '内容が空ではありません。',
-                'type.required' => '区分を選択してください。',
-                'recurring.required' => '日時を選択してください。',
+                'title.required' => 'Title is required',
+                'content.required' => 'Content is required',
+                'type.required' => 'Type is required',
+                'recurring.required' => 'Recurring is required',
             ]
         );
 

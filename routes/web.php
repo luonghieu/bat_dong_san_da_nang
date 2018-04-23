@@ -192,6 +192,27 @@ Route::group(['prefix' => 'common'], function () {
 
 });
 
+    // Login
+    Route::group(['namespace' =>'Auth'],function(){
+    
+    Route::get('login', 'AuthController@login')->name('auth.login');
+
+    Route::post('login',[
+        'uses' =>'AuthController@postLogin',
+        'as' =>'admin.user.postlogin'
+
+    ]);
+
+    Route::get('logout',[ 
+        'uses' =>'AuthController@logout',
+        'as' =>'admin.user.logout'
+
+    ]);
+
+        
+});
+
+
 // =====================public=========================
 Route::group(['prefix' => 'batdongsan'], function () {
     // index

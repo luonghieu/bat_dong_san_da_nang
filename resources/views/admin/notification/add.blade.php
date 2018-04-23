@@ -227,7 +227,7 @@ Notification
                 success : function(result){
                     html = '';
                     $.each(result, function(key, value){
-                        html += '<input type="radio" name="type" value="'+ key +'" > '+ value;
+                        html += '<input type="radio" name="customerId[]" value="'+ key +'" > '+ value;
                     });
                     $('#customer').html(html);
                 }
