@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -16,20 +18,20 @@ class AuthController extends Controller
         return view('admin.auth.login');
     }
 
-    // public function postLogin(Request $request){
-    //     $passWord = md5(trim($request->password));
+    public function postLogin(Request $request){
+        $passWord = md5(trim($request->password));
+        $username = trim($request->username);
 
-    //     $objUser = NguoiDung::where("maso","=",'123')->where("password","=",$passWord)->where('active','=',1)->first();
-    //     if (!empty($objUser)) {
-    //         $id=$objUser->id;
-    //         $request->session()->put('id', $id);
-    //         return redirect('/giaovien');
-    //         die();
-    //     }else{
-    //         $request->session()->flash('msg','Tài khoản không đúng');
-    //         return redirect()->route("admin.user.getlogin");
-    //     }          
-    // }
+        $objUser = User::where("username","=",$username)->where("password","=",$passWord)->where('active','=',1)->first();
+        if (!empty($objUser)) {
+            $id=$objUser->id;
+            $request->session()->put('objUser', $objUser);
+            return redirect()->route("admins.news.list");
+            die();
+        }else{
+            return redirect()->route("auth.login")->with('fail', 'Fail');
+        }          
+    }
 
     //  public function login($maso,$password){
     //     $passWord = md5(trim($password));

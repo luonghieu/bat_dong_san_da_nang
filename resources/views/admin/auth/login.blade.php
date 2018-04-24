@@ -14,10 +14,10 @@
         <link rel="stylesheet" href="{!! asset('admin_asset/css/vendor/bootstrap.min.css') !!}">
         <link rel="stylesheet" href="{!! asset('admin_asset/css/vendor/animate.css') !!}">
         <link rel="stylesheet" href="{!! asset('admin_asset/css/vendor/font-awesome.min.css') !!}">
-        <link rel="stylesheet" href="{!! asset('admin_asset/css/vendor/animsition/css/animsition.min.css') !!}">
+        <link rel="stylesheet" href="{!! asset('admin_asset/css/vendor/animsition.min.css') !!}">
 
-        <!-- project main css files -->
-        <link rel="stylesheet" href="{!! asset('admin_asset/css/vendor/bootstrap.min.css') !!}">
+
+        <link rel="stylesheet" href="{!! asset('admin_asset/css/main.css') !!}">
         <!--/ stylesheets -->
         <script src="{!! asset('admin_asset/s/vendor/modernizr/modernizr-2.8.3-respond-1.4.2.min.js') !!}"></script>
         <!--/ modernizr -->
@@ -34,55 +34,29 @@
 
 
                     <h2 class="text-light text-greensea">Log In</h2>
+                    @if (session('fail'))
+                    <div class="alert alert-lightred alert-dismissable fade in">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <strong>Account is incorrect!</strong>
+                    </div>
+                    @endif
 
-                    <form name="form" class="form-validation mt-20" novalidate="">
-
+                    <form name="form" class="form-validation mt-20" method="post" action="{!! route('auth.login') !!}">
+                        <input type="hidden" name="_token" value="{{csrf_token()}}" />
                         <div class="form-group">
-                            <input type="email" class="form-control underline-input" placeholder="Email">
+                            <input type="text" name="username" class="form-control underline-input" placeholder="username">
                         </div>
 
                         <div class="form-group">
-                            <input type="password" placeholder="Password" class="form-control underline-input">
+                            <input type="password" name="password" placeholder="Password" class="form-control underline-input">
                         </div>
 
                         <div class="form-group text-left mt-20">
-                            <a href="index-2.html" class="btn btn-greensea b-0 br-2 mr-5">Login</a>
-                            <label class="checkbox checkbox-custom-alt checkbox-custom-sm inline-block">
-                                <input type="checkbox"><i></i> Remember me
-                            </label>
-                            <a href="forgotpass.html" class="pull-right mt-10">Forgot Password?</a>
+                            <input type="submit" class="btn btn-greensea b-0 br-2 mr-5" value="Login">
                         </div>
 
                     </form>
 
-                    <hr class="b-3x">
-
-                    <div class="social-login text-left">
-
-                        <ul class="pull-right list-unstyled list-inline">
-                            <li class="p-0">
-                                <a class="btn btn-sm btn-primary b-0 btn-rounded-20" href="javascript:;"><i class="fa fa-facebook"></i></a>
-                            </li>
-                            <li class="p-0">
-                                <a class="btn btn-sm btn-info b-0 btn-rounded-20" href="javascript:;"><i class="fa fa-twitter"></i></a>
-                            </li>
-                            <li class="p-0">
-                                <a class="btn btn-sm btn-lightred b-0 btn-rounded-20" href="javascript:;"><i class="fa fa-google-plus"></i></a>
-                            </li>
-                            <li class="p-0">
-                                <a class="btn btn-sm btn-primary b-0 btn-rounded-20" href="javascript:;"><i class="fa fa-linkedin"></i></a>
-                            </li>
-                        </ul>
-
-                        <h5>Or login with</h5>
-
-                    </div>
-
-                    <div class="bg-slategray lt wrap-reset mt-40">
-                        <p class="m-0">
-                            <a href="signup.html" class="text-uppercase">Create an account</a>
-                        </p>
-                    </div>
 
                 </div>
 
