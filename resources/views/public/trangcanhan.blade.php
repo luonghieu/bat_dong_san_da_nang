@@ -82,13 +82,13 @@ $objUser = Session::get("objUser");
                                                     <a class="mr5 font13" href=""><s class="ic-delete mr5 fl"></s>Xóa</a>
                                                 </div>
                                             </td>
-                                            <td class="bor-right bor-bot">{!! $obj->typePost->name !!}</td>
-                                            <td class="bor-right bor-bot">{!! $obj->start_time !!}</td>
-                                            <td class="bor-right bor-bot">{!! $obj->end_time !!}</td>
+                                            <td class="bor-right bor-bot">{!! $item->typePost->name !!}</td>
+                                            <td class="bor-right bor-bot">{!! $item->start_time !!}</td>
+                                            <td class="bor-right bor-bot">{!! $item->end_time !!}</td>
                                             <td class="bor-bot">
                                                 <div class="action">
                                                     <div class="danglai">
-                                                        @if(date_diff($obj->end_time,date()) >0 )
+                                                        @if($item->end_time>date("Y-m-d") )
                                                         <div class="post_tooltip">
                                                             <span class="imgPost">Đăng lại</span>
                                                         </div>

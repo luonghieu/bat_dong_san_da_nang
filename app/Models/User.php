@@ -49,8 +49,8 @@ class User extends Authenticatable
     /**
      * Get customer relationship
      */
-    public function customer()
+    public function poster()
     {
-        return $this->hasOne('App\Models\Customer', 'user_id', 'id');
+        return $this->hasOne('App\Models\Poster', 'user_id', 'id');
     }
 }
