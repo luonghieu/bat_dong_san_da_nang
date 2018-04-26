@@ -75,9 +75,11 @@ class PublicController extends Controller
 	}
 
     // gioithieu
-	public function sangiaodich()
+	public function sangiaodich($type)
 	{
-		return view('public.sangiaodich');
+	    $menu = Category::where('type_transaction', $type)->pluck('name', 'id');
+	    $list = Post::whereIn(array_keys($menu))->orderBy('type_post_id', 'ASC')->get();
+		return view('public.sangiaodich', ['menu' => $menu, 'list' => $list, 'type' => $type]);
 	}
 
 

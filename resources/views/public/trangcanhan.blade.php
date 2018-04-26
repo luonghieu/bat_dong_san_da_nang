@@ -26,12 +26,12 @@ $objUser = Session::get("objUser");
                         <div class="fillter-news mb10 clearfix">
                             <div class="mix-select w-200 fl mr10 position">
 
-                                <input name="" type="text" id="txtTungay" class="gray show-value" placeholder="Từ ngày" onkeypress="return false;" />
+                                <input name="" type="date" id="txtTungay" class="gray show-value" placeholder="Từ ngày" onkeypress="return false;" />
                                 <s class="ic-search-arrow drop-doww"></s>
                             </div>
                             <div class="mix-select w-200 fl mr10 position">
 
-                                <input name="" type="text" id="txtDenngay" class="gray show-value" placeholder="Đến ngày" onkeypress="return false;" />
+                                <input name="" type="date" id="txtDenngay" class="gray show-value" placeholder="Đến ngày" onkeypress="return false;" />
                                 <s class="ic-search-arrow drop-dow"></s>
                             </div>
                             <div class="mix-select w-200 fl mr10 position wr_select">
@@ -77,9 +77,9 @@ $objUser = Session::get("objUser");
                                                 <div class="mt10">
                                                 </div>
                                                 <div class="mt10">
-                                                    <a class="mr5 font13" href="" target="_blank"><s class="ic-views mr5 mt3 fl"></s>Xem</a>
-                                                    <a class='mr5 font13' href=""><s class="ic-edit mr5 fl"></s>Sửa</a>
-                                                    <a class="mr5 font13" href=""><s class="ic-delete mr5 fl"></s>Xóa</a>
+                                                    <a class="mr5 font13" style="display: block" href="" target="_blank"><s class="ic-views mr5 mt3 fl"></s>Xem</a>
+                                                    <a class='mr5 font13' style="display: block" href=""><s class="ic-edit mr5 fl"></s>Sửa</a>
+                                                    <a class="mr5 font13" style="display: block" href=""><s class="ic-delete mr5 fl"></s>Xóa</a>
                                                 </div>
                                             </td>
                                             <td class="bor-right bor-bot">{!! $item->typePost->name !!}</td>
@@ -128,7 +128,7 @@ $objUser = Session::get("objUser");
                                     </li>
                                     <li class="bor-bot clearfix">
                                         <a class="block color-text pd10" href="/thanh-vien/quan-ly-tin-da-luu.htm">
-                                            <s class="ic-arow-news fl mt5 mr5"></s>Quản lý tin đã lưu
+                                            <s class="ic-arow-news fl mt5 mr5"></s>Quản lý liên hệ
                                         </a>
                                     </li>
                                     <li class="bor-bot clearfix">

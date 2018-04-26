@@ -177,7 +177,6 @@ Route::group(['prefix' => 'managements'], function () {
         Route::post('{id}/update', 'NotificationScheduleController@updateNotification')->name('admins.notification.update');
         Route::get('delete', 'NotificationScheduleController@deleteNotification')->name('admins.notification.delete');
         Route::post('action', 'NotificationScheduleController@actionNotification')->name('admins.notification.action');
-        Route::get('active', 'NotificationScheduleController@activeNotification')->name('admins.notification.active');
     });
 
 });
@@ -197,6 +196,7 @@ Route::group(['prefix' => 'common'], function () {
     
     Route::get('login', 'AuthController@login')->name('auth.login');
     Route::post('login', 'AuthController@postLogin')->name('auth.login');
+    Route::get('logout', 'AuthController@logout')->name('auth.logout');
 
         
 });
@@ -209,8 +209,9 @@ Route::group(['prefix' => 'batdongsan'], function () {
     Route::get('gioithieu', 'PublicController@gioithieu')->name('public.gioithieu');
     Route::get('duan', 'PublicController@duan')->name('public.duan');
     Route::get('chitietduan/{id}', 'PublicController@chitietduan')->name('public.chitietduan');
-    Route::get('sangiaodich', 'PublicController@sangiaodich')->name('public.sangiaodich');
-    Route::get('chitietsanbatdongsan', 'PublicController@chitietsanbatdongsan')->name('public.chitietsanbatdongsan');
+    Route::get('sangiaodich/type/{type}', 'PublicController@sangiaodich')->name('public.sangiaodich');
+    Route::get('sangiaodich/type/{type}/{id}', 'PublicController@sangiaodichtheloai')->name('public.sangiaodich.theloai');
+    Route::get('chitietsanbatdongsan/{id}', 'PublicController@chitietsanbatdongsan')->name('public.chitietsanbatdongsan');
     Route::get('lienhe', 'PublicController@lienhe')->name('public.lienhe');
     Route::get('tintuc/{catId}', 'PublicController@tintuc')->name('public.tintuc');
     Route::get('chitiettintuc/{id}', 'PublicController@chitiettintuc')->name('public.chitiettintuc');
@@ -221,6 +222,7 @@ Route::group(['prefix' => 'batdongsan'], function () {
     Route::post('dangnhap', 'PublicController@xulydangnhap')->name('public.dangnhap');
     Route::get('dangky', 'PublicController@dangky')->name('public.dangky');
     Route::get('trangcanhan', 'PublicController@trangcanhan')->name('public.trangcanhan');
+    Route::post('tuvan', 'PublicController@tuvan')->name('public.tuvan');
 
 
         //=======ajax==========
