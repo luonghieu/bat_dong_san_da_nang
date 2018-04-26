@@ -24,7 +24,6 @@ class AuthController extends Controller
 
         $objUser = User::where("username","=",$username)->where("password","=",$passWord)->where('active','=',1)->first();
         if (!empty($objUser)) {
-            $id=$objUser->id;
             $request->session()->put('objUser', $objUser);
             return redirect()->route("admins.news.list");
             die();
@@ -33,20 +32,10 @@ class AuthController extends Controller
         }          
     }
 
-    //  public function login($maso,$password){
-    //     $passWord = md5(trim($password));
-
-    //     $objUser = NguoiDung::where("maso","like","$maso")->where("password","like","$passWord")->where('active','=',1)->get();
-    //     if (!empty($objUser)) {
-    //        echo json_encode($objUser[0]);
-    //     }         
-    // }
-
-
-    // public function logout(Request $request){
-    //     $request->session()->forget('id');
-    //     return redirect()->route("admin.user.getlogin");
-    // }
+     public function logout(Request $request){
+         $request->session()->forget('objUser');
+         return redirect()->route("auth.login");
+     }
 
     // public function getUser($id){
         
@@ -73,101 +62,4 @@ class AuthController extends Controller
         
     // }
 
-    // public function getGiaoVien()
-    // {
-    //     $giaoVien = GiaoVien::select(['giaovien.hoten as tengiaovien','giaovien.id as maso','nguoidung.password as password','nguoidung.active as active'])->join('nguoidung','giaovien.id','=','nguoidung.maso')->get();
-    //     return view('admin.auth.giaovien',['giaoVien'=>$giaoVien]);
-    // }
-
-    // public function trangThaiGiaoVien($nid){
-    //     $objItem =NguoiDung::where('maso','=',$nid)->first();
-    //     if($objItem->active == '0'){
-    //         $objItem->active = '1';
-    //         $objItem->save();
-    //         echo "<a href='javascript:void(0)' onclick='getTrangThaiGV( {$nid});'>
-    //              <img src='/storage/app/file/active.gif'/>
-    //         </a>";
-    //     }else{
-    //         $objItem->active = '0';
-    //         $objItem->save();
-    //         echo "<a href='javascript:void(0)' onclick='getTrangThaiGV( {$nid});'>
-    //              <img src='/storage/app/file/deactive.gif'/>
-    //         </a>";
-    //     }
-    // }
-
-    // public function editpassGV($id){
-        
-    //     $giaoVien = GiaoVien::select(['giaovien.hoten as tengiaovien','giaovien.id as maso','nguoidung.password as password','nguoidung.active as active'])->join('nguoidung','giaovien.id','=','nguoidung.maso')->where('maso','=',$id)->get();
-    //     echo json_encode($giaoVien[0]); 
-    // }
-
-    //  public function postEditPassGV(){
-        
-    //     $maso = $_POST['masoGV'];
-    //     $passWord=$_POST['passwordGV'];
-    //     $objGV =NguoiDung::where('maso','=',$maso)->first();
-    //     $currentPass =$objGV->password;
-
-    //     if($currentPass != $passWord) {
-    //         $objGV->password=md5($passWord);
-    //         $objGV->save();
-    //         echo json_encode(1);
-    //     } else {
-    //          echo json_encode('notoke');
-    //     }
-        
-        
-    // }
-
-    // //HOCSINH
-    //  public function getHocSinh()
-    // {
-    //     $hocSinh = HocSinh::select(['hocsinh.hoten as tenhocsinh','hocsinh.id as maso','nguoidung.password as password','nguoidung.active as active'])->join('nguoidung','hocsinh.id','=','nguoidung.maso')->get();
-    //     return view('admin.auth.hocsinh',['hocSinh'=>$hocSinh]);
-    // }
-
-
-    // public function editpassHS($id){
-        
-    //     $hocSinh = HocSinh::select(['hocsinh.hoten as tenhocsinh','hocsinh.id as maso','nguoidung.password as password','nguoidung.active as active'])->join('nguoidung','hocsinh.id','=','nguoidung.maso')->where('maso','=',$id)->get();
-    //     echo json_encode($hocSinh[0]); 
-    // }
-
-    // public function postEditPassHS(){
-        
-    //     $maso = $_POST['masoHS'];
-    //     $passWord=$_POST['passwordHS'];
-    //     $objHS =NguoiDung::where('maso','=',$maso)->first();
-    //     $currentPass =$objHS->password;
-
-    //     if($currentPass != $passWord) {
-    //         $objHS->password=md5($passWord);
-    //         $objHS->save();
-    //         echo json_encode(1);
-    //     } else {
-    //          echo json_encode('notoke');
-    //     }
-        
-        
-    // }
-
-
-
-    //  public function trangThaiHocSinh($nid){
-    //     $objItem =NguoiDung::where('maso','=',$nid)->first();
-    //     if($objItem->active == '0'){
-    //         $objItem->active = '1';
-    //         $objItem->save();
-    //         echo "<a href='javascript:void(0)' onclick='getTrangThaiGV( {$nid});'>
-    //              <img src='/storage/app/file/active.gif'/>
-    //         </a>";
-    //     }else{
-    //         $objItem->active = '0';
-    //         $objItem->save();
-    //         echo "<a href='javascript:void(0)' onclick='getTrangThaiGV( {$nid});'>
-    //              <img src='/storage/app/file/deactive.gif'/>
-    //         </a>";
-    //     }
-    // }
 }

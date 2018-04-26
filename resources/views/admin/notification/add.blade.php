@@ -89,7 +89,7 @@ Notification
 				<div class="col-sm-10">
 					<textarea id="summernote" name="content">
 					</textarea>
-					@if ($errors->has('detail'))
+					@if ($errors->has('content'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
 						<strong>{!! $errors->first('content') !!}</strong>
@@ -101,6 +101,12 @@ Notification
 			<div class="form-group">
 				<label class="col-sm-2 col-sm-offset-2 control-label">Send time:</label>
 			</div>
+			@if(Session::has('msgdate'))
+				<div class="alert alert-lightred alert-dismissable fade in">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+					<strong>{{ Session::get('msgdate') }}</strong>
+				</div>
+			@endif
 			<div class="form-group">
 				<div class="col-sm-2 col-sm-offset-2 recurring">
 					<input type="radio" name="recurring" value='3'> Hàng tháng

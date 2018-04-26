@@ -15,7 +15,9 @@ use App\Models\Street;
 use App\Models\UnitPrice;
 use App\Models\TypePost;
 use App\Models\Post;
+use App\Models\User;
 use App\Http\Requests\PostCreateRequest;
+
 class PublicController extends Controller
 {
 	public function __construct()
@@ -73,9 +75,11 @@ class PublicController extends Controller
 	}
 
     // gioithieu
-	public function sangiaodich()
+	public function sangiaodich($type)
 	{
-		return view('public.sangiaodich');
+	    $menu = Category::where('type_transaction', $type)->pluck('name', 'id');
+	    $list = Post::whereIn(array_keys($menu))->orderBy('type_post_id', 'ASC')->get();
+		return view('public.sangiaodich', ['menu' => $menu, 'list' => $list, 'type' => $type]);
 	}
 
 
@@ -188,20 +192,19 @@ class PublicController extends Controller
 	}
 
 	// gioithieu
-	public function xulydangnhap(Requests $request)
+	public function xulydangnhap(Request $request)
 	{
 		$passWord = md5(trim($request->password));
-        $objUser = User::where(function ($query) {
+        $objUser = User::where(function ($query) use ($request) {
 		    $query->where("username","=",$request->name)
 		          ->orWhere('email', '=', $request->name);
 		})->Where("password","=",$passWord)->where('active','=',1)->where('role', User::ROLE['customer'])->first();
         if (!empty($objUser)) {
             $request->session()->put('objUser', $objUser);
-            $posts = Post::where('poster_id', $$objUser->id)->get();
-            return redirect()->route("public.trangcanhan", ['posts' => $posts]);
+            
+            return redirect()->route("public.trangcanhan");
         }else{
-            $request->session()->flash('msg','Tài khoản không đúng');
-            return redirect()->route("public.dangnhap");
+            return redirect()->route("public.dangnhap")->with('msg','Tài khoản không đúng');
         }
 	}
 
@@ -215,7 +218,9 @@ class PublicController extends Controller
 	// gioithieu
 	public function trangcanhan()
 	{
-		return view('public.trangcanhan');
+		$objUser = session()->get('objUser');
+		$posts = Post::where('poster_id', $objUser->poster->id)->get();
+		return view('public.trangcanhan', ['posts' => $posts]);
 	}
 
 

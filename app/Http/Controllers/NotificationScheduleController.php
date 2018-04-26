@@ -4,43 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\NotificationSchedule;
 use App\Models\User;
-use App\Models\Customer;
-use App\Models\Assigntask;
 use Carbon\Carbon;
-
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class NotificationScheduleController extends Controller
 {
-//    public function index(Request $request)
-//    {
-//        $keyword = $request->search;
-//        $fromDate = $request->from_date;
-//        $toDate = $request->to_date;
-//
-//        $notificationSchedules = NotificationSchedule::query();
-//
-//        if (isset($fromDate) && isset($toDate)) {
-//            $fromDate = Carbon::parse($fromDate)->startOfDay();
-//            $toDate = Carbon::parse($toDate)->endOfDay();
-//
-//            $notificationSchedules->where(function ($query) use ($fromDate, $toDate) {
-//                $query->whereBetween('created_at', [$fromDate, $toDate]);
-//            });
-//        }
-//
-//        if (isset($keyword)) {
-//            $notificationSchedules = $notificationSchedules->where(function ($query) use ($keyword) {
-//                $query->where('id', 'like', "%" . $keyword . "%");
-//                $query->orWhere('title', 'like', "%" . $keyword . "%");
-//            });
-//        }
-//
-//        $notificationSchedules = $notificationSchedules->orderBy('id', 'DESC')->paginate($request->limit ?: 10);
-//
-//        return view('admin.adminer.notification_schedules.index', compact('notificationSchedules'));
-//    }
+
     public function listNotification()
     {
         $list  = NotificationSchedule::all();
@@ -52,11 +21,6 @@ class NotificationScheduleController extends Controller
     {
         return view('admin.notification.add');
     }
-
-//    public function create()
-//    {
-//        return view('admin.adminer.notification_schedules.create');
-//    }
 
     public function validateDateTime($request)
     {
@@ -149,11 +113,9 @@ class NotificationScheduleController extends Controller
         }
 
         $type = $request->type;
-
+        $customerIds = [];
         if (NotificationSchedule::TYPES['user'] == $type) {
-            $countUser = User::active()->where('type', User::TYPES['user'])->count();
-        } else {
-            $countUser = User::active()->where('type', User::TYPES['staff'])->count();
+            $customerIds = $request->customerId;
         }
 
         $data = [
@@ -162,24 +124,11 @@ class NotificationScheduleController extends Controller
             "content" => $request->content,
             "time" => $time,
             "recurring" => $recurring,
-            "countUser" => $countUser,
+            "customerIds" => $customerIds,
 
         ];
 
         return $data;
-    }
-
-    public function confirmCreateNotificationSchedule(Request $request)
-    {
-        $data = $this->validateDateTime($request);
-
-        if (!$data) {
-            $request->session()->flash('msgdate', trans('messages.date_not_valid'));
-
-            return redirect()->route('admin.notification_schedules.create');
-        }
-
-        return view('admin.adminer.notification_schedules.confirm', compact('data'));
     }
 
     public function saveNotificationSchedules($notificationSchedule, $request)
@@ -201,8 +150,6 @@ class NotificationScheduleController extends Controller
                 $notificationSchedule->is_recurring = true;
                 $notificationSchedule->recurring_type = 1;
 
-                return $notificationSchedule;
-
                 break;
 
             case NotificationSchedule::RECURRING_TYPES['weekly']:
@@ -211,8 +158,6 @@ class NotificationScheduleController extends Controller
                 $notificationSchedule->is_recurring = true;
                 $notificationSchedule->recurring_type = 2;
 
-                return $notificationSchedule;
-
                 break;
 
             case NotificationSchedule::RECURRING_TYPES['monthly']:
@@ -220,8 +165,6 @@ class NotificationScheduleController extends Controller
                 $notificationSchedule->day_of_month = $data['time']['day_of_month'];
                 $notificationSchedule->is_recurring = true;
                 $notificationSchedule->recurring_type = 3;
-
-                return $notificationSchedule;
 
                 break;
 
@@ -232,46 +175,25 @@ class NotificationScheduleController extends Controller
                 $notificationSchedule->is_recurring = false;
                 $notificationSchedule->recurring_type = null;
 
-                return $notificationSchedule;
-
                 break;
         }
+
+        $notificationSchedule->save();
+
+        return redirect()->route('admins.notification.list')->with('success', 'Success');
+
     }
 
-    public function createDraftNotificationSchedules(Request $request)
+    public function storeNotification(Request $request)
     {
         $notificationSchedule = new NotificationSchedule;
 
         $result = $this->saveNotificationSchedules($notificationSchedule, $request);
 
         if (!$result) {
-            $request->session()->flash('msgdate', trans('messages.date_not_valid'));
+            $request->session()->flash('msgdate', 'Date is not valid');
 
-            return redirect()->route('admin.notification_schedules.create');
-        }
-
-        $notificationSchedule->status = 3;
-
-        try {
-
-            $notificationSchedule->save();
-
-            return redirect()->route('admin.notification_schedules.index');
-        } catch (\Exception $e) {
-            return view('errors.500');
-        }
-    }
-
-    public function createNotification(Request $request)
-    {
-        $notificationSchedule = new NotificationSchedule;
-
-        $result = $this->saveNotificationSchedules($notificationSchedule, $request);
-
-        if (!$result) {
-            $request->session()->flash('msgdate', trans('messages.date_not_valid'));
-
-            return redirect()->route('admin.notification_schedules.create');
+            return redirect()->route('admins.notification.create');
         }
 
         $notificationSchedule->status = 1;
@@ -280,77 +202,40 @@ class NotificationScheduleController extends Controller
 
             $notificationSchedule->save();
 
-            return redirect()->route('admin.notification_schedules.index');
+            return redirect()->route('admins.notification.list');
         } catch (\Exception $e) {
             return view('errors.500');
         }
     }
 
-    public function show(NotificationSchedule $notificationSchedule)
-    {
-        return view('admin.adminer.notification_schedules.show', compact('notificationSchedule'));
-    }
-
-    public function destroy($id)
+    public function delete($id)
     {
         try {
             $notificationSchedule = NotificationSchedule::find($id);
 
             $notificationSchedule->delete();
 
-            return redirect()->route('admin.notification_schedules.index');
+            return redirect()->route('admins.notification.list');
         } catch (\Exception $e) {
             return view('errors.500');
         }
     }
 
-    public function edit(NotificationSchedule $notificationSchedule)
+    public function edit($id)
     {
-        return view('admin.adminer.notification_schedules.edit', compact('notificationSchedule'));
+        $notificationSchedule = NotificationSchedule::find($id);
+        return view('admin.notification.edit', compact('notificationSchedule'));
     }
 
-    public function confirmNotificationSchedule(NotificationSchedule $notificationSchedule, Request $request)
+    public function updateNotificationSchedules($id, Request $request)
     {
-        $data = $this->validateDateTime($request);
-        if (!$data) {
-            $request->session()->flash('msgdate', trans('messages.date_not_valid'));
-
-            return redirect()->route('admin.notification_schedules.edit', compact('notificationSchedule'));
-        }
-
-        return view('admin.adminer.notification_schedules.confirm', compact('notificationSchedule', 'data'));
-    }
-
-    public function draftNotificationSchedules(NotificationSchedule $notificationSchedule, Request $request)
-    {
+        $notificationSchedule = NotificationSchedule::find($id);
         $result = $this->saveNotificationSchedules($notificationSchedule, $request);
 
         if (!$result) {
             $request->session()->flash('msgdate', trans('messages.date_not_valid'));
 
-            return redirect()->route('admin.notification_schedules.edit', compact('notificationSchedule'));
-        }
-
-        $notificationSchedule->status = 3;
-
-        try {
-
-            $notificationSchedule->save();
-
-            return redirect()->route('admin.notification_schedules.index');
-        } catch (\Exception $e) {
-            return view('errors.500');
-        }
-    }
-
-    public function updateNotificationSchedules(NotificationSchedule $notificationSchedule, Request $request)
-    {
-        $result = $this->saveNotificationSchedules($notificationSchedule, $request);
-
-        if (!$result) {
-            $request->session()->flash('msgdate', trans('messages.date_not_valid'));
-
-            return redirect()->route('admin.notification_schedules.edit', compact('notificationSchedule'));
+            return redirect()->route('admins.notification.edit', compact('notificationSchedule'));
         }
 
         $notificationSchedule->status = 1;
@@ -359,11 +244,26 @@ class NotificationScheduleController extends Controller
 
             $notificationSchedule->save();
 
-            return redirect()->route('admin.notification_schedules.index');
+            return redirect()->route('admins.notification.list');
         } catch (\Exception $e) {
             return view('errors.500');
         }
     }
 
-    
+    public function actionNotification(Request $request)
+    {
+        $listObj = NotificationSchedule::whereIn('id', $request->selected)->get();
+        if (!empty($listObj)) {
+            switch ($request->option) {
+                case 1:
+                    foreach ($listObj as $item) {
+                        $item->delete();
+                    }
+                    break;
+            }
+            return redirect()->route('admins.notification.list')->with('success', 'Success');
+        } else {
+
+        }
+    }
 }
