@@ -1,4 +1,9 @@
-<script type="text/javascript" src="{!! asset('public_asset/js/jquery-1.8.2.min.js') !!}"></script>
+<!-- <script type="text/javascript" src="{!! asset('public_asset/js/jquery-1.8.2.min.js') !!}"></script> -->
+<!-- <script src="{!! asset('public_asset/js/jquery.min.js') !!}"></script> -->
+<script src="{!! asset('public_asset/js/bootstrap.min.js') !!}"></script>
+<script src="{!! asset('public_asset/js/jquery.dataTables.min.js') !!}"></script>
+<script src="{!! asset('public_asset/js/dataTables.bootstrap4.min.js') !!}"></script>
+<script type="text/javascript" src="{!! asset('public_asset/js/menu-onpage.js') !!}"></script>
 @yield('script')
     <script type="text/javascript" src="{!! asset('public_asset/js/nivo.slider.js') !!}"></script>
 
@@ -219,7 +224,7 @@
 
 </body>
 
-<script type="text/javascript" src="{!! asset('public_asset/js/jquery.1.10.2.min.js') !!}"></script>
+<!-- <script type="text/javascript" src="{!! asset('public_asset/js/jquery.1.10.2.min.js') !!}"></script> -->
 
 <script type="text/javascript" src="{!! asset('public_asset/js/jquery.mmenu.min.all.js') !!}"></script>
 
@@ -234,7 +239,7 @@
 
 	<!-- Add fancyBox main JS and CSS files -->
 	<script type="text/javascript" src="{!! asset('public_asset/source/jquery.fancybox.js?v=2.1.5') !!}"></script>
-    <script type="text/javascript" src="{!! asset('public_asset/source/jquery-ui.min.js?v=2.1.5') !!}"></script>
+   <!--  <script type="text/javascript" src="{!! asset('public_asset/source/jquery-ui.min.js?v=2.1.5') !!}"></script> -->
 	<link rel="stylesheet" type="text/css" href="{!! asset('public_asset/source/jquery.fancybox.css?v=2.1.5') !!}" media="screen" />
 
 	<!-- Add Button helper (this is optional) -->

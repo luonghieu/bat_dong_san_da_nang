@@ -29,7 +29,7 @@ class NewsCreateRequest extends FormRequest
         return [
             'name' => 'required|max:255',
             'feature' => 'required|min:3|max:255',
-            'detail' => 'required|min:6|max:255',
+            'detail' => 'required|min:6',
             'link' => 'required|max:255',
             'cat_new_id' => ['required', Rule::in($list)],
             'image' => 'nullable|image|max: 1000',
@@ -46,7 +46,6 @@ class NewsCreateRequest extends FormRequest
             'feature.max' => 'Desribe not grater than 255 character.',
             'detail.required' => 'Detail is required.',
             'detail.min' => 'Detail not less than 6 character.',
-            'detail.max' => 'Detail not grater than 255 character.',
             'link.required' => 'Link is required.',
             'link.min' => 'Link not greater than 255 character.',
             'cat_new_id.required' => 'Category is required.',

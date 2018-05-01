@@ -1,6 +1,6 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.employee.css')
+@include('admin.employee.leader.css')
 @endsection
 @section('title')
 Detail Employee

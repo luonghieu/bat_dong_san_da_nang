@@ -14,7 +14,7 @@ Employee
 		<h1 class="custom-font"><strong>Sale</strong></h1>
 		<ul class="controls">
 			<li>
-				<a role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
+				<a href="{!! route('admins.sale.create') !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
 			</li>
 			<li class="dropdown">
 
@@ -50,9 +50,19 @@ Employee
 	<!-- tile body -->
 	<div class="tile-body">
 		<div class="table-responsive">
+			@if (session('success'))
+			<div class="alert alert-success">
+				<p><strong>Add success!</strong></p>
+			</div>
+			@endif
 			<table class="table table-custom" id="editable-usage">
 				<thead>
 					<tr>
+						<th>
+							<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0">
+								<input type="checkbox" id="select-all"><i></i>
+							</label>
+						</th>
 						<th>Id</th>
 						<th>Name</th>
 						<th>Gender</th>
@@ -65,6 +75,9 @@ Employee
 				<tbody>
 					@foreach($list as $obj)
 					<tr class="odd gradeX">
+						<td>
+							<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0"><input type="checkbox" class="selectMe" name="selected[]" value="{!! $obj->id !!}" ><i></i></label>
+						</td>
 						<td>{!! $obj->id !!}</td>
 						<td>
 							<a href="{!! route('admins.employee.detail', ['employee_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $obj->name !!}</a>
@@ -80,12 +93,12 @@ Employee
 						<td>{!! $obj->phone !!}</td>
 						<td>
 							@if ($obj->user->active == 0)
-								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
+							<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
 							@else
-								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
+							<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
 							@endif
 						</td>
-						<td class="actions"><a role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
+						<td class="actions"><a href="{!! route('admins.sale.edit', ['id' => $obj->id]) !!}" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
 					</tr>
 					@endforeach
 				</tbody>
@@ -101,36 +114,36 @@ Employee
 @include('admin.employee.sale.script')
 <script>
     // $( document ).ready(function() {
-    $('#select-all').change(function() {
-        if ($(this).is(":checked")) {
-            $('#editable-usage .selectMe').prop('checked', true);
-        } else {
-            $('#editable-usage .selectMe').prop('checked', false);
-        }
-    });
+    	$('#select-all').change(function() {
+    		if ($(this).is(":checked")) {
+    			$('#editable-usage .selectMe').prop('checked', true);
+    		} else {
+    			$('#editable-usage .selectMe').prop('checked', false);
+    		}
+    	});
 
-    $('#apply').click(function() {
-        var list = $('input[name="selected[]"]:checked');
-        if (list.length == 0) {
-            alert('No obj is selected!');
-            return false;
-        }
-        return true;
-    });
+    	$('#apply').click(function() {
+    		var list = $('input[name="selected[]"]:checked');
+    		if (list.length == 0) {
+    			alert('No obj is selected!');
+    			return false;
+    		}
+    		return true;
+    	});
 
-    function active(id) {
-        $.ajax({
-            url: "{!! route('admins.sale.active') !!}",
-            method: "GET",
-            data: {
-                'id' : id
-            },
-            dataType : 'json',
-            success : function(result){
-                alert('Action success!');
-            }
-        });
-    }
+    	function active(id) {
+    		$.ajax({
+    			url: "{!! route('admins.sale.active') !!}",
+    			method: "GET",
+    			data: {
+    				'id' : id
+    			},
+    			dataType : 'json',
+    			success : function(result){
+    				alert('Action success!');
+    			}
+    		});
+    	}
 
 
     // });

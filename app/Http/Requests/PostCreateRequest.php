@@ -46,7 +46,7 @@ class PostCreateRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'Block is required.',
+            'name.required' => 'Name is required.',
             'fullname.required' => 'Fullname is required.',
             'phone.required' => 'Phone is required.',
             'email.required' => 'Email is required.',

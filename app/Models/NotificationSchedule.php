@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class NotificationSchedule extends Model
 {
+    protected $table = 'notification_schedules';
+
     const RECURRING_TYPES = [
         'daily' => 1,
         'weekly' => 2,
@@ -33,5 +35,6 @@ class NotificationSchedule extends Model
         'send_date',
         'send_time',
         'status',
+        'reciever_id'
     ];
 }

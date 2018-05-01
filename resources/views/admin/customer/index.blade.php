@@ -13,6 +13,12 @@ Customer
 	<div class="tile-header dvd dvd-btm">
 		<h1 class="custom-font"><strong>Customer</strong></h1>
 		<ul class="controls">
+			<li>
+				<a href="{!! route('admins.customer.addRegister') !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
+			</li>
+			<li>
+				<a href="{!! route('admins.customer.list') !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Refresh</a>
+			</li>
 			<li class="dropdown">
 
 				<a role="button" tabindex="0" class="dropdown-toggle settings" data-toggle="dropdown">
@@ -64,32 +70,47 @@ Customer
 							</th>
 							<th>Id</th>
 							<th>Name</th>
-							<th>Address</th>
 							<th>Email</th>
 							<th>Phone</th>
-							<th>Number of purchase</th>
-							<th>Purchase transaction</th>
+							<th>Personal information</th>
+							<th>Project</th>
 							<th>Created at</th>
-							<th style="width: 160px;" class="no-sort">Actions</th>
+							<th>Actions</th>
+							<th>Add</th>
 						</tr>
 					</thead>
 					<tbody>
 						@foreach($list as $obj)
 						<tr class="odd gradeX">
-							<td>
+							<td rowspan="{!! $obj->registers->count() !!}">
 								<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0"><input type="checkbox" class="selectMe" name="selected[]" value="{!! $obj->id !!}" ><i></i></label>
 							</td>
-							<td>{!! $obj->id !!}</td>
-							<td>{!! $obj->name !!}</td>
-							<td>{!! $obj->address !!}</td>
-							<td>{!! $obj->user->email !!}</td>
-							<td>{!! $obj->phone !!}</td>
-							<td>{!! $obj->purchaseTransaction->count() !!}</td>
-							<td>
+							<td rowspan="{!! $obj->registers->count() !!}">{!! $obj->id !!}</td>
+							<td rowspan="{!! $obj->registers->count() !!}">{!! $obj->name !!}</td>
+							<td rowspan="{!! $obj->registers->count() !!}">{!! $obj->email !!}</td>
+							<td rowspan="{!! $obj->registers->count() !!}">{!! $obj->phone !!}</td>
+							<td rowspan="{!! $obj->registers->count() !!}">
 								<a href="{!! route('admins.customer.detail', ['customer_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
 							</td>
-							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
-							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
+							<td>
+								@foreach($obj->registers as $item)
+								<div style="height: 50px"><a href="{!! route('admins.customer.detailTransaction', ['registerId' => $item->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $item->project->name !!}</a></div>
+								@endforeach
+							</td>
+							<td>
+								@foreach($obj->registers as $item)
+								<div style="height: 50px;">{!! date( "d/m/Y", strtotime($item->created_at)) !!}</div>
+								@endforeach
+							</td>
+							<td class="actions">
+								@foreach($obj->registers as $item)
+								<div style="height: 50px;"><a href="javascript:void(0)" onclick="removeRegister({!! $item->id !!})" role="button" tabindex="0" class="text-danger text-uppercase text-strong text-sm mr-10">Remove</a></div>
+								@endforeach
+							</td>
+							<td rowspan="{!! $obj->registers->count() !!}">
+								<a href="javascript:void(0)" onclick="addRegister({!! $obj->id !!})" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Add</a>
+								<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
+							</td>
 						</tr>
 						@endforeach
 					</tbody>
@@ -114,7 +135,7 @@ Customer
 </section>
 <!-- /tile -->
 @endsection
-
+@include('admin.customer.addRegister')
 @section('script')
 @include('admin.customer.script')
 <script>
@@ -136,6 +157,43 @@ Customer
 		return true;
 	});
 
+	function addRegister(id) {
+		$.ajax({
+			url: "{{ route('admins.customer.getRegister') }}",
+			method: "GET",
+			data: {
+				'id' : id,
+			},
+			dataType : 'json',
+			success : function(result){
+				html = '';
+				$.each (result, function (key, item){
+					html += '<option value="' + key + '">' + item + '</option>'
+				});
+				$('#projects').html(html);
+				$('#id').val(id);
+				$('#addRegister').modal('show');
+			}
+		});
+	}
+
+	function removeRegister(id) {
+		if (confirm('Are you sure!')) {
+			$.ajax({
+				url: "{{ route('admins.customer.removeRegister') }}",
+				method: "GET",
+				data: {
+					'id' : id,
+				},
+				dataType : 'json',
+				success : function(result){
+					alert('Delete success!');
+				}
+			});
+		} else {
+			return false;
+		}
+	}
 
 // });
 </script>

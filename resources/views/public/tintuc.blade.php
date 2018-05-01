@@ -6,7 +6,11 @@
 
         <div class="breakdum">
 
-            <a href="http://phoson.vn">Trang chủ</a><span> <i class="fa fa-caret-right" aria-hidden="true"></i> <h1>Tin tức</h1></span>
+            <a href="http://phoson.vn">Trang chủ</a><span> <i class="fa fa-caret-right" aria-hidden="true"></i> <h1>Tin tức</h1>
+                @if(isset($cat))
+                <i class="fa fa-caret-right" aria-hidden="true"></i><h1>{!! $cat->name !!}</h1>
+                @endif
+            </span>
 
         </div>
 
@@ -14,7 +18,7 @@
         <div class="row">
 
             <div class="col-md-8">
-                @foreach($newsByCat as $obj)
+                @foreach($list as $obj)
 
                 <div class="item_news">
 
@@ -33,7 +37,7 @@
                 </div>
                 @endforeach
 
-                <div class="navigation"><span class="current_page_item">Trang <b>1</b> trên <b>16</b></span><span class="current_page_item">1</span><span class="page_item"><a href="http://phoson.vn/tin-tuc/2">2</a></span><span class="page_item"><a href="http://phoson.vn/tin-tuc/3">3</a></span><span class="page_item"><a href="http://phoson.vn/tin-tuc/4">4</a></span><span class="page_item"><a href="http://phoson.vn/tin-tuc/5">5</a></span><span class="page_item"><a href="http://phoson.vn/tin-tuc/6">6</a></span><span class="page_item"><a href="http://phoson.vn/tin-tuc/7">7</a></span><span class="page_item"><a href="http://phoson.vn/tin-tuc/2">»</a></span><span class="current_page_item">...</span><span class="page_item"><a href="http://phoson.vn/tin-tuc/16">16</a></span></div>
+                <div>{!! $list->links() !!}</div>
             </div>
 
             <div class="col-md-4">

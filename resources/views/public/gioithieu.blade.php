@@ -3,7 +3,7 @@
 <div class="content_wrapper">
     <div class="container">
         <div class="breakdum">
-            <a href="http://phoson.vn">Trang chủ</a><span> <i class="fa fa-caret-right" aria-hidden="true"></i> <h1>Giới thiệu</h1></span>
+            <a href="{!! route('public.trangchu') !!}">Trang chủ</a><span> <i class="fa fa-caret-right" aria-hidden="true"></i> <h1>Giới thiệu</h1></span>
         </div>
         <div class="noi_dung"><p>
             <br />

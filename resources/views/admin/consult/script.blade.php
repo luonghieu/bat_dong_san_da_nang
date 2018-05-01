@@ -28,7 +28,7 @@
       var aData = oTable.row(nRow).data();
 
       $.ajax({
-        url: "{!! route('admins.product.sale.delete') !!}",
+        url: "{!! route('admins.consult.delete') !!}",
         method: "GET",
         data: {
           'id' : aData[1]
@@ -41,6 +41,11 @@
       });
     });
 
+    //load wysiwyg editor
+    $('#summernote').summernote({
+      height: 200   //set editable area's height
+    });
+  //*load wysiwyg editor
 });
 
 </script>

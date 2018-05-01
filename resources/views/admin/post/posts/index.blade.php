@@ -1,6 +1,6 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.product.lease.css')
+@include('admin.post.posts.css')
 @endsection
 @section('title')
 Posts
@@ -13,9 +13,6 @@ Posts
 	<div class="tile-header dvd dvd-btm">
 		<h1 class="custom-font"><strong>Posts</strong></h1>
 		<ul class="controls">
-			<li>
-				<a href="{!! route('admins.product.lease.create') !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
-			</li>
 			<li class="dropdown">
 
 				<a role="button" tabindex="0" class="dropdown-toggle settings" data-toggle="dropdown">
@@ -70,6 +67,7 @@ Posts
 							<th>Description</th>
 							<th>Direction</th>
 							<th>Category</th>
+							<th>Type</th>
 							<th>Image</th>
 							<th>Status</th>
 							<th>Village</th>
@@ -107,11 +105,18 @@ Posts
 							<td>{!! $obj->description !!}</td>
 							<td>
 								@foreach($direction as $key => $value)
-									@if($obj->direction == $key) {!! $value !!}
-									@endif
+								@if($obj->direction == $key) {!! $value !!}
+								@endif
 								@endforeach
 							</td>
 							<td>{!! $obj->cat->name !!}</td>
+							<td>
+								@if ($obj->cat->type_transaction == 1)
+								<p>Bán</p>
+								@else
+								<p>Cho thuê</p>
+								@endif
+							</td>
 							<td><img src="{!! asset((empty($obj->image)) ? '/images/default.jpg' : $obj->image ) !!}" class="img-responsive text-center" /></td>
 							<td>
 								<select name="status-{!! $obj->id !!}" onChange = "changeStatus({!! $obj->id !!})">
@@ -122,18 +127,23 @@ Posts
 							</td>
 							<td>
 								@if ($obj->village_id)
-									{!! $obj->village->name !!}
+								{!! $obj->village->name !!}
 								@endif
-									<p>Khong xac dinh</p>
+								<p>Khong xac dinh</p>
 							</td>
 							<td>
 								@if ($obj->street_id)
-									{!! $obj->street->name !!}
+								{!! $obj->street->name !!}
 								@endif
-									<p>Khong xac dinh</p>
+								<p>Khong xac dinh</p>
 							</td>
 							<td>{!! $obj->district->name !!}</td>
-							<td>{!! $obj->project->name !!}</td>
+							<td>
+								@if ($obj->project_id)
+								{!! $obj->project->name !!}
+								@endif
+								<p>Khong xac dinh</p>
+							</td>
 							<td>{!! $obj->area !!}</td>
 							<td>{!! $obj->view !!}</td>
 							<td>{!! $obj->price !!}</td>
@@ -183,38 +193,38 @@ Posts
 @include('admin.post.posts.script')
 <script>
 	// $( document ).ready(function() {
-	$('#select-all').change(function() {
-		if ($(this).is(":checked")) {
-			$('#editable-usage .selectMe').prop('checked', true);
-		} else {
-			$('#editable-usage .selectMe').prop('checked', false);
-		}
-	});
+		$('#select-all').change(function() {
+			if ($(this).is(":checked")) {
+				$('#editable-usage .selectMe').prop('checked', true);
+			} else {
+				$('#editable-usage .selectMe').prop('checked', false);
+			}
+		});
 
-	$('#apply').click(function() {
-		var list = $('input[name="selected"]:checked');
-		if (list.length == 0) {
-			alert('No obj is selected!');
-			return false;
-		}
-		return true;
-	});
+		$('#apply').click(function() {
+			var list = $('input[name="selected"]:checked');
+			if (list.length == 0) {
+				alert('No obj is selected!');
+				return false;
+			}
+			return true;
+		});
 
-    function changeStatus(id) {
-        status = $('select[name = "status-' + id + '"]').val();
-        $.ajax({
-            url: "{!! route('admins.post.status') !!}",
-            method: "GET",
-            data: {
-                'id' : id,
-				'status' : status
-            },
-            dataType : 'json',
-            success : function(result){
-                alert('Action success!');
-            }
-        });
-    }
+		function changeStatus(id) {
+			status = $('select[name = "status-' + id + '"]').val();
+			$.ajax({
+				url: "{!! route('admins.post.status') !!}",
+				method: "GET",
+				data: {
+					'id' : id,
+					'status' : status
+				},
+				dataType : 'json',
+				success : function(result){
+					alert('Action success!');
+				}
+			});
+		}
 // });
-	</script>
-	@endsection
+</script>
+@endsection

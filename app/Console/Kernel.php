@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('sms:birthday')->hourly();
+        $schedule->command('sms:birthday')->everyMinute();
     }
 
     /**

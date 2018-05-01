@@ -2,17 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AssignTask;
 use App\Models\NotificationSchedule;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Notification;
 
 class NotificationScheduleController extends Controller
 {
 
     public function listNotification()
     {
-        $list  = NotificationSchedule::all();
+        $objLogin = session()->get('objUser');
+
+        if ($objLogin->role == User::ROLE['admin']) {
+            $list  = NotificationSchedule::all();
+        } else {
+            $customerId = AssignTask::where('employee_id', $objLogin->employee->id)->pluck('id')->toArray();
+            $list  = NotificationSchedule::where('reciever_id', $objLogin->id)->orWhereIn('reciever_id', $customerId)->orderBy('status', 'ASC')->orderBy('id', 'DESC')->get();
+        }
+
         return view('admin.notification.index', ['list' => $list]);
     }
 
@@ -265,5 +275,13 @@ class NotificationScheduleController extends Controller
         } else {
 
         }
+    }
+
+    // status
+    public function statusNotification(Request $request)
+    {
+        $objUpdate = Notification::find($request->id);
+        $objUpdate->update(['status' => $request->status]);
+        echo json_encode('ok');
     }
 }

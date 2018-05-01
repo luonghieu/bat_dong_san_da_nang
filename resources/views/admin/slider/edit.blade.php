@@ -98,7 +98,7 @@ Slider
 			<div class="form-group">
 				<label class="col-sm-2 control-label">Description</label>
 				<div class="col-sm-10">
-					<textarea id="summernote" name="detail">{!! $obj->description !!}
+					<textarea id="summernote" name="description">{!! $obj->description !!}
 					</textarea>
 					@if ($errors->has('description'))
 					<div class="alert alert-lightred alert-dismissable fade in">
@@ -110,7 +110,7 @@ Slider
 			</div>
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-10">
-					<button type="submit" class="btn btn-rounded btn-primary btn-sm">Cancel</button>
+					<button type="reset" class="btn btn-rounded btn-primary btn-sm">Cancel</button>
 				</div>
 			</div>
 		</form>

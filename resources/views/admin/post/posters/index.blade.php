@@ -1,6 +1,6 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.customer.postCustomer.css')
+@include('admin.post.posters.css')
 @endsection
 @section('title')
 Post Customer
@@ -87,7 +87,7 @@ Post Customer
 							<td>{!! $obj->phone !!}</td>
 							<td>{!! $obj->posts->count() !!}</td>
 							<td>
-								<a href="{!! route('admins.poster.detail', ['poster_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
+								<a href="{!! route('admins.post.listByPoster', ['id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
 							</td>
 							<td>
 								@if ($obj->active == 0) 
@@ -126,7 +126,7 @@ Post Customer
 @endsection
 
 @section('script')
-@include('admin.customer.postCustomer.script')
+@include('admin.post.posters.script')
 <script>
 // $( document ).ready(function() {
 	$('#select-all').change(function() {

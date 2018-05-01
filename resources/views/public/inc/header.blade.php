@@ -1,4 +1,3 @@
-
 <div class="visible-xs"><div class="menumobile">
     <div class="header">
     	<a href="#menu"></a>
@@ -7,125 +6,89 @@
     
     <nav id="menu">
     	<ul>
-            <li><a href="http://phoson.vn"><i class="fa fa-home" aria-hidden="true"></i></a></li>
-            <li><a href="http://phoson.vn/gioi-thieu.html">Giới thiệu</a></li>
-            <li><a  href="http://phoson.vn/du-an/">Dự án</a>
-                <ul>
-                    <li><a href="http://phoson.vn/du-an-noi-bat/">Dự án nổi bật</a></li>
-                </ul> 
-            </li>
-            <li><a  href="http://phoson.vn/san-giao-dich/">BĐS bán</a>
+            <li><a href="{!! route('public.trangchu') !!}"><i class="fa fa-home" aria-hidden="true"></i></a></li>
+            <li><a href="{!! route('public.gioithieu') !!}">Giới thiệu</a></li>
+            <li><a  href="{!! route('public.duan') !!}">Dự án</a></li>
+            <li><a  href="{!! route('public.sangiaodich', ['type' => 1]) !!}">BĐS bán</a>
                 <ul>
                     @foreach($bdsBan as $obj)
-                    <li><a href="http://phoson.vn/khach-san/">{!! $obj->name !!}</a></li>
+                    <li><a href="{!! route('public.sangiaodich.theloai', ['type' => 1, 'id' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
                     @endforeach
                 </ul>   
             </li>
-            <li><a  href="http://phoson.vn/san-giao-dich/">BĐS cho thuê</a>
+            <li><a  href="{!! route('public.sangiaodich', ['type' => 2]) !!}">BĐS cho thuê</a>
                 <ul>
                     @foreach($bdsChoThue as $obj)
-                    <li><a href="http://phoson.vn/khach-san/">{!! $obj->name !!}</a></li>
+                    <li><a href="{!! route('public.sangiaodich.theloai', ['type' => 1, 'id' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
                     @endforeach
                 </ul>   
             </li>
 
-            <li><a  href="http://phoson.vn/tin-tuc/">Tin tức</a>
+            <li><a  href="{!! route('public.tintuc.list') !!}">Tin tức</a>
                 <ul>
                     @foreach($catNews as $obj)
-                    <li><a href="{!! route('public.tintuc', ['catId', $obj->id]) !!}">{!! $obj->name !!}</a></li>
+                    <li><a href="{!! route('public.tintuc', ['catId' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
                     @endforeach
                 </ul>
             </li>
-            <li><a  href="http://phoson.vn/tuyen-dung/">Tuyển dụng</a></li>
-            <li><a  href="http://phoson.vn/lien-he.html">Liên hệ</a></li>
-            
+            <li><a  href="{!! route('public.lienhe') !!}">Liên hệ</a></li>
         </ul>
     </nav>
 </div>
 <!-- menu_left vip --></div>
 <div class="top_op">
     <div class="container">                            
-        <a href="mailto:phosonland@gmail.com" class="hot_mail">Đăng ký</a>
-        <a href="mailto:phosonland@gmail.com" class="hot_mail">Đăng nhập</a>
-        <a href="tel:0963 822 922" class="hot_phone">Đăng tin</a>
+        <a href="{!! route('public.dangky') !!}" class="hot_mail">Đăng ký</a>
+        <a href="{!! route('public.dangnhap') !!}" class="hot_mail">Đăng nhập</a>
+        <a href="{!! route('public.dangtin') !!}" class="hot_phone" id="dangtin">Đăng tin</a>
         <div class="clear"></div>
     </div>
 </div>
-
+<script type="text/javascript">
+    $('#dangtin').click(function(){
+        @if(session()->get('objUser') == null)
+        alert('Bạn phải đăng nhập để đăng tin');
+        return false;
+        @endif
+        return true;
+    });
+</script>
 <div class="menutop_wrapper">
 
     <div class="container">
 
-        <div class="logo"><a href="http://phoson.vn"><img src="{!! asset('public_asset/images/logo.png') !!}" alt="logo"/></a></div>
+        <div class="logo"><a href="{!! route('public.trangchu') !!}"><img src="{!! asset('public_asset/images/logo.png') !!}" alt="logo"/></a></div>
 
         <div class="menu">
 
             <ul class=" hidden-xs">
 
-                <li><a href="http://phoson.vn"><i class="fa fa-home" aria-hidden="true"></i></a></li>
-
-                <li><a href="http://phoson.vn/gioi-thieu.html">Giới thiệu</a></li>
-
-                
-                <li><a  href="http://phoson.vn/du-an/">Dự án</a>
-
+                <li><a href="{!! route('public.trangchu') !!}"><i class="fa fa-home" aria-hidden="true"></i></a></li>
+                <li><a href="{!! route('public.gioithieu') !!}">Giới thiệu</a></li>
+                <li><a  href="{!! route('public.duan') !!}">Dự án</a></li>
+                <li><a  href="{!! route('public.sangiaodich', ['type' => 1]) !!}">BĐS bán</a>
                     <ul>
-
-
-                        <li><a href="http://phoson.vn/du-an-noi-bat/">Dự án nổi bật</a></li>
-
-                        
-                    </ul> 
-
-                </li>
-
-                <li><a  href="http://phoson.vn/san-giao-dich/">Sàn giao dịch</a>
-
-                    <ul>
-
-
-                        <li><a href="http://phoson.vn/khach-san/">Khách sạn</a></li>
-
-                        
-                        <li><a href="http://phoson.vn/can-ho-chung-cu/">Căn hộ - chung cư</a></li>
-
-                        
-                        <li><a href="http://phoson.vn/nha-dat-ven-bien/">Nhà đất ven biển</a></li>
-
-                        
-                        <li><a href="http://phoson.vn/nha-dat-trung-tam/">Nhà đất trung tâm</a></li>
-
-                        
-                        <li><a href="http://phoson.vn/cho-thue/">Cho thuê</a></li>
-
-                        
-                        <li><a href="http://phoson.vn/biet-thu/">Biệt thự</a></li>
-
-                        
+                        @foreach($bdsBan as $obj)
+                        <li><a href="{!! route('public.sangiaodich.theloai', ['type' => 1, 'id' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
+                        @endforeach
                     </ul>   
-
                 </li>
-
-                
-
-                <li><a  href="http://phoson.vn/tin-tuc/">Tin tức</a>
-
+                <li><a  href="{!! route('public.sangiaodich', ['type' => 2]) !!}">BĐS cho thuê</a>
                     <ul>
-                        <li><a href="http://phoson.vn/thi-truong-bds/">Thị trường BĐS</a></li>
-                        <li><a href="http://phoson.vn/goc-nhin-pho-son/">Góc nhìn Phố Son</a></li>
-                        <li><a href="http://phoson.vn/phong-thuy-cuoc-song/">Phong thủy cuộc sống</a></li>
-
-                        <li><a href="http://phoson.vn/thu-vien-hinh-anh/">Thư viện hình ảnh</a></li>
-                        <li><a href="http://phoson.vn/thu-vien-video/">Thư viện video</a></li>
-
-                    </ul>
-
+                        @foreach($bdsChoThue as $obj)
+                        <li><a href="{!! route('public.sangiaodich.theloai', ['type' => 1, 'id' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
+                        @endforeach
+                    </ul>   
                 </li>
 
-                <li><a  href="http://phoson.vn/tuyen-dung/">Tuyển dụng</a></li>
-
-                <li><a  href="http://phoson.vn/lien-he.html">Liên hệ</a></li>
-
+                <li><a  href="{!! route('public.tintuc.list') !!}">Tin tức</a>
+                    <ul>
+                        @foreach($catNews as $obj)
+                        <li><a href="{!! route('public.tintuc', ['catId' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
+                        @endforeach
+                    </ul>
+                </li>
+                <li><a  href="{!! route('public.lienhe') !!}">Liên hệ</a></li>
             </ul>
 
             <div class="searchne">

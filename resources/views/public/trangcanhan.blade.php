@@ -19,9 +19,6 @@ $objUser = Session::get("objUser");
             </div>
             <div class="value-newsup clearfix">
                 <div id="PH_Container_MainContent_pnMainContent">
-
-
-
                     <div class="w-700 fr">
                         <div class="fillter-news mb10 clearfix">
                             <div class="mix-select w-200 fl mr10 position">
@@ -37,7 +34,7 @@ $objUser = Session::get("objUser");
                             <div class="mix-select w-200 fl mr10 position wr_select">
 
                                 <select name="" id="ddlStatus" class="gray radius">
-                                    <option selected="selected" value="0">--Chọn--</option>
+                                    <option selected="selected" value="0">--Chọn loai tin--</option>
                                     <option value="1">Hiển thị</option>
                                     <option value="2">Tin hết hạn</option>
                                     <option value="3">Tin bị xóa</option>
@@ -47,7 +44,7 @@ $objUser = Session::get("objUser");
                             <div class="mix-select w-200 fl mr10 position wr_select">
 
                                 <select name="" id="ddlStatus" class="gray radius">
-                                    <option selected="selected" value="0">--Chọn--</option>
+                                    <option selected="selected" value="0">--Chọn loai tin--</option>
                                     <option value="1">Tin VIP</option>
                                     <option value="2">Tin uu dai</option>
                                     <option value="3">Tin binh thuong</option>
@@ -62,11 +59,12 @@ $objUser = Session::get("objUser");
                                     <tbody>
                                         <tr class="bg-gray3 font14">
                                             <td style="width: 5%">Mã tin</td>
-                                            <td style="width: 15%">Tiêu đề</td>
-                                            <td style="width: 30%">Loại tin</td>
+                                            <td style="width: 30%">Tiêu đề</td>
+                                            <td style="width: 15%">Loại tin</td>
                                             <td style="width: 15%">Ngày đăng</td>
                                             <td style="width: 15%">Hết hạn</td>
-                                            <td style="width: 20%">Thao tác</td>
+                                            <td style="width: 10%">Tư vấn</td>
+                                            <td style="width: 10%">Thao tác</td>
                                         </tr>
 
                                         @foreach($posts as $item)
@@ -74,93 +72,55 @@ $objUser = Session::get("objUser");
                                             <td class="bor-right bor-bot">{!! $item->id !!}</td>
                                             <td class="tl bor-right bor-bot">
                                                 <label>{!! $item->name !!}</label>
-                                                <div class="mt10">
-                                                </div>
-                                                <div class="mt10">
-                                                    <a class="mr5 font13" style="display: block" href="" target="_blank"><s class="ic-views mr5 mt3 fl"></s>Xem</a>
-                                                    <a class='mr5 font13' style="display: block" href=""><s class="ic-edit mr5 fl"></s>Sửa</a>
-                                                    <a class="mr5 font13" style="display: block" href=""><s class="ic-delete mr5 fl"></s>Xóa</a>
-                                                </div>
-                                            </td>
-                                            <td class="bor-right bor-bot">{!! $item->typePost->name !!}</td>
-                                            <td class="bor-right bor-bot">{!! $item->start_time !!}</td>
-                                            <td class="bor-right bor-bot">{!! $item->end_time !!}</td>
-                                            <td class="bor-bot">
-                                                <div class="action">
-                                                    <div class="danglai">
-                                                        @if($item->end_time>date("Y-m-d") )
-                                                        <div class="post_tooltip">
-                                                            <span class="imgPost">Đăng lại</span>
-                                                        </div>
-                                                        @endif
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+                                                        <a class="mr5 font13" href="" target="_blank"><s class="ic-views mr5 mt3 fl"></s>Xem</a>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                    <a class='mr5 font13' href=""><s class="ic-edit mr5 fl"></s>Sửa</a>
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                    <a class="mr5 font13" href=""><s class="ic-delete mr5 fl"></s>Xóa</a>
+                                                  </div>
+                                              </div>
+                                          </td>
+                                          <td class="bor-right bor-bot">{!! $item->typePost->name !!}</td>
+                                          <td class="bor-right bor-bot">{!! $item->start_time !!}</td>
+                                          <td class="bor-right bor-bot">{!! $item->end_time !!}</td>
+                                          <td class="bor-bot"> <a class="mr5 font13" href="{!! route('public.trangcanhan.chitiettuvan', ['idPost' => $item->id ]) !!}"><s class="ic-delete mr5 fl"></s>Chi tiết</a></td>
+                                          <td class="bor-bot">
+                                            <div class="action">
+                                                <div class="danglai">
+                                                    @if($item->end_time>date("Y-m-d") )
+                                                    <div class="post_tooltip">
+                                                        <span class="imgPost">Đăng lại</span>
                                                     </div>
+                                                    @endif
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
 
-                            <div class="box page page_controll nobor position tr">
-                                <span id="PH_Container_MainContent_ctl00_ProductsPager"></span>
-                            </div>
+                        <div class="box page page_controll nobor position tr">
+                            <span id="PH_Container_MainContent_ctl00_ProductsPager"></span>
                         </div>
                     </div>
-                    <script src="/Scripts/jquery.bt.min.js"></script>
-                    <div class="w-280 fl mt-35">
-                        <div class="box user-manger">
-                            <div class="title font-robotonormal">
-                                <h3 class="bg_white pd5 bor-bot bor-right font16 normal uppercase">Trang cá nhân</h3>
-                                <s class="ic-news-09"></s>
-                            </div>
-                            <div class="box-cont bor-left bor-right bor-bot font14">
-                                <ul class="clearfix">
-                                    <li class="bor-bot clearfix">
-                                        <a class="active block color-text pd10" href="/thanh-vien/quan-ly-tin.htm">
-                                            <s class="ic-arow-news fl mt5 mr5"></s>Quản lý tin rao bán/ thuê
-                                        </a>
-                                    </li>
-                                    <li class="bor-bot clearfix">
-                                        <a class="block color-text pd10" href="/thanh-vien/dang-tin-ban-cho-thue-nha-dat.htm">
-                                            <s class="ic-arow-news fl mt5 mr5"></s>Đăng tin rao bán/cho thuê
-                                        </a>
-                                    </li>
-                                    <li class="bor-bot clearfix">
-                                        <a class="block color-text pd10" href="/thanh-vien/quan-ly-tin-da-luu.htm">
-                                            <s class="ic-arow-news fl mt5 mr5"></s>Quản lý liên hệ
-                                        </a>
-                                    </li>
-                                    <li class="bor-bot clearfix">
-                                        <a class="block color-text pd10" href="/thanh-vien/thay-doi-thong-tin.htm">
-                                            <s class="ic-arow-news fl mt5 mr5"></s>Thay đổi thông tin cá nhân
-                                        </a>
-                                    </li>
-                                    <li class="bor-bot clearfix">
-                                        <a class="block color-text pd10" href="/thanh-vien/doi-mat-khau.htm">
-                                            <s class="ic-arow-news fl mt5 mr5"></s>Thay đổi mật khẩu
-                                        </a>
-                                    </li>
-                                    <li class="bor-bot clearfix nobor">
-
-                                        <a class="block color-text pd10" href="javascript:MemberLogOut()">
-                                            <s class="ic-arow-news fl mt5 mr5"></s>Thoát khỏi hệ thống
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
+                @include('public.inc.trangcanhan')
 
             </div>
 
         </div>
 
-        <div class="clear">
-        </div>
     </div>
+
+    <div class="clear">
+    </div>
+</div>
 </div>
 </div>
 @endsection

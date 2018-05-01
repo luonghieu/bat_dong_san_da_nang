@@ -50,6 +50,8 @@
 	
 	<link href="{!! asset('public_asset/css/jquery-ui.min.css') !!}" rel="stylesheet" type="text/css" />
 	<link href="{!! asset('public_asset/css/jquery.selectbox.css') !!}" rel="stylesheet" type="text/css" />
+	<link href="{!! asset('public_asset/css/dataTables.bootstrap.min.css') !!}" rel="stylesheet" type="text/css" />
+	<script src="{!! asset('public_asset/js/jquery.min.js') !!}"></script>
 	<script>
 		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -60,7 +62,7 @@
 		ga('send', 'pageview');
 
 	</script>
-</head>
+</head>	
 <body>
 	@include('public.inc.header')
 	@include('public.inc.rightbar')

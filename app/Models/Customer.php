@@ -9,7 +9,7 @@ class Customer extends Model
     protected $table = 'customers';
 
 	protected $fillable = [
-        'name', 'email', 'phone', 'address'
+        'name', 'email', 'phone', 'created_at'
     ];
 
     public $timestamps=false;
@@ -25,18 +25,11 @@ class Customer extends Model
     /**
      * Get productTransaction relationship
      */
-    public function transaction()
+    public function registers()
     {
-        return $this->hasMany('App\Models\Transaction', 'customer_id', 'id');
+        return $this->hasMany('App\Models\Register', 'customer_id', 'id');
     }
 
-    /**
-     * Get purchaseTransaction relationship
-     */
-    public function purchaseTransaction()
-    {
-        return $this->hasMany('App\Models\PurchaseTransaction', 'customer_id', 'id');
-    }
 
     /**
      * Get rating relationship

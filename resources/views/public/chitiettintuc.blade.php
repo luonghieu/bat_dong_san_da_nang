@@ -7,7 +7,9 @@
         </div>
         <div class="row">
             <div class="col-md-8">
-                <span class="item_news_date">{!! $obj->created_at !!}</span>
+                <span class="item_news_date" style="float:left">{!! $obj->created_at !!}</span>
+                <span class="item_news_date" style="float:right">Lượt xem: {!! $obj->view !!}</span>
+                <div class="clear"></div>
                 <h1 class="item_news_name">{!! $obj->name !!}</h1>
                 <h2 class="chu_thich_detail"></h2>
                 <div class="noi_dung">

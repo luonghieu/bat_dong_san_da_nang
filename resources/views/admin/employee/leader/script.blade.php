@@ -26,7 +26,6 @@
 
       var nRow = $(this).parents('tr')[0];
       var aData = oTable.row(nRow).data();
-
       $.ajax({
         url: "{!! route('admins.leader.delete') !!}",
         method: "GET",
