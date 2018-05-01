@@ -1,5 +1,6 @@
 @extends('public.inc.index')
 @section('content')
+@include('public.tuvanduan')
 <div class="content_wrapper">
     <div class="container">
         <div class="breakdum">
@@ -22,13 +23,15 @@
                         @foreach($list as $obj)
                         <li class="col-lg-4 col-md-4 col-sm-6 col-xs-6 col-479">
                             <div class="boc">
-                                <div style="position: relative;overflow: hidden;" class="contai"><a href="{!! route('public.chitietduan', ['id' => $obj->id ]) !!}"><img src="{{ asset($obj->image) }}" alt="{!! $obj->name !!}" class="img-responsive" /></a>
-                                    <h2 class="ten"><a href="{!! route('public.chitietduan', ['id' => $obj->id ]) !!}">{!! $obj->name !!}</a></h2>
+                                <div style="position: relative;overflow: hidden;" class="contai"><a href="{!! route('public.chitietduan', ['id' => $obj->id ]) !!}"><img src="{{ asset($obj->image) }}" alt="{!! $obj->name !!}" class="img-responsive" style="width:265px;height:120px;"/></a>
+                                    <h2 class="ten"><a href="{!! route('public.chitietduan', ['id' => $obj->id ]) !!}" id="title">{!! $obj->name !!}</a></h2>
                                 </div>
                                 <div class="content_content">
-                                    <span class="ngay">{!! $obj->created_at !!}</span>
-                                    <div class="chu_thich">{!! $obj->name !!}</div>
-                                    <div class="chitiet"><a href="{!! route('public.chitietduan', ['id' => $obj->id ]) !!}">Xem thêm <i class="fa fa-angle-right" aria-hidden="true"></i></a></div>
+                                    <span class="ngay" style="float:left">{!! $obj->created_at !!}</span>
+                                    <div style="float:right"><a title="Nhận tư vấn và thông tin ưu đãi" onclick="getcontact({!! $obj->id !!})" href="javascript:void(0)"><img src="{!! asset('/images/star.png') !!}" alt="{{ asset($obj->name) }}" style="width: 20px; height: 20px;"/></a></div>
+                                    <div class="clear"></div>
+                                    <div class="chitiet"><a href="{!! route('public.chitietduan', ['id' => $obj->id ]) !!}">Xem thêm <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                    </div>
 
                                     <div class="clear"></div>
                                 </div>
@@ -36,8 +39,8 @@
                         </li>
                         @endforeach
                         
-                        <div class="navigation"><span class="current_page_item">Trang <b>1</b> trên <b>3</b></span><span class="current_page_item">1</span><span class="page_item"><a href="http://phoson.vn/du-an-noi-bat/2">2</a></span><span class="page_item"><a href="http://phoson.vn/du-an-noi-bat/3">3</a></span><span class="page_item"><a href="http://phoson.vn/du-an-noi-bat/2">»</a></span></div>   
                     </ul>
+                    <div>{!! $list->links() !!}</div>
                 </div>
             </div>
 
@@ -46,4 +49,12 @@
 </div>
 @endsection
 @section('script')
+<script>
+    function getcontact (itemId)
+    {
+        $('#name').html($('#title').text());
+        $('#id').val(itemId);
+        $('#tuvanduan').modal('show');
+    }
+</script>
 @endsection

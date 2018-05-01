@@ -9,7 +9,7 @@ class NotificationRecieves extends Model
     protected $table = 'notification_recieves';
 
 	protected $fillable = [
-        'notification_id', 'reciever_id','is_read'
+        'notification_id', 'customer_id'
     ];
 
     public $timestamps=false;
@@ -25,16 +25,8 @@ class NotificationRecieves extends Model
     /**
      * Get products relationship
      */
-    public function employee()
-    {
-        return $this->belongsTo('App\Models\Employee', 'reciever_id', 'id');
-    }
-
-    /**
-     * Get products relationship
-     */
     public function customer()
     {
-        return $this->belongsTo('App\Models\Customer', 'reciever_id', 'id');
+        return $this->belongsTo('App\Models\Customer', 'customer_id', 'id');
     }
 }

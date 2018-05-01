@@ -1,6 +1,6 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.employee.css')
+@include('admin.employee.sale.css')
 @endsection
 @section('title')
 Employee
@@ -54,7 +54,7 @@ Employee
 			<p>{{ session('error') }}</p>
 		</div>
 		@endif
-		<form class="form-horizontal" role="form" id="form-add" method="post" action="{!! route('admins.sale.createOrUpdate', ['id' => 0]) !!}" enctype="multipart/form-data">
+		<form class="form-horizontal" role="form" id="form-add" method="post" action="{!! route('admins.sale.store') !!}" enctype="multipart/form-data">
 			<input type="hidden" name="_token" value="{{csrf_token()}}" />
 			<div class="form-group">
 				<label for="inputEmail3" class="col-sm-2 control-label">Name</label>
@@ -111,7 +111,7 @@ Employee
 			</div>
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-10">
-					<button type="submit" class="btn btn-rounded btn-primary btn-sm">Cancel</button>
+					<button type="reset" class="btn btn-rounded btn-primary btn-sm">Cancel</button>
 				</div>
 			</div>
 		</form>
@@ -123,7 +123,7 @@ Employee
 @endsection
 
 @section('script')
-@include('admin.employee.script')
+@include('admin.employee.sale.script')
 <script>
 	$( document ).ready(function() {
 		$('#add-entry').click(function (e) {

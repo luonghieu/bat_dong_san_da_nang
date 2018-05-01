@@ -1,6 +1,6 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.customer.postCustomer.css')
+@include('admin.customer.css')
 @endsection
 @section('title')
 Transaction
@@ -13,6 +13,10 @@ Transaction
 	<div class="tile-header dvd dvd-btm">
 		<h1 class="custom-font"><strong>Transaction</strong></h1>
 		<ul class="controls">
+			<li>
+				<a href="{!! route('admins.customer.createTransaction', ['registerId' => $register->id]) !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
+			</li>
+
 			<li class="dropdown">
 
 				<a role="button" tabindex="0" class="dropdown-toggle settings" data-toggle="dropdown">
@@ -45,9 +49,12 @@ Transaction
 	<!-- /tile header -->
 
 	<!-- tile body -->
+	<center><h3>
+		<a href="{!! route('admins.project.detail',['project_id' => $register->project->id]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $register->project->name !!}</a>
+	</h3></center>
 	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.customer.actionTransaction') !!}">
 		<input type="hidden" name="_token" value="{{csrf_token()}}" />
-		<input type="hidden" name="customer_id" value="{!! $customer_id !!}" />
+		<input type="hidden" name="registerId" value="{!! $register->id !!}" />
 		<div class="tile-body">
 			<div class="table-responsive">
 				@if (session('success'))
@@ -64,12 +71,12 @@ Transaction
 								</label>
 							</th>
 							<th>Id</th>
-							<th>Project</th>
 							<th>Block</th>
 							<th>Floor</th>
 							<th>Status</th>
 							<th>Created at</th>
 							<th>Description</th>
+							<th>Rating</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
 						</tr>
 					</thead>
@@ -81,22 +88,56 @@ Transaction
 							</td>
 							<td>{!! $obj->id !!}</td>
 							<td>
-								<a href="{!! route('admins.project.detail',['project_id' => $obj->product->project->id]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $obj->product->name !!}</a>
+								<a href="{!! route('admins.product.detail',['id' => $obj->product->id]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $obj->product->block !!}</a>
 							</td>
-							<td>{!! $obj->block !!}</td>
 							<td>{!! $obj->floor !!}</td>
 							<td>
-								<select class="form-control mb-10" name="status" onchange="status({!! $obj->id !!})">
+								<select class="form-control mb-10" name="status-{!! $obj->id !!}" onchange="statusTransaction({!! $obj->id !!})">
 									@foreach ($status as $key => $value)
-										<option {{($obj->status == $value)? 'selected="selected"' : ''}} value="{!! $value !!}">{!! $key !!}</option>
+									<option {{($obj->status == $value)? 'selected="selected"' : ''}} value="{!! $value !!}">{!! $key !!}</option>
 									@endforeach
 								</select>
 							</td>
 							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
 							<td>
-								<textarea>{!! $obj->description !!}</textarea>
+								{!! $obj->description !!}
 							</td>
-							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
+							<td>
+								@if($obj->status == 0)
+								<div id="rateit_star1"  data-transactionid="{{ $obj->id }}"></div>
+								<script type="text/javascript">
+									$(function () {
+										$('#rateit_star1').rateit({min: 1, max: 10, step: 1});
+										$('#rateit_star1').bind('rated', function (e) {
+											var ri = $(this);
+											var value = ri.rateit('value');
+											var transactionid = ri.data('transactionid');
+											$.ajax({
+												url: "{{ route('admins.customer.ratingTransaction') }}",
+												method: "GET",
+												data: {
+													'value' : value,
+													'transactionid' : transactionid,
+												},
+												dataType : 'json',
+												success : function(result){
+													alert('Bạn đã đánh giá '+value +' sao cho sản phẩm có id là:'+productID );
+                                                        //không cho phép đánh giá,sau khi đã đánh giá xong
+                                                        ri.rateit('readonly', true);
+                                                    }
+                                                });
+										});
+									});
+								</script>
+								@endif
+								<div class="rateit" data-rateit-value="{{ $obj->rating }}"  data-rateit-readonly="true"></div>
+							</td>
+							<td class="actions">
+								@if ($obj->status != 0) 
+								<a href="{!! route('admins.customer.editTransaction',['id' => $obj->id]) !!}" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a>
+								@endif
+								<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a>
+							</td>
 						</tr>
 						@endforeach
 					</tbody>
@@ -126,7 +167,7 @@ Transaction
 @endsection
 
 @section('script')
-@include('admin.customer.postCustomer.scriptDetail')
+@include('admin.customer.scriptTransaction')
 <script>
 // $( document ).ready(function() {
 	$('#select-all').change(function() {
@@ -146,20 +187,20 @@ Transaction
 		return true;
 	});
 
-	function status (id) {
-        var status = $('input[name="status"]').val();
-        $.ajax({
-            url: "{!! route('admins.customer.status') !!}",
-            method: "GET",
-            data: {
-                'id' : id,
-                'status' : status
-            },
-            dataType : 'json',
-            success : function(result){
-                alert('Action success!');
-            }
-        });
+	function statusTransaction(id) {
+		status = $('select[name = "status-' + id + '"]').val();
+		$.ajax({
+			url: "{!! route('admins.customer.statusTransaction') !!}",
+			method: "GET",
+			data: {
+				'id' : id,
+				'status' : status
+			},
+			dataType : 'json',
+			success : function(result){
+				alert('Action success!');
+			}
+		});
 	}
 
 // });

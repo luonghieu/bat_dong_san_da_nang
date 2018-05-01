@@ -78,3 +78,84 @@ if (!function_exists('getListNotificationScheduleStatus')) {
         return App\NotificationSchedule::STATUS;
     }
 }
+
+if (!function_exists('getTransactionStatus')) {
+    function getTransactionStatus($status)
+    {
+        $list = array_flip(\App\Models\Transaction::STATUS);
+        return $list[$status];
+
+    }
+}
+
+if (!function_exists('getNotificationScheduleTime')) {
+    function getSendNotificationScheduleTime($value, $data = [])
+    {
+        $today = Carbon::today();
+        switch ($value) {
+            case App\NotificationSchedule::RECURRING_TYPES['daily']:
+                return Carbon\Carbon::parse($data['send_time']);
+                break;
+            case App\NotificationSchedule::RECURRING_TYPES['weekly']:
+                switch ($data['date_of_week']) {
+                    case (Carbon\Carbon::SUNDAY):
+                        if ($today->dayOfWeek == Carbon\Carbon::SUNDAY) {
+                            return Carbon\Carbon::parse($data['send_time']);
+                        } else {
+                            return false;
+                        }
+                        break;
+                    case (Carbon\Carbon::MONDAY):
+                        if ($today->dayOfWeek == Carbon\Carbon::MONDAY) {
+                            return Carbon\Carbon::parse($data['send_time']);
+                        } else {
+                            return false;
+                        }
+                        break;
+                    case (Carbon\Carbon::TUESDAY):
+                        if ($today->dayOfWeek == Carbon\Carbon::TUESDAY) {
+                            return Carbon\Carbon::parse($data['send_time']);
+                        } else {
+                            return false;
+                        }
+                        break;
+                    case (Carbon\Carbon::WEDNESDAY):
+                        if ($today->dayOfWeek == Carbon\Carbon::WEDNESDAY) {
+                            return Carbon\Carbon::parse($data['send_time']);
+                        } else {
+                            return false;
+                        }
+                        break;
+                    case (Carbon\Carbon::THURSDAY):
+                        if ($today->dayOfWeek == Carbon\Carbon::THURSDAY) {
+                            return Carbon\Carbon::parse($data['send_time']);
+                        } else {
+                            return false;
+                        }
+                        break;
+                    case (Carbon\Carbon::FRIDAY):
+                        if ($today->dayOfWeek == Carbon\Carbon::FRIDAY) {
+                            return Carbon\Carbon::parse($data['send_time']);
+                        } else {
+                            return false;
+                        }
+                        break;
+                    case (Carbon\Carbon::SATURDAY):
+                        if ($today->dayOfWeek == Carbon\Carbon::SATURDAY) {
+                            return Carbon\Carbon::parse($data['send_time']);
+                        } else {
+                            return false;
+                        }
+                        break;
+                }
+
+            case App\NotificationSchedule::RECURRING_TYPES['monthly']:
+                return Carbon\Carbon::parse($data['send_time'])->month($data['day_of_month']);
+                break;
+
+            default:
+                return Carbon\Carbon::parse($data['send_date'] . " " . $data['send_time']);
+                break;
+        }
+    }
+}

@@ -107,7 +107,7 @@ Slider
 			</div>
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-10">
-					<button type="submit" class="btn btn-rounded btn-primary btn-sm">Cancel</button>
+					<button type="reset" class="btn btn-rounded btn-primary btn-sm">Cancel</button>
 				</div>
 			</div>
 		</form>

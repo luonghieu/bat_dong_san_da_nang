@@ -28,7 +28,7 @@ class SliderCreateRequest extends FormRequest
             'name' => 'required|max:255',
             'description' => 'required|min:3|max:255',
             'link' => 'required|max:255',
-            'image' => 'required|image|max: 1000',
+            'image' => 'nullable|image|max: 1000',
         ];
     }
 
@@ -42,7 +42,6 @@ class SliderCreateRequest extends FormRequest
             'description.max' => 'Desribe not grater than 255 character.',
             'link.required' => 'Link is required.',
             'link.min' => 'Link not greater than 255 character.',
-            'image.required' => 'Image is required.',
             'image.image' => 'Image must in png, jpg, jpeg.',
             'image.max' => 'Image not greater than 1000kb.',
         ];

@@ -26,9 +26,10 @@
 
       var nRow = $(this).parents('tr')[0];
       var aData = oTable.row(nRow).data();
+      alert(aData[1]);
 
       $.ajax({
-        url: "{!! route('admins.news.delete') !!}",
+        url: "{!! route('admins.slider.delete') !!}",
         method: "GET",
         data: {
           'id' : aData[1]

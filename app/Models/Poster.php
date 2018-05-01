@@ -27,7 +27,7 @@ class Poster extends Model
      */
     public function posts()
     {
-        return $this->hasMany('App\Models\Posts', 'poster_id', 'id');
+        return $this->hasMany('App\Models\Post', 'poster_id', 'id');
     }
 
 }

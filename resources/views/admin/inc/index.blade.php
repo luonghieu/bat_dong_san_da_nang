@@ -39,6 +39,9 @@
 
     <!-- ===Modernizr=== -->
     <script src="{!! asset('admin_asset/js/vendor/modernizr/modernizr-2.8.3-respond-1.4.2.min.js') !!}"></script>
+    <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
+    <link href="{{ asset('admin_asset/css/rateit.css') }}" rel="stylesheet" type="text/css">
+    <script src="{{ asset('admin_asset/js/jquery.rateit.min.js') }}" type="text/javascript"></script>
     
     <!--/ modernizr -->
 

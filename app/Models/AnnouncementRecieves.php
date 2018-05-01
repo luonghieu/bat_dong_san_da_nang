@@ -25,16 +25,9 @@ class AnnouncementRecieves extends Model
     /**
      * Get products relationship
      */
-    public function manager()
+    public function user()
     {
-        return $this->belongsTo('App\Models\Employee', 'reciever_id', 'id');
+        return $this->belongsTo('App\Models\User', 'reciever_id', 'id');
     }
 
-    /**
-     * Get products relationship
-     */
-    public function employee()
-    {
-        return $this->belongsTo('App\Models\Employee', 'reciever_id', 'id');
-    }
 }

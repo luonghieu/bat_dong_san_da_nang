@@ -1,6 +1,7 @@
 <!-- === Vendor JavaScripts === -->
         <script src="{!! asset('admin_asset/js/vendor/jquery/jquery-1.11.2.min.js') !!}"></script>
 
+
         <script src="{!! asset('admin_asset/js/vendor/bootstrap/bootstrap.min.js') !!}"></script>
 
         <script src="{!! asset('admin_asset/js/vendor/jRespond/jRespond.min.js') !!}"></script>
@@ -56,8 +57,8 @@
         ============================================= -->
         <script src="{!! asset('admin_asset/js/main.js') !!}"></script>
         <!--/ custom javascripts -->
-        <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
-        <script>
+        <!-- <script src="{{ asset('ckeditor/ckeditor.js') }}"></script> -->
+       <!--  <script>
             CKEDITOR.replace( 'editor1', {
                 filebrowserBrowseUrl: '{{ asset('ckfinder/ckfinder.html') }}',
                 filebrowserImageBrowseUrl: '{{ asset('ckfinder/ckfinder.html?type=Images') }}',
@@ -66,7 +67,7 @@
                 filebrowserImageUploadUrl: '{{ asset('ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images') }}',
                 filebrowserFlashUploadUrl: '{{ asset('ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Flash') }}'
             });
-         </script>
+         </script> -->
 
 @yield('script')
 

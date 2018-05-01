@@ -25,7 +25,7 @@ class AuthController extends Controller
         $objUser = User::where("username","=",$username)->where("password","=",$passWord)->where('active','=',1)->first();
         if (!empty($objUser)) {
             $request->session()->put('objUser', $objUser);
-            return redirect()->route("admins.news.list");
+            return redirect()->route("admins.profile");
             die();
         }else{
             return redirect()->route("auth.login")->with('fail', 'Fail');

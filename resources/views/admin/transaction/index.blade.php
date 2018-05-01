@@ -1,9 +1,9 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.customer.postCustomer.css')
+@include('admin.news.css')
 @endsection
 @section('title')
-Post Customer
+Transaction
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,8 +11,11 @@ Post Customer
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Customer</strong></h1>
+		<h1 class="custom-font"><strong>Transaction</strong></h1>
 		<ul class="controls">
+			<li>
+				<a href="{!! route('admins.transaction.create') !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
+			</li>
 			<li class="dropdown">
 
 				<a role="button" tabindex="0" class="dropdown-toggle settings" data-toggle="dropdown">
@@ -45,9 +48,8 @@ Post Customer
 	<!-- /tile header -->
 
 	<!-- tile body -->
-	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.postCustomer.actionProductTransaction') !!}">
+	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.news.action') !!}">
 		<input type="hidden" name="_token" value="{{csrf_token()}}" />
-		<input type="hidden" name="customer_id" value="{!! $customer_id !!}" />
 		<div class="tile-body">
 			<div class="table-responsive">
 				@if (session('success'))
@@ -65,13 +67,14 @@ Post Customer
 							</th>
 							<th>Id</th>
 							<th>Name</th>
-							<th>Published</th>
-							<th>End date</th>
-							<th>Type post</th>
-							<th>Free time</th>
-							<th>Price(thousand VND/day)</th>
-							<th>Payed</th>
+							<th>Describe</th>
+							<th>Detail</th>
+							<th>Category</th>
+							<th>Image</th>
+							<th>Link</th>
 							<th>Active</th>
+							<th>View</th>
+							<th>Created at</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
 						</tr>
 					</thead>
@@ -82,21 +85,12 @@ Post Customer
 								<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0"><input type="checkbox" class="selectMe" name="selected[]" value="{!! $obj->id !!}" ><i></i></label>
 							</td>
 							<td>{!! $obj->id !!}</td>
-							<td>
-								<a href="{!! route('admins.product.detail',['product_id' => $obj->product->id]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $obj->product->name !!}</a>
-							</td>
-							<td>{!! date( "d/m/Y", strtotime($obj->published)) !!}</td>
-							<td>{!! date( "d/m/Y", strtotime($obj->end_date)) !!}</td>
-							<td>{!! $obj->typePost->name !!}</td>
-							<td>{!! $obj->typePost->type_free_time !!}</td>
-							<td>{!! $obj->typePost->price !!}</td>
-							<td>
-								@if ($obj->payed == 0) 
-								<span onclick="activePayed({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
-								@else
-								<span onclick="activePayed({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
-								@endif
-							</td>
+							<td>{!! $obj->name !!}</td>
+							<td>{!! $obj->feature !!}</td>
+							<td>{!! $obj->detail !!}</td>
+							<td>{!! $obj->catNew->name !!}</td>
+							<td><img src="{!! asset((empty($obj->image)) ? '/images/default.jpg' : $obj->image ) !!}" class="img-responsive text-center" /></td>
+							<td>{!! $obj->link !!}</td>
 							<td>
 								@if ($obj->active == 0) 
 								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
@@ -104,7 +98,9 @@ Post Customer
 								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
 								@endif
 							</td>
-							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
+							<td>{!! $obj->view !!}</td>
+							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
+							<td class="actions"><a href="{!! route('admins.news.edit',['id' => $obj->id]) !!}" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
 						</tr>
 						@endforeach
 					</tbody>
@@ -121,8 +117,6 @@ Post Customer
 						<option value="1">Delete selected</option>
 						<option value="2">Active selected</option>
 						<option value="3">Non-active selected</option>
-						<option value="4">Active pay selected</option>
-						<option value="5">Non-active pay selected</option>
 					</select>
 					<input type="submit" id="apply" class="btn btn-sm btn-default" value="Apply">
 				</div>
@@ -135,9 +129,9 @@ Post Customer
 @endsection
 
 @section('script')
-@include('admin.customer.postCustomer.scriptDetail')
+@include('admin.news.script')
 <script>
-// $( document ).ready(function() {
+	// $( document ).ready(function() {
 	$('#select-all').change(function() {
 		if ($(this).is(":checked")) {
 			$('#editable-usage .selectMe').prop('checked', true);
@@ -147,7 +141,7 @@ Post Customer
 	});
 
 	$('#apply').click(function() {
-		var list = $('input[name="selected[]"]:checked');
+		var list = $('input[name="selected"]:checked');
 		if (list.length == 0) {
 			alert('No obj is selected!');
 			return false;
@@ -155,9 +149,10 @@ Post Customer
 		return true;
 	});
 
+
 	function active(id) {
 		$.ajax({
-			url: "{!! route('admins.postCustomer.activeProductTransaction') !!}",
+			url: "{!! route('admins.news.active') !!}",
 			method: "GET",
 			data: {
 				'id' : id
@@ -168,22 +163,6 @@ Post Customer
 			}
 		});
 	}
-
-	function activePayed(id) {
-		$.ajax({
-			url: "{!! route('admins.postCustomer.activePaidProductTransaction') !!}",
-			method: "GET",
-			data: {
-				'id' : id
-			},
-			dataType : 'json',
-			success : function(result){
-				alert('Action success!');
-			}
-		});
-	}
-
-
 // });
-</script>
-@endsection
+	</script>
+	@endsection

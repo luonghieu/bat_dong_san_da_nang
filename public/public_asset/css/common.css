@@ -396,7 +396,7 @@ ul.tt_lienhe li.mail1{background: url(../images/m1.png) no-repeat left center;}
 .block_span2{width: 30%;float: left;text-align: center;color: #939393;}
 .block_span2 strong{font-size: 18px;color: #939393;display: block;padding-bottom: 8px;}
 
-.bocne{    border: 1px solid #B9B9B9;padding: 10px;min-height: 164px;}
+.bocne{    border: 1px solid #B9B9B9;padding: 10px;min-height: auto;}
 
 .menutop_wrapper.fixed{position: fixed;top: 0px;z-index: 9992;width: 100%;}
 .menupage {

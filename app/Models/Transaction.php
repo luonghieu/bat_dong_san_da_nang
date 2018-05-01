@@ -16,7 +16,7 @@ class Transaction extends Model
     protected $table = 'transactions';
 
 	protected $fillable = [
-        'customer_id', 'product_id', 'description', 'block', 'floor', 'created_at', 'status'
+        'register_id', 'product_id', 'description', 'floor', 'created_at', 'status', 'rating'
     ];
 
     public $timestamps=false;
@@ -24,9 +24,9 @@ class Transaction extends Model
     /**
      * Get customer relationship
      */
-    public function customer()
+    public function register()
     {
-        return $this->belongsTo('App\Models\Customer', 'customer_id', 'id');
+        return $this->belongsTo('App\Models\Register', 'register_id', 'id');
     }
 
     /**

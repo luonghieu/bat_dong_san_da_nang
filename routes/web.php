@@ -2,23 +2,31 @@
 // auth - managements
 // Route::group(['middleware' => 'auth', 'prefix' => 'managements'], function () {
 Route::group(['prefix' => 'managements'], function () {
+    //profile
+    Route::get('profile', 'AdminController@profile')->name('admins.profile');
+    Route::post('profile', 'AdminController@updateProfile')->name('admins.profile.update');
     // employees
     Route::group(['prefix' => 'employees'], function () {
         // leader-Admin
         Route::get('leaders/list', 'AdminController@listLeaders')->name('admins.leader.list');
+
         Route::get('leaders/create', 'AdminController@createLeader')->name('admins.leader.create');
-        Route::get('leaders/edit/{id}', 'AdminController@editLeader')->name('admins.leader.edit');
-        Route::get('leaders/createOrUpdate/{id}', 'AdminController@createOrUpdateLeader')->name('admins.leader.createOrUpdate');
+        Route::post('leaders/create', 'AdminController@storeLeader')->name('admins.leader.store');
+        Route::get('leaders/{id}/edit', 'AdminController@editLeader')->name('admins.leader.edit');
+        Route::post('leaders/{id}/update', 'AdminController@updateLeader')->name('admins.leader.update');
+
         Route::get('leaders/delete', 'AdminController@deleteLeader')->name('admins.leader.delete');
-        Route::get('leaders/action', 'AdminController@actionLeader')->name('admins.leader.action');
+        Route::post('leaders/action', 'AdminController@actionLeader')->name('admins.leader.action');
         Route::get('leaders/active', 'AdminController@activeLeader')->name('admins.leader.active');
 
         // sale-Admin
         Route::get('sales/list', 'AdminController@listSales')->name('admins.sale.list');
-        Route::get('sales/create', 'AdminController@createSales')->name('admins.sale.create');
-        Route::get('sales/edit/{id}', 'AdminController@editSales')->name('admins.sale.edit');
-        Route::get('sales/createOrUpdate/{id}', 'AdminController@createOrUpdateSale')->name('admins.sale.createOrUpdate');
+        Route::get('sales/create', 'AdminController@createSale')->name('admins.sale.create');
+        Route::post('sales/create', 'AdminController@storeSale')->name('admins.sale.store');
+        Route::get('sales/{id}/edit', 'AdminController@editSale')->name('admins.sale.edit');
+        Route::post('sales/{id}/update', 'AdminController@updateSale')->name('admins.sale.update');
         Route::get('sales/delete', 'AdminController@deleteSale')->name('admins.sale.delete');
+        Route::post('sales/action', 'AdminController@actionSale')->name('admins.sale.action');
         Route::get('sales/active', 'AdminController@activeSale')->name('admins.sale.active');
 
         Route::get('detail/{employee_id}', 'AdminController@detailEmployee')->name('admins.employee.detail');
@@ -30,13 +38,35 @@ Route::group(['prefix' => 'managements'], function () {
         Route::get('list', 'AdminController@listCustomer')->name('admins.customer.list');
         Route::get('delete', 'AdminController@deleteCustomer')->name('admins.customer.delete');
         Route::post('action', 'AdminController@actionCustomer')->name('admins.customer.action');
-        Route::get('detail/{customer_id}', 'AdminController@detailTransaction')->name('admins.customer.detail');
-        // purchase transaction
+
+        // detail customer
+        Route::get('detail/{customer_id}', 'AdminController@detailCustomer')->name('admins.customer.detail');
+        Route::get('store/detail', 'AdminController@storeDetailCustomer')->name('admins.customer.storeDetail');
+        Route::get('update/detail', 'AdminController@updateDetailCustomer')->name('admins.customer.updateDetail');
+        Route::get('get/detail', 'AdminController@getDetailCustomer')->name('admins.customer.getDetail');
+        Route::get('delete/detail', 'AdminController@deleteDetailCustomer')->name('admins.customer.deleteDetail');
+        Route::post('action/detail', 'AdminController@actionDetailCustomer')->name('admins.customer.actionDetail');
+
+        // register
+        Route::get('register/store', 'AdminController@storeRegister')->name('admins.customer.storeRegister');
+        Route::get('register/add', 'AdminController@addRegister')->name('admins.customer.addRegister');
+        Route::post('register/storeAll', 'AdminController@storeAllRegister')->name('admins.customer.storeAllRegister');
+        Route::get('register/remove', 'AdminController@removeRegister')->name('admins.customer.removeRegister');
+        Route::get('register/get', 'AdminController@getRegister')->name('admins.customer.getRegister');
+
+        // transaction
+        Route::get('{registerId}/transaction', 'AdminController@detailTransaction')->name('admins.customer.detailTransaction');
+        Route::get('transaction/create/{registerId}', 'AdminController@createTransaction')->name('admins.customer.createTransaction');
+        Route::post('transaction/create', 'AdminController@storeTransaction')->name('admins.customer.storeTransaction');
+        Route::get('transaction/edit/{transactionId}', 'AdminController@editTransaction')->name('admins.customer.editTransaction');
+        Route::post('transaction/update', 'AdminController@updateTransaction')->name('admins.customer.updateTransaction');
+        Route::get('transaction/getFloorByProduct', 'AdminController@getFloorByProduct')->name('admins.customer.getFloorByProduct');
         Route::post('actionTransaction', 'AdminController@actionTransaction')->name('admins.customer.actionTransaction');
-        Route::post('statusTransaction', 'AdminController@statusTransaction')->name('admins.customer.statusTransaction');
+        Route::get('statusTransaction', 'AdminController@statusTransaction')->name('admins.customer.statusTransaction');
+        Route::post('ratingTransaction', 'AdminController@ratingTransaction')->name('admins.customer.ratingTransaction');
         Route::get('deleteTransaction', 'AdminController@deleteTransaction')->name('admins.customer.deleteTransaction');
 
-        Route::get('detail/{customer_id}', 'AdminController@detailCustomer')->name('admins.customer.detail');
+        
 
     });
 
@@ -55,6 +85,7 @@ Route::group(['prefix' => 'managements'], function () {
 
         Route::group(['prefix' => 'posts'], function () {
             Route::get('list', 'AdminController@listPost')->name('admins.post.list');
+            Route::get('listPostByPoster/{id}', 'AdminController@listPostByPoster')->name('admins.post.listByPoster');
             Route::get('delete', 'AdminController@deletePost')->name('admins.post.delete');
             Route::post('action', 'AdminController@actionPost')->name('admins.post.action');
             Route::get('status', 'AdminController@statusPost')->name('admins.post.status');
@@ -129,14 +160,19 @@ Route::group(['prefix' => 'managements'], function () {
         Route::get('delete', 'AdminController@deleteProject')->name('admins.project.delete');
         Route::post('action', 'AdminController@actionProject')->name('admins.project.action');
         Route::get('active', 'AdminController@activeProject')->name('admins.project.active');
+        Route::get('status/{id}', 'AdminController@statusProject')->name('admins.project.status');
+        Route::get('getFloorByBlock', 'AdminController@getFloorByBlock')->name('admins.project.getFloorByBlock');
+        Route::get('search', 'AdminController@searchTransaction')->name('admins.project.searchTransaction');
+        Route::get('statusProject', 'AdminController@changeStatusProject')->name('admins.project.statusProject');
     });
 
      // product
     Route::group(['prefix' => 'product'], function () {
-        Route::get('list', 'AdminController@listProduct')->name('admins.project.list');
-        Route::get('create', 'AdminController@createProduct')->name('admins.product.create');
-        Route::post('create', 'AdminController@storeProduct')->name('admins.product.store');
-        Route::post('{id}/update', 'AdminController@updateProduct')->name('admins.product.update');
+        Route::get('list', 'AdminController@listProduct')->name('admins.product.list');
+        Route::get('detail/{id}', 'AdminController@detailProduct')->name('admins.product.detail');
+        Route::get('create/{projectId}', 'AdminController@createProduct')->name('admins.product.create');
+        Route::get('create', 'AdminController@storeProduct')->name('admins.product.store');
+        Route::post('update', 'AdminController@updateProduct')->name('admins.product.update');
         Route::get('delete', 'AdminController@deleteProduct')->name('admins.product.delete');
     });
 
@@ -167,6 +203,15 @@ Route::group(['prefix' => 'managements'], function () {
         Route::get('active', 'AdminController@activeAnnouncement')->name('admins.announcement.active');
     });
 
+     // notification
+    Route::group(['prefix' => 'consult'], function () {
+        // post-Admin
+        Route::get('list', 'AdminController@listConsult')->name('admins.consult.list');
+        Route::get('save/{id}', 'AdminController@saveConsult')->name('admins.consult.save');
+        Route::get('delete', 'AdminController@deleteConsult')->name('admins.consult.delete');
+        Route::post('action', 'AdminController@actionConsult')->name('admins.consult.action');
+    });
+
     // notification
     Route::group(['prefix' => 'notification'], function () {
         // post-Admin
@@ -177,6 +222,7 @@ Route::group(['prefix' => 'managements'], function () {
         Route::post('{id}/update', 'NotificationScheduleController@updateNotification')->name('admins.notification.update');
         Route::get('delete', 'NotificationScheduleController@deleteNotification')->name('admins.notification.delete');
         Route::post('action', 'NotificationScheduleController@actionNotification')->name('admins.notification.action');
+        Route::post('status', 'NotificationScheduleController@statusNotification')->name('admins.notification.status');
     });
 
 });
@@ -205,24 +251,44 @@ Route::group(['prefix' => 'common'], function () {
 // =====================public=========================
 Route::group(['prefix' => 'batdongsan'], function () {
     // index
-    Route::get('', 'PublicController@index')->name('public.index');
+    Route::get('', 'PublicController@index')->name('public.trangchu');
+
     Route::get('gioithieu', 'PublicController@gioithieu')->name('public.gioithieu');
+
     Route::get('duan', 'PublicController@duan')->name('public.duan');
     Route::get('chitietduan/{id}', 'PublicController@chitietduan')->name('public.chitietduan');
+
     Route::get('sangiaodich/type/{type}', 'PublicController@sangiaodich')->name('public.sangiaodich');
     Route::get('sangiaodich/type/{type}/{id}', 'PublicController@sangiaodichtheloai')->name('public.sangiaodich.theloai');
     Route::get('chitietsanbatdongsan/{id}', 'PublicController@chitietsanbatdongsan')->name('public.chitietsanbatdongsan');
+
     Route::get('lienhe', 'PublicController@lienhe')->name('public.lienhe');
+    Route::post('lienhe', 'PublicController@taolienhe')->name('public.taolienhe');
+
+    Route::get('tintuc', 'PublicController@listtintuc')->name('public.tintuc.list');
     Route::get('tintuc/{catId}', 'PublicController@tintuc')->name('public.tintuc');
     Route::get('chitiettintuc/{id}', 'PublicController@chitiettintuc')->name('public.chitiettintuc');
-    Route::get('tuyendung', 'PublicController@tuyendung')->name('public.tuyendung');
+
     Route::get('dangtin', 'PublicController@dangtin')->name('public.dangtin');
-    Route::post('dangtin/{id}', 'PublicController@taotin')->name('public.dangtin');
+    Route::post('taotin', 'PublicController@taotin')->name('public.taotin');
+
     Route::get('dangnhap', 'PublicController@dangnhap')->name('public.dangnhap');
     Route::post('dangnhap', 'PublicController@xulydangnhap')->name('public.dangnhap');
+
     Route::get('dangky', 'PublicController@dangky')->name('public.dangky');
+    Route::post('dangky', 'PublicController@postdangky')->name('public.postdangky');
+
     Route::get('trangcanhan', 'PublicController@trangcanhan')->name('public.trangcanhan');
-    Route::post('tuvan', 'PublicController@tuvan')->name('public.tuvan');
+    Route::get('chitiettuvan/{idPost}', 'PublicController@chitiettuvan')->name('public.trangcanhan.chitiettuvan');
+    Route::get('thaydoithongtincanhan', 'PublicController@thaydoithongtincanhan')->name('public.trangcanhan.thaydoithongtincanhan');
+    Route::post('postthaydoithongtincanhan', 'PublicController@postthaydoithongtincanhan')->name('public.trangcanhan.postthaydoithongtincanhan');
+    Route::get('thaydoimatkhau', 'PublicController@thaydoimatkhau')->name('public.trangcanhan.thaydoimatkhau');
+    Route::post('postthaydoimatkhau', 'PublicController@postthaydoimatkhau')->name('public.trangcanhan.postthaydoimatkhau');
+    Route::get('dangxuat', 'PublicController@dangxuat')->name('public.trangcanhan.dangxuat');
+
+    Route::get('tuvan', 'PublicController@tuvan')->name('public.tuvan');
+    Route::get('tuvanduan', 'PublicController@tuvanduan')->name('public.tuvanduan');
+    Route::post('dangkyduan', 'PublicController@dangkyduan')->name('public.dangkyduan');
 
 
         //=======ajax==========

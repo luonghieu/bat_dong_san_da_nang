@@ -94,7 +94,7 @@ Slider
 								@endif
 							</td>
 							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
-							<td class="actions"><a href="{!! route('admins.news.edit',['id' => $obj->id]) !!}" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
+							<td class="actions"><a href="{!! route('admins.slider.edit',['id' => $obj->id]) !!}" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
 						</tr>
 						@endforeach
 					</tbody>

@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Post extends Model
 {
     const STATUS = [
-        'processing' => 1,
-        'processed' => 2,
+        'processing' => 0,
+        'processed' => 1,
         'paid' => 2,
         'cancel' => 3,
     ];
