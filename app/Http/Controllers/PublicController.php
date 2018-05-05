@@ -380,9 +380,9 @@ class PublicController extends Controller
 	public function chitiettuvan($idPost)
 	{
 		$list = Consult::where('product_id', $idPost)
-			->where('type', Consult::TYPE['post'])
-			->orderBy('created_at', 'desc')
-			->get();
+		->where('type', Consult::TYPE['post'])
+		->orderBy('created_at', 'desc')
+		->get();
 		return view('public.chitiettuvan', ['list' => $list]);
 	}
 
@@ -415,21 +415,21 @@ class PublicController extends Controller
 		Consult::create($data);
 
 		$createAnnouncement = [
-		  'title' => Announcement::TITLE['customer'],
-          'content' => Announcement::CONTENT['customer'],
-          'active' => 1,
-          'created_at' => Carbon::now()
-        ];
+			'title' => Announcement::TITLE['customer'],
+			'content' => Announcement::CONTENT['customer'],
+			'active' => 1,
+			'created_at' => Carbon::now()
+		];
 
 		$announcement = Announcement::create($createAnnouncement);
 		$manager = Employee::join('users', 'employee.user_id', 'users.id')->where('role', User::ROLE['manager'])->pluck('users.id')->toArray();
 		foreach ($manager as $id) {
-		    AnnouncementRecieves::create([
-		        'announcement_id' => $announcement->id,
-                'reciever_id' => $id,
-                'is_read' => 0
-            ]);
-        }
+			AnnouncementRecieves::create([
+				'announcement_id' => $announcement->id,
+				'reciever_id' => $id,
+				'is_read' => 0
+			]);
+		}
 
 		echo json_encode('ok');
 	}
@@ -437,22 +437,22 @@ class PublicController extends Controller
 	public function dangkyduan(Request $request)
 	{
 		$rules = $this->validate($request,
-                [
-                	'name' => 'required|max:50',
-                    'email' => 'required|email',
-                    'phone' => 'required|numeric',
-                    'message' => 'nullable|max:255'
-                ],
-                [
-                    'name.required' => 'Name is required',
-                    'name.max' => 'Name is not greater than 50 character',
-                    'email.required' => 'Email is required',
-                    'email.email' => 'Email is not valid',
-                    'phone.required' => 'Phone is required',
-                    'phone.numeric' => 'Phone must be number',
-                    'message.max' => 'Message is not greater than 255 character',
-                ]
-            );
+			[
+				'name' => 'required|max:50',
+				'email' => 'required|email',
+				'phone' => 'required|numeric',
+				'message' => 'nullable|max:255'
+			],
+			[
+				'name.required' => 'Name is required',
+				'name.max' => 'Name is not greater than 50 character',
+				'email.required' => 'Email is required',
+				'email.email' => 'Email is not valid',
+				'phone.required' => 'Phone is required',
+				'phone.numeric' => 'Phone must be number',
+				'message.max' => 'Message is not greater than 255 character',
+			]
+		);
 
 
 		$data = [
@@ -472,6 +472,18 @@ class PublicController extends Controller
 	{
 		session()->forget('objUser');
 		return redirect()->route('public.trangchu');
+	}
+
+	public function timkiem()
+	{
+		$sale = Category::where('type_transaction', Category::TYPETRANSACTION['sale'])
+		->pluck('name', 'id')
+		->toArray();
+		$district = District::pluck('name', 'id')->toArray();
+		$unitPrice = UnitPrice::where('type_transaction', Category::TYPETRANSACTION['sale'])
+		->pluck('name', 'id')->toArray();
+
+		return view('public.timkiem', ['sale' => $sale, 'district' => $district, 'unitPrice' => $unitPrice]);
 	}
 
 

@@ -74,6 +74,7 @@
 							<th>Title</th>
 							<th>Content</th>
 							<th>Active</th>
+							<th>Created by</th>
 							<th>Created at</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
 						</tr>
@@ -94,6 +95,7 @@
 										<span @if ($objUser->id == $obj->user_id || $objUser->role == 1) onclick="active({!! $obj->id !!})" @endif class="check-toggler toggle-class checked" data-toggle="checked"></span>
 									@endif
 								</td>
+								<td>{!! $obj->user->username !!}</td>
 								<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
 								<td class="actions">
 									@if ($objUser->id == $obj->user_id || $objUser->role == 1)

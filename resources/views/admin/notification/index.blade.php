@@ -13,8 +13,19 @@
 		<div class="tile-header dvd dvd-btm">
 			<h1 class="custom-font"><strong>Notification</strong></h1>
 			<ul class="controls">
-				<li>
-					<a href="{!! route('admins.notification.create') !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
+				<li class="dropdown">
+
+					<a role="button" tabindex="0" class="dropdown-toggle settings" data-toggle="dropdown"><i class="fa fa-plus mr-5"></i>Add</a>
+
+					<ul class="dropdown-menu pull-right with-arrow animated littleFadeInUp">
+						<li>
+							<a href="{!! route('admins.notification.create', ['type' => 1]) !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i>My Schedule</a>
+						</li>
+						<li>
+							<a href="{!! route('admins.notification.create', ['type' => 2]) !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i>Send Customer</a>
+						</li>
+					</ul>
+
 				</li>
 				<li class="dropdown">
 

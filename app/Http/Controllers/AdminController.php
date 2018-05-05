@@ -14,6 +14,7 @@ use App\Http\Requests\IntroduceCreateRequest;
 use App\Http\Requests\ScheduleCreateRequest;
 use App\Http\Requests\ProjectCreateRequest;
 use App\Http\Requests\SliderCreateRequest;
+use App\Http\Requests\AnnouncementCreateRequest;
 use App\Models\Employee;
 use App\Models\Customer;
 use App\Models\User;
@@ -1745,7 +1746,7 @@ public function storeProduct(Request $request)
                         '</div>' .
                         '<div>' .
                             '<label for="">Description</label>' .
-                            '<textarea name="txtContent" class="form-control" name="description-' .  $obj->id . '" id="editor1">' . $obj->description . '</textarea>' .
+                            '<textarea class="form-control" name="description-' .  $obj->id . '">' . $obj->description . '</textarea>' .
                         '</div>' .
                     '</div>';
     echo $result;
@@ -1773,11 +1774,12 @@ public function updateProduct(Request $request)
             'floor' => $request->$floor,
             'area' => $request->$area,
             'price' => $request->$price,
-            'description' => $request->$description,
+            'description' => ($request->$description) ?? '',
         ];
 
         $obj->update($data);
     }
+    echo json_encode('ok');
 
 }
 
@@ -1919,7 +1921,8 @@ public function listAnnouncement()
     } else {
         $list  = Announcement::select(['announcements.*', 'is_read'])
         ->join('announcement_recieves', 'announcement.id', 'announcement_recieves.announcement_id')
-        ->where('user_id', $objLogin->id)->orderBy('is_read', 'ASC')->orderBy('id', 'DESC')->get();
+        ->where('user_id', $objLogin->id)->orWhere('causer_id', $objLogin->id)
+        ->orderBy('is_read', 'ASC')->orderBy('id', 'DESC')->get();
         AnnouncementRecieves::where('reciever_id', $objLogin->id)->update('is_read', 1);
     }
 
@@ -1935,8 +1938,10 @@ public function createAnnouncement()
     // store
 public function storeAnnouncement(AnnouncementCreateRequest $request)
 {
+    $loginUser = session()->get('objUser');
     $data = $request->all();
     $data['created_at'] = Carbon::now();
+    $data['causer_id'] = $loginUser->id;
 
     if ($announcement = Announcement::create($data)) {
         $userId = User::where('role', '!=', User::ROLE['admin'])->where('role', '!=', User::ROLE['customer'])->pluck('id')->toArray();
@@ -1975,11 +1980,11 @@ public function updateAnnouncement(AnnouncementCreateRequest $request, $id)
 }
 
     //delete
-public function deleteAnnouncement($id)
+public function deleteAnnouncement(Request $request)
 {
-    $obj = Announcement::find($id);
+    $obj = Announcement::find($request->id);
     if ($obj->delete()) {
-        AnnouncementRecieves::where('announcement_id', $id)->delete();
+        AnnouncementRecieves::where('announcement_id', $request->id)->delete();
         echo json_encode('ok');
     }
 }

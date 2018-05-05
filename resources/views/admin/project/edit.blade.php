@@ -118,7 +118,7 @@ Detail Project
 						</div>
 						<div>
 							<label for="">Description</label>
-							<textarea name="txtContent" class="form-control" name="description-{!! $product->id !!}" id="editor1">{!! $product->description !!}</textarea>
+							<textarea class="form-control" name="description-{!! $product->id !!}">{!! $product->description !!}</textarea>
 						</div>
 					</div>
 					@endforeach
@@ -321,8 +321,15 @@ Detail Project
 		});
 
 		$('#edit').click(function(){
-			$('#form-product').submit();
-			$('#form-project').submit();
+			$.ajax({
+				url: "{!! route('admins.product.update') !!}",
+				method: "POST",
+				data: $("#form-product").serialize(),
+					dataType : 'json',
+					success : function(result){
+						$('#form-project').submit();
+					}
+				});
 		});
 
 		$('#add-product').click(function(){

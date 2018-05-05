@@ -38,6 +38,6 @@ class Announcement extends Model
      */
     public function user()
     {
-        return $this->hasMany('App\Models\User', 'causer_id', 'id');
+        return $this->belongsTo('App\Models\User', 'causer_id', 'id');
     }
 }

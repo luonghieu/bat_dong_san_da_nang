@@ -216,7 +216,7 @@ Route::group(['prefix' => 'managements'], function () {
     Route::group(['prefix' => 'notification'], function () {
         // post-Admin
         Route::get('list', 'NotificationScheduleController@listNotification')->name('admins.notification.list');
-        Route::get('create', 'NotificationScheduleController@createNotification')->name('admins.notification.create');
+        Route::get('create/{type}', 'NotificationScheduleController@createNotification')->name('admins.notification.create');
         Route::post('create', 'NotificationScheduleController@storeNotification')->name('admins.notification.store');
         Route::get('{id}/edit', 'NotificationScheduleController@editNotification')->name('admins.notification.edit');
         Route::post('{id}/update', 'NotificationScheduleController@updateNotification')->name('admins.notification.update');
@@ -289,6 +289,7 @@ Route::group(['prefix' => 'batdongsan'], function () {
     Route::get('tuvan', 'PublicController@tuvan')->name('public.tuvan');
     Route::get('tuvanduan', 'PublicController@tuvanduan')->name('public.tuvanduan');
     Route::post('dangkyduan', 'PublicController@dangkyduan')->name('public.dangkyduan');
+    Route::get('timkiem', 'PublicController@timkiem')->name('public.timkiem');
 
 
         //=======ajax==========

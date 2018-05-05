@@ -24,7 +24,6 @@ class AnnouncementCreateRequest extends FormRequest
      */
     public function rules()
     {
-        $list = CatNew::all(['id'])->pluck('id')->toArray();
         return [
             'title' => 'required|max:255',
             'content' => 'required|min:3|max:255',

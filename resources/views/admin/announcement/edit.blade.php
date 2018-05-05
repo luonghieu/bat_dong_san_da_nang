@@ -71,7 +71,7 @@ Announcement
 			<div class="form-group">
 				<label class="col-sm-2 control-label">Content</label>
 				<div class="col-sm-10">
-					<textarea id="summernote" name="detail">{!! $obj->content !!}
+					<textarea id="summernote" name="content">{!! $obj->content !!}
 					</textarea>
 					@if ($errors->has('content'))
 					<div class="alert alert-lightred alert-dismissable fade in">

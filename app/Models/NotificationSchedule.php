@@ -8,15 +8,17 @@ class NotificationSchedule extends Model
 {
     protected $table = 'notification_schedules';
 
+    public $timestamps=false;
+
     const RECURRING_TYPES = [
         'daily' => 1,
         'weekly' => 2,
         'monthly' => 3,
     ];
 
-    const TYPES = [
-        'customer' => 1,
-        'employee' => 2,
+    const TYPE = [
+        'employee' => 1,
+        'customer' => 2,
     ];
 
     const STATUS = [
@@ -35,6 +37,7 @@ class NotificationSchedule extends Model
         'send_date',
         'send_time',
         'status',
-        'reciever_id'
+        'reciever_id',
+        'created_at'
     ];
 }
