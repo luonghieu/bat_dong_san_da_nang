@@ -234,6 +234,8 @@ Route::group(['prefix' => 'common'], function () {
 
     Route::get('getLoaiNhaDat', 'CommonController@getLoaiNhaDat')->name('common.getLoaiNhaDat');
     Route::get('getCustomerByUserLogin', 'CommonController@getCustomerByUserLogin')->name('common.getCustomerByUserLogin');
+    Route::get('getSaleSearch', 'CommonController@getSaleSearch')->name('common.getSaleSearch');
+    Route::get('getLeaseSearch', 'CommonController@getLeaseSearch')->name('common.getLeaseSearch');
 
 });
 
@@ -290,6 +292,7 @@ Route::group(['prefix' => 'batdongsan'], function () {
     Route::get('tuvanduan', 'PublicController@tuvanduan')->name('public.tuvanduan');
     Route::post('dangkyduan', 'PublicController@dangkyduan')->name('public.dangkyduan');
     Route::get('timkiem', 'PublicController@timkiem')->name('public.timkiem');
+    Route::post('posttimkiem', 'PublicController@posttimkiem')->name('public.posttimkiem');
 
 
         //=======ajax==========

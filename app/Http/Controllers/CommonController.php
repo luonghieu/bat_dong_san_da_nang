@@ -52,4 +52,44 @@ class CommonController extends Controller
         echo json_encode($customer);
     }
 
+     // gioithieu
+    public function getSaleSearch()
+    {
+        $cat = Category::where('type_transaction', Category::TYPETRANSACTION['sale'])
+        ->pluck('name', 'id')
+        ->toArray();
+        $price = [
+            'Thỏa thuận',
+            '< 500 triệu',
+            '500 - 800 triệu',
+            '800 - 1 tỷ',
+            '1 - 5 tỷ',
+            '> 5 tỷ'
+        ];
+        echo json_encode([
+            'cat' => $cat,
+            'price' => $price
+        ]);
+    }
+
+     // gioithieu
+    public function getLeaseSearch()
+    {
+        $cat = Category::where('type_transaction', Category::TYPETRANSACTION['lease'])
+        ->pluck('name', 'id')
+        ->toArray();
+        $price = [
+            'Thỏa thuận',
+            '< 1 triệu',
+            '1 - 5 triệu',
+            '5 - 10 triệu',
+            '10 - 40 triệu',
+            '> 40 triệu'
+        ];
+        echo json_encode([
+            'cat' => $cat,
+            'price' => $price
+        ]);
+    }
+
 }

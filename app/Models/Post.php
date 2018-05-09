@@ -14,7 +14,7 @@ class Post extends Model
     ];
 
     const DIRECTION = [
-        0 => 'Khong xac dinh',
+        0 => 'Không xác định',
         1 => 'Đông',
         2 => 'Tây',
         3 => 'Nam',

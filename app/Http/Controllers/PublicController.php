@@ -480,10 +480,8 @@ class PublicController extends Controller
 		->pluck('name', 'id')
 		->toArray();
 		$district = District::pluck('name', 'id')->toArray();
-		$unitPrice = UnitPrice::where('type_transaction', Category::TYPETRANSACTION['sale'])
-		->pluck('name', 'id')->toArray();
-
-		return view('public.timkiem', ['sale' => $sale, 'district' => $district, 'unitPrice' => $unitPrice]);
+		$direction = Post::DIRECTION;
+		return view('public.timkiem', ['sale' => $sale, 'district' => $district, 'direction' => $direction]);
 	}
 
 
