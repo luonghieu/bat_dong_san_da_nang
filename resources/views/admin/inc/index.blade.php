@@ -36,12 +36,12 @@
     <!-- project main css files -->
     <link rel="stylesheet" href="{!! asset('admin_asset/css/main.css') !!}">
     <!--/ stylesheets -->
+<!-- === Vendor JavaScripts === -->
+ <script src="{!! asset('admin_asset/js/jquery.min.js') !!}"></script>
 
-    <!-- ===Modernizr=== -->
-    <script src="{!! asset('admin_asset/js/vendor/modernizr/modernizr-2.8.3-respond-1.4.2.min.js') !!}"></script>
+        <!-- Latest compiled and minified JavaScript -->
+
     <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
-    <link href="{{ asset('admin_asset/css/rateit.css') }}" rel="stylesheet" type="text/css">
-    <script src="{{ asset('admin_asset/js/jquery.rateit.min.js') }}" type="text/javascript"></script>
     
     <!--/ modernizr -->
 

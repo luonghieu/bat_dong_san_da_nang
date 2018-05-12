@@ -60,13 +60,23 @@ Add Transaction
         <form class="form-horizontal" role="form" id="form-add" method="post" action="{!! route('admins.customer.storeTransaction') !!}">
             <input type="hidden" name="_token" value="{{csrf_token()}}" />
             <input type="hidden" name="registerId" value="{{$register->id}}" />
+            <input type="hidden" name="projectId" id="projectId" value="{{$register->project->id}}" />
             <div class="form-group">
                 <label for="inputEmail3" class="col-sm-2 control-label">Block</label>
                 <div class="col-sm-10">
                     <select class="form-control" name="block" id="block">
-                        @foreach($products as $item)
-                        <option value="{!! $item->id !!}">{!! $item->block !!}</option>
+                        <option value="-1">--Choose--</option>
+                        @foreach($blocks as $item)
+                        <option value="{!! $item !!}">{!! $item !!}</option>
                         @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">Land</label>
+                <div class="col-sm-10">
+                    <select class="form-control" name="land" id="land">
+                        <option value="-1">--Choose--</option>
                     </select>
                 </div>
             </div>
@@ -74,18 +84,15 @@ Add Transaction
                 <label for="inputPassword3" class="col-sm-2 control-label">Floor</label>
                 <div class="col-sm-10">
                     <select class="form-control" name="floor" id="floor">
-                        @foreach(range(1, $floor) as $value)
-                        <option value="{!! $value!!}">{!! $value !!}</option>
-                        @endforeach
+                        <option value="-1">--Choose--</option>
                     </select>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label">Description</label>
                 <div class="col-sm-10">
-                   <textarea id="editor1" name="description">
-                   </textarea>
-                   <script>
+                 <textarea id="editor1" name="description"></textarea>
+                 <script>
                     CKEDITOR.replace( 'editor1', {
                         filebrowserBrowseUrl: '{{ asset('ckfinder/ckfinder.html') }}',
                         filebrowserImageBrowseUrl: '{{ asset('ckfinder/ckfinder.html?type=Images') }}',
@@ -97,43 +104,6 @@ Add Transaction
                 </script>
             </div>
         </div>
-        <!-- <div class="form-group">
-            <label for="inputPassword3" class="col-sm-2 control-label">Rating</label>
-            <div class="col-sm-10">
-                <div class="rateit">
-                    <button id="rateit-reset-2" type="button" data-role="none" class="rateit-reset" aria-label="reset rating" aria-controls="rateit-range-2"></button>
-                    <div id="rateit-range-2" class="rateit-range" tabindex="0" role="slider" aria-label="rating" aria-owns="rateit-reset-2" aria-valuemin="0" aria-valuemax="5" aria-valuenow="4" aria-readonly="false" style="width: 80px; height: 16px;">
-                        <div class="rateit-selected" style="height: 16px; width: 64px; display: block;"></div>
-                        <div class="rateit-hover" style="height: 16px; width: 0px; display: none;"></div>
-                    </div>
-                </div>
-                <div id="rateit"  data-transactionid="add"></div>
-                <script type="text/javascript">
-                    $(function () {
-                        $('#rateit_star1').rateit({min: 1, max: 10, step: 1});
-                        $('#rateit_star1').bind('rated', function (e) {
-                            var ri = $(this);
-                            var value = ri.rateit('value');
-                            var transactionid = ri.data('transactionid');
-                            $.ajax({
-                                url: "{{ route('admins.customer.ratingTransaction') }}",
-                                method: "GET",
-                                data: {
-                                    'value' : value,
-                                    'transactionid' : transactionid,
-                                },
-                                dataType : 'json',
-                                success : function(result){
-                                    alert('Bạn đã đánh giá '+value +' sao cho sản phẩm có id là:'+productID );
-                                        //không cho phép đánh giá,sau khi đã đánh giá xong
-                                        ri.rateit('readonly', true);
-                                    }
-                                });
-                        });
-                    });
-                </script>
-            </div>
-        </div> -->
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <button type="submit" class="btn btn-rounded btn-primary btn-sm">Cancel</button>
@@ -155,16 +125,47 @@ Add Transaction
         });
 
         $('#block').change(function () {
-            productId = $(this).val();
+            block = $(this).val();
+            if (block == -1) {
+                $("#land").html('<option value="-1">--Choose--</option>');
+                $("#floor").html('<option value="-1">--Choose--</option>');
+                return false;
+            }
             $.ajax({
-                url: "{{ route('admins.customer.getFloorByProduct') }}",
+                url: "{{ route('admins.project.getLandByBlock') }}",
                 method: "GET",
                 data: {
-                    'productId' : productId,
+                    'block' : block,
+                    'projectId' : $('#projectId').val(),
                 },
                 dataType : 'json',
                 success : function(result){
-                    html = '';
+                    html = '<option value="-1">--Choose--</option>';
+                    $.each (result, function (key, item){
+                      html += '<option value="' + item + '">' + item + '</option>';
+                  });
+                    $("#land").html(html);
+                }
+            });
+        });
+
+        $('#land').change(function () {
+            land = $(this).val();
+            if (land == -1) {
+                $("#floor").html('<option value="-1">--Choose--</option>');
+                return false;
+            }
+            $.ajax({
+                url: "{{ route('admins.project.getFloorByLand') }}",
+                method: "GET",
+                data: {
+                    'block' : $('#block').val(),
+                    'land' : land,
+                    'projectId' : $('#projectId').val(),
+                },
+                dataType : 'json',
+                success : function(result){
+                    html = '<option value="-1">--Choose--</option>';
                     $.each (result, function (key, item){
                         html += '<option value="' + item + '">' + item + '</option>'
                     });

@@ -1,9 +1,9 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.news.css')
+@include('admin.transaction.css')
 @endsection
 @section('title')
-News
+Add Transaction
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +11,7 @@ News
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>News</strong></h1>
+		<h1 class="custom-font"><strong>Add Transaction</strong></h1>
 		<ul class="controls">
 			<li>
 				<a role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
@@ -54,71 +54,48 @@ News
 			<p>{{ session('error') }}</p>
 		</div>
 		@endif
-		<form class="form-horizontal" role="form" id="form-add" method="post" action="{!! route('admins.news.store') !!}" enctype="multipart/form-data">
+		<form class="form-horizontal" role="form" id="form-add" method="post" action="{!! route('admins.transaction.storeAllTransaction') !!}">
 			<input type="hidden" name="_token" value="{{csrf_token()}}" />
+			<h3>Product</h3>
 			<div class="form-group">
-				<label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+				<label for="inputEmail3" class="col-sm-2 control-label">Project</label>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" id="inputEmail3" name="name" placeholder="Title">
-					@if ($errors->has('name'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('name') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="inputPassword3" class="col-sm-2 control-label">Describe</label>
-				<div class="col-sm-10">
-					<input type="text" name="feature" class="form-control" id="inputPassword3" placeholder="Describe">
-					@if ($errors->has('feature'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('feature') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="inputPassword3" class="col-sm-2 control-label">Link</label>
-				<div class="col-sm-10">
-					<input type="text" name="link" class="form-control" id="inputPassword3" placeholder="Link">
-					@if ($errors->has('link'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('link') !!}</strong>
-					</div>
-					@endif
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Category</label>
-				<div class="col-sm-10">
-					<select class="form-control mb-10" name="cat_new_id">
-						@foreach($listCat as $obj)
-						<option value="{!! $obj->id !!}">{!! $obj->name !!}</option>
+					<select class="form-control" name="project" id="project">
+						<option value="-1">--Choose--</option>
+						@foreach($projects as $key => $item)
+						<option value="{!! $key !!}">{!! $item !!}</option>
 						@endforeach
 					</select>
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-2 control-label">Image</label>
+				<label for="inputEmail3" class="col-sm-2 control-label">Block</label>
 				<div class="col-sm-10">
-					<input type="file" name="image" class="filestyle" data-buttonText="Find file" data-iconName="fa fa-inbox">
-					@if ($errors->has('image'))
-					<div class="alert alert-lightred alert-dismissable fade in">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('image') !!}</strong>
-					</div>
-					@endif
+					<select class="form-control" name="block" id="block">
+						<option value="-1">--Choose--</option>
+					</select>
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-2 control-label">Detail</label>
+				<label for="inputPassword3" class="col-sm-2 control-label">Land</label>
 				<div class="col-sm-10">
-					<textarea id="editor1" name="detail">
-					</textarea>
+					<select class="form-control" name="land" id="land">
+						<option value="-1">--Choose--</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">Floor</label>
+				<div class="col-sm-10">
+					<select class="form-control" name="floor" id="floor">
+						<option value="-1">--Choose--</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Description</label>
+				<div class="col-sm-10">
+					<textarea id="editor1" name="description"></textarea>
 					<script>
 						CKEDITOR.replace( 'editor1', {
 							filebrowserBrowseUrl: '{{ asset('ckfinder/ckfinder.html') }}',
@@ -129,10 +106,41 @@ News
 							filebrowserFlashUploadUrl: '{{ asset('ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Flash') }}'
 						});
 					</script>
-					@if ($errors->has('detail'))
+				</div>
+			</div>
+			<h3>Customer</h3>
+			<div class="form-group">
+				<label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+				<div class="col-sm-10">
+					<input type="text" name="name" class="form-control" />
+					@if ($errors->has('name'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<strong>{!! $errors->first('detail') !!}</strong>
+						<strong>{!! $errors->first('name') !!}</strong>
+					</div>
+					@endif
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+				<div class="col-sm-10">
+					<input type="text" name="email" class="form-control" />
+					@if ($errors->has('email'))
+					<div class="alert alert-lightred alert-dismissable fade in">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<strong>{!! $errors->first('email') !!}</strong>
+					</div>
+					@endif
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputEmail3" class="col-sm-2 control-label">Phone</label>
+				<div class="col-sm-10">
+					<input type="text" name="phone" class="form-control" />
+					@if ($errors->has('phone'))
+					<div class="alert alert-lightred alert-dismissable fade in">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<strong>{!! $errors->first('phone') !!}</strong>
 					</div>
 					@endif
 				</div>
@@ -151,11 +159,85 @@ News
 @endsection
 
 @section('script')
-@include('admin.news.script')
 <script>
 	$( document ).ready(function() {
 		$('#add-entry').click(function (e) {
 			$('#form-add').submit();
+		});
+
+		$('#project').change(function () {
+			projectId = $(this).val();
+			if (block == -1) {
+				$("#block").html('<option value="-1">--Choose--</option>');
+				$("#land").html('<option value="-1">--Choose--</option>');
+				$("#floor").html('<option value="-1">--Choose--</option>');
+				return false;
+			}
+			$.ajax({
+				url: "{{ route('admins.project.getBlockByProject') }}",
+				method: "GET",
+				data: {
+					'projectId' : projectId,
+				},
+				dataType : 'json',
+				success : function(result){
+					html = '<option value="-1">--Choose--</option>';
+					$.each (result, function (key, item){
+						html += '<option value="' + item + '">' + item + '</option>';
+					});
+					$("#block").html(html);
+				}
+			});
+		});
+
+		$('#block').change(function () {
+			block = $(this).val();
+			if (block == -1) {
+				$("#land").html('<option value="-1">--Choose--</option>');
+				$("#floor").html('<option value="-1">--Choose--</option>');
+				return false;
+			}
+			$.ajax({
+				url: "{{ route('admins.project.getLandByBlock') }}",
+				method: "GET",
+				data: {
+					'block' : block,
+					'projectId' : $('#project').val(),
+				},
+				dataType : 'json',
+				success : function(result){
+					html = '<option value="-1">--Choose--</option>';
+					$.each (result, function (key, item){
+						html += '<option value="' + item + '">' + item + '</option>';
+					});
+					$("#land").html(html);
+				}
+			});
+		});
+
+		$('#land').change(function () {
+			land = $(this).val();
+			if (land == -1) {
+				$("#floor").html('<option value="-1">--Choose--</option>');
+				return false;
+			}
+			$.ajax({
+				url: "{{ route('admins.project.getFloorByLand') }}",
+				method: "GET",
+				data: {
+					'block' : $('#block').val(),
+					'land' : land,
+					'projectId' : $('#project').val(),
+				},
+				dataType : 'json',
+				success : function(result){
+					html = '<option value="-1">--Choose--</option>';
+					$.each (result, function (key, item){
+						html += '<option value="' + item + '">' + item + '</option>'
+					});
+					$('#floor').html(html);
+				}
+			});
 		});
 	});
 </script>

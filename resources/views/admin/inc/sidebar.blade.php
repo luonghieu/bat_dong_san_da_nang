@@ -1,4 +1,8 @@
-
+@if (session('objUser'))
+    @php
+        $objUser = Session::get("objUser");
+    @endphp
+@endif
 <!-- ================================================
 ================= SIDEBAR Content ===================
 ================================================= -->
@@ -28,13 +32,17 @@
                             <li>
                                 <a href="{!! route('admins.announcement.list') !!}" tabindex="0"><i class="fa fa-list"></i> <span>Announcement</span></a>
                             </li>
+                            @if ($objUser->role != 3 && $objUser->role != 4)
                             <li>
                                 <a role="button" tabindex="0"><i class="fa fa-list"></i> <span>Employee</span></a>
                                 <ul>
+                                    @if ($objUser->role == 1)
                                     <li><a href="{!! route('admins.leader.list') !!}"><i class="fa fa-caret-right"></i> Leader sale</a></li>
+                                    @endif
                                     <li><a href="{!! route('admins.sale.list') !!}"><i class="fa fa-caret-right"></i> Sale</a></li>
                                 </ul>
                             </li>
+                            @endif
                             <li>
                                 <a role="button" tabindex="0"><i class="fa fa-pencil"></i> <span>Customer</span></a>
                                 <ul>
@@ -46,10 +54,10 @@
                                 <a role="button" tabindex="0" href="{!! route('admins.post.list') !!}"><i class="fa fa-table"></i> <span>Post</span></a>
                             </li>
                             <li>
-                                <a role="button" tabindex="0" href="{!! route('admins.post.list') !!}"><i class="fa fa-table"></i> <span>Product</span></a>
+                                <a href="{!! route('admins.project.list') !!}" role="button" tabindex="0"><i class="fa fa-desktop"></i> <span>Project</span></a>
                             </li>
                             <li>
-                                <a href="{!! route('admins.project.list') !!}" role="button" tabindex="0"><i class="fa fa-desktop"></i> <span>Project</span></a>
+                                <a href="{!! route('admins.transaction.listAll') !!}" role="button" tabindex="0"><i class="fa fa-desktop"></i> <span>Transaction</span></a>
                             </li>
                             <li>
                                 <a href="{!! route('admins.assign.list') !!}" role="button" tabindex="0"><i class="fa fa-map-marker"></i> <span>Assign Task</span></a>

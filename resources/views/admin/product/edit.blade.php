@@ -14,7 +14,7 @@ Product
 		<h1 class="custom-font"><strong>Add Product</strong></h1>
 		<ul class="controls">
 			<li>
-				<a id="add-entry" role="button" tabindex="0"><i class="fa fa-plus mr-5"></i> Add</a>
+				<a id="add-entry" role="button" tabindex="0"><i class="fa fa-plus mr-5"></i> Edit</a>
 			</li>
 			<li class="dropdown">
 
@@ -54,12 +54,13 @@ Product
 			<p>{{ session('error') }}</p>
 		</div>
 		@endif
-		<form role="form" id="form-add" method="post" action="{!! route('admins.product.store', ['id' => $projectId]) !!}" enctype="multipart/form-data">
+		<form role="form" id="form-add" method="post" action="{!! route('admins.product.update') !!}" enctype="multipart/form-data">
 			<input type="hidden" name="_token" value="{{csrf_token()}}" />
+			<input type="hidden" name="productId" value="{{$obj->id}}" />
 			<div class="form-group">
 				<label for="inputPassword3">Block</label>
 				<div>
-					<input type="text" class="form-control" placeholder="Block" name="block" value="">
+					<input type="text" class="form-control" placeholder="Block" name="block" value="{{ $obj->block }}">
 					@if ($errors->has('block'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -71,7 +72,7 @@ Product
 			<div class="form-group">
 				<label for="inputPassword3">Land</label>
 				<div>
-					<input type="text" class="form-control" placeholder="Land" name="land" value="">
+					<input type="text" class="form-control" placeholder="Land" name="land" value="{{ $obj->land }}">
 					@if ($errors->has('land'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -83,7 +84,7 @@ Product
 			<div class="form-group">
 				<label for="inputPassword3">Floor</label>
 				<div>
-					<input type="text" class="form-control" placeholder="Floor" name="floor" value="">
+					<input type="text" class="form-control" placeholder="Floor" name="floor" value="{{ $obj->floor }}">
 					@if ($errors->has('floor'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -95,7 +96,7 @@ Product
 			<div class="form-group">
 				<label for="inputPassword3">Area</label>
 				<div>
-					<input type="text" class="form-control" placeholder="Area" name="area" value="">
+					<input type="text" class="form-control" placeholder="Area" name="area" value="{{ $obj->area }}">
 					@if ($errors->has('area'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -107,7 +108,7 @@ Product
 			<div class="form-group">
 				<label for="inputPassword3">Price</label>
 				<div>
-					<input type="text" class="form-control" placeholder="Price" name="price" value="">
+					<input type="text" class="form-control" placeholder="Price" name="price" value="{{ $obj->price }}">
 					@if ($errors->has('price'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -121,14 +122,14 @@ Product
 				<div>
 					<select name="direction" class="form-control">
 						@foreach($direction as $key => $item)
-						<option value="{{$key}}">{{ $item }}</option>
+						<option {{($obj->direction == $key) ? 'selected="selected"' : ''}} value="{{$key}}">{{ $item }}</option>
 						@endforeach
 					</select>
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="inputPassword3">Description</label>
-				<textarea id="editor1" name="description"></textarea>
+				<textarea id="editor1" name="description">{{ $obj->description }}</textarea>
 				<script>
 					CKEDITOR.replace( 'editor1', {
 						filebrowserBrowseUrl: '{{ asset('ckfinder/ckfinder.html') }}',

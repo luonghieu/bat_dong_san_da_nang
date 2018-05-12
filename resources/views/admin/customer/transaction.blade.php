@@ -72,8 +72,10 @@ Transaction
 							</th>
 							<th>Id</th>
 							<th>Block</th>
+							<th>Land</th>
 							<th>Floor</th>
-							<th>Status</th>
+							<th>Direction</th>
+							<th width="150px">Status</th>
 							<th>Created at</th>
 							<th>Description</th>
 							<th>Rating</th>
@@ -90,7 +92,9 @@ Transaction
 							<td>
 								<a href="{!! route('admins.product.detail',['id' => $obj->product->id]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $obj->product->block !!}</a>
 							</td>
+							<td>{!! $obj->product->land !!}</td>
 							<td>{!! $obj->floor !!}</td>
+							<td>{!! $direction[$obj->product->direction] !!}</td>
 							<td>
 								<select class="form-control mb-10" name="status-{!! $obj->id !!}" onchange="statusTransaction({!! $obj->id !!})">
 									@foreach ($status as $key => $value)
@@ -104,36 +108,61 @@ Transaction
 							</td>
 							<td>
 								@if($obj->status == 0)
-								<div id="rateit_star1"  data-transactionid="{{ $obj->id }}"></div>
+								<div id="rateYo{{$obj->id}}"></div>
+								<span style="color: red"></span>
+								<div id ="rating{{$obj->id}}">
+									<a id="saveRating{{$obj->id}}" href="javascript:void(0)">Save Rating</a>
+								</div>
 								<script type="text/javascript">
 									$(function () {
-										$('#rateit_star1').rateit({min: 1, max: 10, step: 1});
-										$('#rateit_star1').bind('rated', function (e) {
-											var ri = $(this);
-											var value = ri.rateit('value');
-											var transactionid = ri.data('transactionid');
+										var rate = 0;
+										$rateYo = $("#rateYo" + {{$obj->id}}).rateYo({
+											maxValue: 10,
+											numStars: 10,
+											starWidth: "20px",
+											rating: {{$obj->rating}},
+											onChange: function (rating, rateYoInstance) {
+												$(this).next().text(rating);
+												rate = rating;
+											}
+										});
+										$("#rateYo"+ {{$obj->id}}).click(function () {
+											alert("Rating " + rate);
+										});
+										$("#saveRating"+ {{$obj->id}}).click(function () {
 											$.ajax({
-												url: "{{ route('admins.customer.ratingTransaction') }}",
+												url: "{!! route('admins.customer.ratingTransaction') !!}",
 												method: "GET",
 												data: {
-													'value' : value,
-													'transactionid' : transactionid,
+													'id' : {{$obj->id}},
+													'rating' : rate
 												},
 												dataType : 'json',
 												success : function(result){
-													alert('Bạn đã đánh giá '+value +' sao cho sản phẩm có id là:'+productID );
-                                                        //không cho phép đánh giá,sau khi đã đánh giá xong
-                                                        ri.rateit('readonly', true);
-                                                    }
-                                                });
+													alert('Rating success!');
+													return false;
+												}
+											});
+										});
+									});
+								</script>
+								@else
+								<div id="rateYo{{$obj->id}}"></div>
+								<script type="text/javascript">
+									$(function () {
+										$("#rateYo" + {{$obj->id}}).rateYo({
+											maxValue: 10,
+											numStars: 10,
+											starWidth: "20px",
+											rating: {{$obj->rating}},
+											readOnly: true
 										});
 									});
 								</script>
 								@endif
-								<div class="rateit" data-rateit-value="{{ $obj->rating }}"  data-rateit-readonly="true"></div>
 							</td>
 							<td class="actions">
-								@if ($obj->status != 0) 
+								@if ($obj->status == 0) 
 								<a href="{!! route('admins.customer.editTransaction',['id' => $obj->id]) !!}" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a>
 								@endif
 								<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a>
@@ -167,6 +196,9 @@ Transaction
 @endsection
 
 @section('script')
+<script src="{!! asset('admin_asset/js/jquery.rateyo.min.js') !!}"></script>
+<!-- ===Modernizr=== -->
+<script src="{!! asset('admin_asset/js/vendor/modernizr/modernizr-2.8.3-respond-1.4.2.min.js') !!}"></script>
 @include('admin.customer.scriptTransaction')
 <script>
 // $( document ).ready(function() {

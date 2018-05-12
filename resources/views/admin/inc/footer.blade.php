@@ -1,7 +1,6 @@
 <!-- === Vendor JavaScripts === -->
         <script src="{!! asset('admin_asset/js/vendor/jquery/jquery-1.11.2.min.js') !!}"></script>
-
-
+       
         <script src="{!! asset('admin_asset/js/vendor/bootstrap/bootstrap.min.js') !!}"></script>
 
         <script src="{!! asset('admin_asset/js/vendor/jRespond/jRespond.min.js') !!}"></script>
@@ -56,18 +55,6 @@
         ============== Custom JavaScripts ===============
         ============================================= -->
         <script src="{!! asset('admin_asset/js/main.js') !!}"></script>
-        <!--/ custom javascripts -->
-        <!-- <script src="{{ asset('ckeditor/ckeditor.js') }}"></script> -->
-       <!--  <script>
-            CKEDITOR.replace( 'editor1', {
-                filebrowserBrowseUrl: '{{ asset('ckfinder/ckfinder.html') }}',
-                filebrowserImageBrowseUrl: '{{ asset('ckfinder/ckfinder.html?type=Images') }}',
-                filebrowserFlashBrowseUrl: '{{ asset('ckfinder/ckfinder.html?type=Flash') }}',
-                filebrowserUploadUrl: '{{ asset('ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files') }}',
-                filebrowserImageUploadUrl: '{{ asset('ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images') }}',
-                filebrowserFlashUploadUrl: '{{ asset('ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Flash') }}'
-            });
-         </script> -->
 
 @yield('script')
 
@@ -292,14 +279,14 @@
         <!--/ Page Specific Scripts -->
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
-        <script>
+        <!-- <script>
             (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
             function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
             e=o.createElement(i);r=o.getElementsByTagName(i)[0];
             e.src='../../www.google-analytics.com/analytics.js';
             r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
             ga('create','UA-XXXXX-X','auto');ga('send','pageview');
-        </script>
+        </script> -->
 
     </body>
 

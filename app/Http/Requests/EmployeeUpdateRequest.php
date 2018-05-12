@@ -4,9 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Models\CatNew;
 
-class EmployeeCreateRequest extends FormRequest
+class EmployeeUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -31,9 +30,8 @@ class EmployeeCreateRequest extends FormRequest
             'phone' => 'required|numeric',
             'gender' => ['required', Rule::in(['0', '1'])], 
             'image' => 'nullable|image|max: 1000',
-            'username' => 'required|min:3|max:50|unique:users',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
+            'email' => 'required|email',
+            'password' => 'nullable|min:6',
         ];
     }
 
@@ -51,14 +49,8 @@ class EmployeeCreateRequest extends FormRequest
             'gender.required' => 'Gender is required.',
             'image.image' => 'Image must in png, jpg, jpeg.',
             'image.max' => 'Image not greater than 1000kb.',
-            'username.required' => 'Username is required.',
-            'username.min' => 'Username is not less than 3 character',
-            'username.max' => 'Username is not greater than 50 character',
-            'username.unique' => 'Username is exist',
             'email.required' => 'Email is required.',
             'email.email' => 'Email is not valid',
-            'email.unique' => 'Email is exist',
-            'password.required' => 'Password is required.',
             'password.min' => 'Password is not less than 6 character.',
         ];
     }

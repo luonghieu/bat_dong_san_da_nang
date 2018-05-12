@@ -36,35 +36,10 @@ class AssignTask extends Model
     }
 
     /**
-     * Get chat relationship
-     */
-    public function chat()
-    {
-        return $this->hasOne('App\Models\Chat', 'assign_task_id', 'id');
-    }
-
-    /**
-     * Get customerService relationship
-     */
-    public function customerService()
-    {
-        return $this->hasOne('App\Models\CustomerService', 'assign_task_id', 'id');
-    }
-
-    /**
      * Get assignedBy relationship
      */
-    public function assignedByAdmin()
+    public function assigner()
     {
-        return $this->belongsTo('App\Models\User', 'assigner_id', 'id')->where('role', $this::ROLE['admin']);
+        return $this->belongsTo('App\Models\User', 'assigner_id', 'id');
     }
-
-    /**
-     * Get assignedBy relationship
-     */
-    public function assignedByLeader()
-    {
-        return $this->belongsTo('App\Models\Employee', 'assigner_id', 'id');
-    }
-
 }

@@ -181,46 +181,14 @@ $objUser = Session::get("objUser");
                                                 </li>
 
                                                 <li class="mb20 clearfix">
-                                                    <label class="w-15-100 fl lh35">LỊCH ĐĂNG TIN <span class="red">*</span></label>
+                                                    <label class="w-15-100 fl lh35">Lịch đăng tin<span class="red">*</span></label>
                                                     <div class="w-85-100 fl pr13 clearfix">
                                                         <div class="fl position">
-                                                            <span>Loại tin rao: </span></br>
-                                                            <select id="typePost" onchange="" class="select">
-                                                                @foreach($typePost as $obj)
-                                                                <option value="{!! $obj->id !!}">{!! $obj->name !!}</option>
-                                                                @endforeach
-                                                            </select>
-
-                                                        </div>
-                                                        <div class="fl position">
-                                                            <span>Từ:</span></br>
-                                                            <input name="start_time" type="date" value="{!! date('Y-m-d') !!}"/>
-
+                                                            <span>Từ: {!! date('Y-m-d H:i:s') !!}</span></br>
                                                         </div>
                                                         <div class="fr position">
-                                                            <span>Đến:</span></br>
-                                                            <input name="end_time" type="date" value="{!! date('Y-m-d') !!}"/>
+                                                            <span>Đến: {!! date('Y-m-d H:i:s', strtotime('+3 days')) !!}</span></br>
                                                         </span>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li class="mb20 clearfix">
-                                                <label class="w-15-100 fl lh35"><span class="red"></span></label>
-                                                <div class="w-85-100 fl pr13 clearfix">
-                                                    <div class="fl position">
-                                                        <span>Đơn giá:</span></br>
-                                                        <p style="color: Red;" id="price">
-                                                            {!! $typePost[0]->price !!}
-                                                        </p>đồng/Ngày
-
-                                                    </div>
-                                                    <div class="fr position">
-                                                        <span>Số ngày:</span></br>
-                                                        <p style="color: Red;" id="days"></p>
-                                                    </div>
-                                                    <div class="fr position">
-                                                        <span>Thành tiền:</span></br>
-                                                        <p style="color: Red;" id="total"></p>
                                                     </div>
                                                 </div>
                                             </li>

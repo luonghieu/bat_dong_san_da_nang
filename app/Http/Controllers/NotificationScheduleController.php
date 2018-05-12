@@ -17,7 +17,7 @@ class NotificationScheduleController extends Controller
         $objLogin = session()->get('objUser');
 
         if ($objLogin->role == User::ROLE['admin']) {
-            $list  = NotificationSchedule::all();
+            $list  = NotificationSchedule::orderBy('status', 'ASC')->orderBy('id', 'DESC')->get();
         } else {
             $customerId = AssignTask::where('employee_id', $objLogin->employee->id)->pluck('id')->toArray();
             $list  = NotificationSchedule::where('reciever_id', $objLogin->id)->orWhereIn('reciever_id', $customerId)->orderBy('status', 'ASC')->orderBy('id', 'DESC')->get();
@@ -29,9 +29,9 @@ class NotificationScheduleController extends Controller
     public function createNotification($type)
     {
         if ($type == NotificationSchedule::TYPE['customer']) {
-         $objLogin = session()->get('objUser');
+           $objLogin = session()->get('objUser');
 
-         if ($objLogin->role == User::ROLE['admin']) {
+           if ($objLogin->role == User::ROLE['admin']) {
             $listCustomer  = Customer::paginate(5);
         } else {
             $listCustomer = Customer::select('customers.*')
@@ -43,6 +43,13 @@ class NotificationScheduleController extends Controller
         $listCustomer = null;
     }
     return view('admin.notification.add', ['list' => $listCustomer]);
+}
+
+// edit
+public function editNotification($id)
+{
+    $notificationSchedule = NotificationSchedule::find($id);
+    return view('admin.notification.edit', compact('notificationSchedule'));
 }
 
 public function validateDateTime($request)
@@ -129,6 +136,10 @@ public function validateDateTime($request)
         $send_date = $year . "-" . $month . "-" . $date;
         $send_time = $hour . ":" . $minute;
 
+        if (Carbon::now()->gt(Carbon::parse($send_date . ' ' . $send_time))) {
+            return false;
+        }
+       
         $time = [
             'send_year' => $year,
             'send_month' => $month,
@@ -150,7 +161,7 @@ public function validateDateTime($request)
         "content" => $request->content,
         "time" => $time,
         "recurring" => $recurring,
-        "reciever_id" => ($request->type == 1) ? $objUser->id : $request->selected,
+        "reciever_id" => ($request->type == 1) ? $objUser->id : (($request->type == 2) ? $request->selected : ''),
 
     ];
     return $data;
@@ -166,7 +177,10 @@ public function saveNotificationSchedules($notificationSchedule, $request)
 
     $notificationSchedule->title = $data['title'];
     $notificationSchedule->content = $data['content'];
-    $notificationSchedule->type = $data['type'];
+    if ($data['type'] != 0) {
+        $notificationSchedule->type = $data['type'];
+    }
+    
     $recurring = $data['recurring'];
 
     switch ($recurring) {
@@ -202,16 +216,24 @@ public function saveNotificationSchedules($notificationSchedule, $request)
 
         break;
     }
+
+
     if ($data['type'] == 1) {
         $notificationSchedule->reciever_id = $data['reciever_id'];
         $notificationSchedule->created_at = Carbon::now();
         $notificationSchedule->save();
     } else {
-        foreach ($data['reciever_id'] as $id) {
-            $notificationSchedule->reciever_id = $id;
+        if ($data['type'] == 2) {
+            foreach ($data['reciever_id'] as $id) {
+                $notificationSchedule->reciever_id = $id;
+                $notificationSchedule->created_at = Carbon::now();
+                $notificationSchedule->save();
+            }
+        } else {
             $notificationSchedule->created_at = Carbon::now();
             $notificationSchedule->save();
         }
+        
     }
 
     
@@ -245,34 +267,13 @@ public function storeNotification(Request $request)
     }
 }
 
-public function delete($id)
-{
-    try {
-        $notificationSchedule = NotificationSchedule::find($id);
-
-        $notificationSchedule->delete();
-
-        return redirect()->route('admins.notification.list');
-    } catch (\Exception $e) {
-        return view('errors.500');
-    }
-}
-
-public function edit($id)
-{
-    $notificationSchedule = NotificationSchedule::find($id);
-    return view('admin.notification.edit', compact('notificationSchedule'));
-}
-
-public function updateNotificationSchedules($id, Request $request)
+public function updateNotification($id, Request $request)
 {
     $notificationSchedule = NotificationSchedule::find($id);
     $result = $this->saveNotificationSchedules($notificationSchedule, $request);
 
     if (!$result) {
-        $request->session()->flash('msgdate', trans('messages.date_not_valid'));
-
-        return redirect()->route('admins.notification.edit', compact('notificationSchedule'));
+        return redirect()->back()->withInput()->with('msgdate', 'Date is not valid');
     }
 
     $notificationSchedule->status = 1;
@@ -280,6 +281,19 @@ public function updateNotificationSchedules($id, Request $request)
     try {
 
         $notificationSchedule->save();
+
+        return redirect()->route('admins.notification.list');
+    } catch (\Exception $e) {
+        return view('errors.500');
+    }
+}
+
+public function delete($id)
+{
+    try {
+        $notificationSchedule = NotificationSchedule::find($id);
+
+        $notificationSchedule->delete();
 
         return redirect()->route('admins.notification.list');
     } catch (\Exception $e) {
@@ -307,7 +321,7 @@ public function actionNotification(Request $request)
     // status
 public function statusNotification(Request $request)
 {
-    $objUpdate = Notification::find($request->id);
+    $objUpdate = NotificationSchedule::find($request->id);
     $objUpdate->update(['status' => $request->status]);
     echo json_encode('ok');
 }

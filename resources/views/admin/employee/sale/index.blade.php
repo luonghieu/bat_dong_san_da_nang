@@ -48,11 +48,13 @@ Employee
 	<!-- /tile header -->
 
 	<!-- tile body -->
+	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.sale.action') !!}">
+		<input type="hidden" name="_token" value="{{csrf_token()}}" />
 	<div class="tile-body">
 		<div class="table-responsive">
 			@if (session('success'))
 			<div class="alert alert-success">
-				<p><strong>Add success!</strong></p>
+				<p><strong>Action success!</strong></p>
 			</div>
 			@endif
 			<table class="table table-custom" id="editable-usage">
@@ -64,10 +66,14 @@ Employee
 							</label>
 						</th>
 						<th>Id</th>
+						<th>Image</th>
 						<th>Name</th>
 						<th>Gender</th>
 						<th>Address</th>
 						<th>Phone</th>
+						<th>Email</th>
+						<th>Username</th>
+						<th>Password</th>
 						<th>Active</th>
 						<th style="width: 160px;" class="no-sort">Actions</th>
 					</tr>
@@ -80,6 +86,9 @@ Employee
 						</td>
 						<td>{!! $obj->id !!}</td>
 						<td>
+							<img src="{!! asset((empty($obj->user->image)) ? '/images/default.jpg' : $obj->user->image ) !!}" class="img-responsive text-center" />
+						</td>
+						<td>
 							<a href="{!! route('admins.employee.detail', ['employee_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $obj->name !!}</a>
 						</td>
 						<td>
@@ -91,6 +100,9 @@ Employee
 						</td>
 						<td>{!! $obj->address !!}</td>
 						<td>{!! $obj->phone !!}</td>
+						<td>{!! $obj->user->email !!}</td>
+						<td>{!! $obj->user->username !!}</td>
+						<td>*****************</td>
 						<td>
 							@if ($obj->user->active == 0)
 							<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
@@ -106,6 +118,21 @@ Employee
 		</div>
 	</div>
 	<!-- /tile body -->
+	<!-- /tile body -->
+		<div class="tile-footer dvd dvd-top">
+			<div class="row">
+
+				<div class="col-sm-5 hidden-xs">
+					<select class="input-sm form-control w-sm inline" name="option">
+						<option value="1">Delete selected</option>
+						<option value="2">Active selected</option>
+						<option value="3">Non-active selected</option>
+					</select>
+					<input type="submit" id="apply" class="btn btn-sm btn-default" value="Apply">
+				</div>
+			</div>
+		</div>
+		<!-- /tile footer -->
 
 </section>
 <!-- /tile -->

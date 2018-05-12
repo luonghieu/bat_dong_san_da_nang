@@ -28,7 +28,7 @@ class Post extends Model
     protected $table = 'posts';
 
 	protected $fillable = [
-        'name', 'description', 'direction', 'cat_id', 'image', 'status', 'village_id', 'street_id', 'district_id', 'project_id', 'area', 'view', 'price', 'unit_price_id', 'type_post_id', 'frontispiece', 'road_ahead', 'number_of_floor', 'number_of_room', 'number_of_toilet', 'furniture', 'poster_id', 'deleted_at', 'info_contact', 'start_time', 'end_time'
+        'name', 'description', 'direction', 'cat_id', 'image', 'status', 'village_id', 'street_id', 'district_id', 'project_id', 'area', 'view', 'price', 'unit_price_id', 'frontispiece', 'road_ahead', 'number_of_floor', 'number_of_room', 'number_of_toilet', 'furniture', 'poster_id', 'deleted_at', 'info_contact', 'start_time', 'end_time'
     ];
 
     public $timestamps=false;
@@ -81,13 +81,13 @@ class Post extends Model
         return $this->belongsTo('App\Models\UnitPrice', 'unit_price_id', 'id');
     }
 
-     /**
-     * Get street relationship
-     */
-    public function typePost()
-    {
-        return $this->belongsTo('App\Models\TypePost', 'type_post_id', 'id');
-    }
+    //  /**
+    //  * Get street relationship
+    //  */
+    // public function typePost()
+    // {
+    //     return $this->belongsTo('App\Models\TypePost', 'type_post_id', 'id');
+    // }
 
     /**
      * Get ratingProducts relationship

@@ -94,7 +94,7 @@ Customer
 							</td>
 							<td>
 								@foreach($obj->registers as $item)
-								<div style="height: 50px"><a href="{!! route('admins.customer.detailTransaction', ['registerId' => $item->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $item->project->name !!}</a></div>
+								<div style="height: 50px; width: 300px;"><a href="{!! route('admins.customer.detailTransaction', ['registerId' => $item->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $item->project->name !!}</a></div>
 								@endforeach
 							</td>
 							<td>

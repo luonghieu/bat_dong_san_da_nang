@@ -59,7 +59,7 @@
 				<div class="table-responsive">
 					@if (session('success'))
 						<div class="alert alert-success">
-							<p><strong>Add success!</strong></p>
+							<p><strong>Action success!</strong></p>
 						</div>
 					@endif
 					<table class="table table-custom" id="editable-usage">
@@ -81,7 +81,7 @@
 						</thead>
 						<tbody>
 						@foreach($list as $obj)
-							<tr class="odd gradeX {{ ($obj->is_read) ? ' success' : '' }}">
+							<tr class="odd gradeX {{ isset($obj->is_read) ? (($obj->is_read) ? ' ' :'danger') : '' }}">
 								<td>
 									<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0"><input type="checkbox" class="selectMe" name="selected[]" value="{!! $obj->id !!}" ><i></i></label>
 								</td>
@@ -89,19 +89,23 @@
 								<td>{!! $obj->title !!}</td>
 								<td>{!! $obj->content !!}</td>
 								<td>
-									@if ($obj->active == 0)
-										<span @if ($objUser->id == $obj->user_id || $objUser->role == 1) onclick="active({!! $obj->id !!})" @endif class="check-toggler toggle-class" data-toggle="checked"></span>
+									@if ($objUser->id == $obj->causer_id || $objUser->role == 1)
+										@if ($obj->active == 0)
+											<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
+										@else
+											<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
+										@endif
 									@else
-										<span @if ($objUser->id == $obj->user_id || $objUser->role == 1) onclick="active({!! $obj->id !!})" @endif class="check-toggler toggle-class checked" data-toggle="checked"></span>
-									@endif
+									No permission
+									@endif 
 								</td>
 								<td>{!! $obj->user->username !!}</td>
 								<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
 								<td class="actions">
-									@if ($objUser->id == $obj->user_id || $objUser->role == 1)
+									@if ($objUser->id == $obj->causer_id || $objUser->role == 1)
 										<a href="{!! route('admins.announcement.edit',['id' => $obj->id]) !!}" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a>
-										<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a>
 									@endif
+									<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a>
 								</td>
 							</tr>
 						@endforeach
@@ -143,7 +147,7 @@
         });
 
         $('#apply').click(function() {
-            var list = $('input[name="selected"]:checked');
+            var list = $('input[name="selected[]"]:checked');
             if (list.length == 0) {
                 alert('No obj is selected!');
                 return false;
@@ -159,7 +163,7 @@
                 data: {
                     'id' : id
                 },
-                dataType : 'json',
+                dataType : 'html',
                 success : function(result){
                     alert('Action success!');
                 }

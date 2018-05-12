@@ -56,6 +56,7 @@ Employee
 		@endif
 		<form class="form-horizontal" role="form" id="form-add" method="post" action="{!! route('admins.sale.store') !!}" enctype="multipart/form-data">
 			<input type="hidden" name="_token" value="{{csrf_token()}}" />
+			<h3>Information</h3>
 			<div class="form-group">
 				<label for="inputEmail3" class="col-sm-2 control-label">Name</label>
 				<div class="col-sm-10">
@@ -105,6 +106,55 @@ Employee
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
 						<strong>{!! $errors->first('phone') !!}</strong>
+					</div>
+					@endif
+				</div>
+			</div>
+			<h3>Account</h3>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Image</label>
+				<div class="col-sm-10">
+					<input type="file" name="image" class="filestyle" data-buttonText="Find file" data-iconName="fa fa-inbox">
+					@if ($errors->has('image'))
+					<div class="alert alert-lightred alert-dismissable fade in">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<strong>{!! $errors->first('image') !!}</strong>
+					</div>
+					@endif
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">Username</label>
+				<div class="col-sm-10">
+					<input type="text" name="username" class="form-control" id="inputPassword3" placeholder="Username">
+					@if ($errors->has('username'))
+					<div class="alert alert-lightred alert-dismissable fade in">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<strong>{!! $errors->first('username') !!}</strong>
+					</div>
+					@endif
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">Password</label>
+				<div class="col-sm-10">
+					<input type="password" name="password" class="form-control" id="inputPassword3" placeholder="Password">
+					@if ($errors->has('password'))
+					<div class="alert alert-lightred alert-dismissable fade in">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<strong>{!! $errors->first('password') !!}</strong>
+					</div>
+					@endif
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">Email</label>
+				<div class="col-sm-10">
+					<input type="text" name="email" class="form-control" id="inputPassword3" placeholder="Email">
+					@if ($errors->has('email'))
+					<div class="alert alert-lightred alert-dismissable fade in">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<strong>{!! $errors->first('email') !!}</strong>
 					</div>
 					@endif
 				</div>

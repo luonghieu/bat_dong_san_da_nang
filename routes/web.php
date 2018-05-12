@@ -60,10 +60,11 @@ Route::group(['prefix' => 'managements'], function () {
         Route::post('transaction/create', 'AdminController@storeTransaction')->name('admins.customer.storeTransaction');
         Route::get('transaction/edit/{transactionId}', 'AdminController@editTransaction')->name('admins.customer.editTransaction');
         Route::post('transaction/update', 'AdminController@updateTransaction')->name('admins.customer.updateTransaction');
-        Route::get('transaction/getFloorByProduct', 'AdminController@getFloorByProduct')->name('admins.customer.getFloorByProduct');
+        Route::get('transaction/getDataByBlock', 'AdminController@getDataByBlock')->name('admins.customer.getDataByBlock');
+        Route::get('transaction/getFloorByLand', 'AdminController@getFloorByLand')->name('admins.customer.getFloorByLand');
         Route::post('actionTransaction', 'AdminController@actionTransaction')->name('admins.customer.actionTransaction');
         Route::get('statusTransaction', 'AdminController@statusTransaction')->name('admins.customer.statusTransaction');
-        Route::post('ratingTransaction', 'AdminController@ratingTransaction')->name('admins.customer.ratingTransaction');
+        Route::get('ratingTransaction', 'AdminController@ratingTransaction')->name('admins.customer.ratingTransaction');
         Route::get('deleteTransaction', 'AdminController@deleteTransaction')->name('admins.customer.deleteTransaction');
 
         
@@ -113,6 +114,8 @@ Route::group(['prefix' => 'managements'], function () {
         Route::get('list', 'AdminController@listAssignTask')->name('admins.assign.list');
         Route::get('create', 'AdminController@createAssignTask')->name('admins.assign.create');
         Route::post('create', 'AdminController@storeAssignTask')->name('admins.assign.store');
+        Route::get('{id}/edit', 'AdminController@editAssignTask')->name('admins.assign.edit');
+        Route::post('update', 'AdminController@updateAssignTask')->name('admins.assign.update');
         Route::get('delete', 'AdminController@deleteAssignTask')->name('admins.assign.delete');
         Route::post('action', 'AdminController@actionAssignTask')->name('admins.assign.action');
     });
@@ -161,19 +164,25 @@ Route::group(['prefix' => 'managements'], function () {
         Route::post('action', 'AdminController@actionProject')->name('admins.project.action');
         Route::get('active', 'AdminController@activeProject')->name('admins.project.active');
         Route::get('status/{id}', 'AdminController@statusProject')->name('admins.project.status');
-        Route::get('getFloorByBlock', 'AdminController@getFloorByBlock')->name('admins.project.getFloorByBlock');
+        
         Route::get('search', 'AdminController@searchTransaction')->name('admins.project.searchTransaction');
         Route::get('statusProject', 'AdminController@changeStatusProject')->name('admins.project.statusProject');
+
+        Route::get('getBlockByProject', 'AdminController@getBlockByProject')->name('admins.project.getBlockByProject');
+        Route::get('getLandByBlock', 'AdminController@getLandByBlock')->name('admins.project.getLandByBlock');
+        Route::get('getFloorByLand', 'AdminController@getFloorByLand')->name('admins.project.getFloorByLand');
     });
 
      // product
     Route::group(['prefix' => 'product'], function () {
-        Route::get('list', 'AdminController@listProduct')->name('admins.product.list');
+        Route::get('list/{projectId}', 'AdminController@listProduct')->name('admins.product.list');
         Route::get('detail/{id}', 'AdminController@detailProduct')->name('admins.product.detail');
         Route::get('create/{projectId}', 'AdminController@createProduct')->name('admins.product.create');
-        Route::get('create', 'AdminController@storeProduct')->name('admins.product.store');
+        Route::post('create/{projectId}', 'AdminController@storeProduct')->name('admins.product.store');
+        Route::get('{id}/edit', 'AdminController@editProduct')->name('admins.product.edit');
         Route::post('update', 'AdminController@updateProduct')->name('admins.product.update');
         Route::get('delete', 'AdminController@deleteProduct')->name('admins.product.delete');
+        Route::get('action', 'AdminController@actionProduct')->name('admins.product.action');
     });
 
      // slider
@@ -222,7 +231,17 @@ Route::group(['prefix' => 'managements'], function () {
         Route::post('{id}/update', 'NotificationScheduleController@updateNotification')->name('admins.notification.update');
         Route::get('delete', 'NotificationScheduleController@deleteNotification')->name('admins.notification.delete');
         Route::post('action', 'NotificationScheduleController@actionNotification')->name('admins.notification.action');
-        Route::post('status', 'NotificationScheduleController@statusNotification')->name('admins.notification.status');
+        Route::get('status', 'NotificationScheduleController@statusNotification')->name('admins.notification.status');
+    });
+
+    // announcement
+    Route::group(['prefix' => 'transaction'], function () {
+        // post-Admin
+        Route::get('list', 'AdminController@listAllTransaction')->name('admins.transaction.listAll');
+        Route::get('create', 'AdminController@createAllTransaction')->name('admins.transaction.createAllTransaction');
+        Route::post('create', 'AdminController@storeAllTransaction')->name('admins.transaction.storeAllTransaction');
+        Route::get('search', 'AdminController@searchAllTransaction')->name('admins.transaction.searchAllTransaction');
+        Route::post('action', 'AdminController@actionAllTransaction')->name('admins.transaction.actionAllTransaction');
     });
 
 });

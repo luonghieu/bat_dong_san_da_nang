@@ -54,7 +54,7 @@ Employee
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>Add success!</strong></p>
+					<p><strong>Action success!</strong></p>
 				</div>
 				@endif
 				<table class="table table-custom" id="editable-usage">
@@ -66,10 +66,14 @@ Employee
 								</label>
 							</th>
 							<th>Id</th>
+							<th>Image</th>
 							<th>Name</th>
 							<th>Gender</th>
 							<th>Address</th>
 							<th>Phone</th>
+							<th>Email</th>
+							<th>Username</th>
+							<th>Password</th>
 							<th>Active</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
 						</tr>
@@ -82,9 +86,12 @@ Employee
 							</td>
 							<td>{!! $obj->id !!}</td>
 							<td>
-								<a href="{!! route('admins.employee.detail', ['employee_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $obj->name !!}</a>
+								<img src="{!! asset((empty($obj->user->image)) ? '/images/default.jpg' : $obj->user->image ) !!}" class="img-responsive text-center" />
 							</td>
 							<td>
+								<a href="{!! route('admins.leader.edit', ['employee_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $obj->name !!}</a>
+							</td>
+							<td> 
 								@if($obj->gender==0)
 								Nam
 								@else
@@ -93,6 +100,9 @@ Employee
 							</td>
 							<td>{!! $obj->address !!}</td>
 							<td>{!! $obj->phone !!}</td>
+							<td>{!! $obj->user->email !!}</td>
+							<td>{!! $obj->user->username !!}</td>
+							<td>*****************</td>
 							<td>
 								@if ($obj->user->active == 0)
 								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>

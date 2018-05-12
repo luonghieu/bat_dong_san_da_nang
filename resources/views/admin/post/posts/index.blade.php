@@ -78,10 +78,8 @@ Posts
 							<th>View</th>
 							<th>Price</th>
 							<th>Unit price</th>
-							<th>Type post</th>
 							<th>Start time</th>
 							<th>End time</th>
-							<th>Fee(VND/month)</th>
 							<th>Frontispiece</th>
 							<th>Road ahead(m)</th>
 							<th>Number of floor</th>
@@ -148,10 +146,8 @@ Posts
 							<td>{!! $obj->view !!}</td>
 							<td>{!! $obj->price !!}</td>
 							<td>{!! $obj->unitPrice->name !!}</td>
-							<td>{!! $obj->typePost->name !!}</td>
 							<td>{!! date( "d/m/Y", strtotime($obj->start_time)) !!}</td>
 							<td>{!! date( "d/m/Y", strtotime($obj->end_time)) !!}</td>
-							<td>{!! $obj->typePost->price !!}</td>
 							<td>{!! $obj->frontispiece !!}</td>
 							<td>{!! $obj->road_ahead !!}</td>
 							<td>{!! $obj->number_of_floor !!}</td>

@@ -40,4 +40,14 @@ class NotificationSchedule extends Model
         'reciever_id',
         'created_at'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User', 'reciever_id', 'id');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo('App\Models\Customer', 'reciever_id', 'id');
+    }
 }

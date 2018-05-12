@@ -1,6 +1,6 @@
 @extends('admin.inc.index')
 @section('css')
-@include('admin.news.css')
+@include('admin.notification.css')
 @endsection
 @section('title')
 Notification
@@ -208,7 +208,7 @@ Notification
 @endsection
 
 @section('script')
-@include('admin.news.script')
+@include('admin.notification.script')
 <script>
 
 	$('#select-all').change(function() {
@@ -223,8 +223,7 @@ Notification
 		type = $('input[name="type"]').val();
 
 		if (type != 1) {
-			var list = $('input[name="selected"]:checked');
-			alert(list);
+			var list = $('input[name="selected[]"]:checked');
 			if (list.length == 0) {
 				alert('No obj is selected!');
 				return false;

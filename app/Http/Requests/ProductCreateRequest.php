@@ -25,10 +25,12 @@ class ProductCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'block' => 'required|numeric',
+            'block' => 'required|max:50',
+            'land' => 'required|max:50',
             'floor' => 'required|numeric',
             'area' => 'required|numeric',
             'price' => 'required|numeric',
+            'description' => 'required|max:255',
         ];
     }
 
@@ -36,13 +38,17 @@ class ProductCreateRequest extends FormRequest
     {
         return [
             'block.required' => 'Block is required.',
-            'block.numeric' => 'Block must be number.',
+            'block.max' => 'Block is not greater than 50 character.',
+            'land.required' => 'Land is required.',
+            'land.max' => 'Land is not greater than 50 character.',
             'floor.required' => 'floor is required.',
             'floor.numeric' => 'Floor must be number.',
             'area.required' => 'Area is required.',
             'area.numeric' => 'Area must be number.',
             'price.required' => 'Price is required.',
             'price.numeric' => 'Price must be number.',
+            'description.required' => 'Description is required.',
+            'description.max' => 'Description is not greater than 255 character.',
         ];
     }
 }

@@ -11,10 +11,10 @@ Project
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Project</strong></h1>
+		<h1 class="custom-font"><strong>Product</strong></h1>
 		<ul class="controls">
 			<li>
-				<a href="{!! route('admins.project.create') !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
+				<a href="{!! route('admins.product.create', ['projectId' => $projectId]) !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
 			</li>
 			<li class="dropdown">
 
@@ -48,13 +48,13 @@ Project
 	<!-- /tile header -->
 
 	<!-- tile body -->
-	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.project.action') !!}">
+	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.product.action') !!}">
 		<input type="hidden" name="_token" value="{{csrf_token()}}" />
 		<div class="tile-body">
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>Add success!</strong></p>
+					<p><strong>Action success!</strong></p>
 				</div>
 				@endif
 				<table class="table table-custom" id="editable-usage">
@@ -66,12 +66,14 @@ Project
 								</label>
 							</th>
 							<th>Id</th>
-							<th>Name</th>
-							<th>Detail</th>
+							<th>Block</th>
+							<th>Land</th>
+							<th>Floor</th>
+							<th>Price</th>
+							<th>Area (m2)</th>
+							<th>Direction</th>
 							<th>View</th>
-							<th>Status</th>
-							<th>Image</th>
-							<th>Created at</th>
+							<th>Description</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
 						</tr>
 					</thead>
@@ -82,23 +84,18 @@ Project
 								<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0"><input type="checkbox" class="selectMe" name="selected[]" value="{!! $obj->id !!}" ><i></i></label>
 							</td>
 							<td>{!! $obj->id !!}</td>
-							<td>{!! $obj->name !!}</td>
-							<td>
-								<a href="{!! route('admins.project.edit', ['id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
-							</td>
+							<td>{!! $obj->block !!}</td>
+							<td>{!! $obj->land !!}</td>
+							<td>{!! $obj->floor !!}</td>
+							<td>{!! $obj->price !!}</td>
+							<td>{!! $obj->area !!}</td>
+							<td>{!! $direction[$obj->direction] !!}</td>
 							<td>{!! $obj->view !!}</td>
-							<td>
-								<select class="form-control mb-10" name="status">
-									@foreach($status as $key => $value)
-									<option {{ ($obj->status == $value) ? 'selected="selected"' : ''}} value="{!! $value !!}">{!! $key !!}</option>
-									@endforeach
-								</select>
+							<td>{!! $obj->description !!}</td>
+							<td class="actions">
+								<a href="{!! route('admins.product.edit',['id' => $obj->id]) !!}"  tabindex="0" class="text-primary text-uppercase text-strong text-sm mr-10">Edit</a>
+								<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a>
 							</td>
-							<td>
-								<img src="{!! asset((empty($obj->image)) ? '/images/default.jpg' : $obj->image ) !!}" class="img-responsive text-center" />
-							</td>
-							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
-							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
 						</tr>
 						@endforeach
 					</tbody>
@@ -113,8 +110,6 @@ Project
 				<div class="col-sm-5 hidden-xs">
 					<select class="input-sm form-control w-sm inline" name="option">
 						<option value="1">Delete selected</option>
-						<option value="2">Change to processed status</option>
-						<option value="3">Change to cancel status</option>
 					</select>
 					<input type="submit" id="apply" class="btn btn-sm btn-default" value="Apply">
 				</div>
@@ -127,7 +122,7 @@ Project
 @endsection
 
 @section('script')
-@include('admin.project.script')
+@include('admin.product.script')
 <script>
 	// $( document ).ready(function() {
 	$('#select-all').change(function() {

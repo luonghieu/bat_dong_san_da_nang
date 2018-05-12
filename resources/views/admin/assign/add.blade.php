@@ -60,8 +60,9 @@ Assign Task
 				<label for="inputEmail3" class="col-sm-2 control-label">Employee</label>
 				<div class="col-sm-10">
 					<select class="form-control mb-10" name="employee_id">
-						@foreach($employees as $item)
-							<option value="{!! $item->id !!}">{!! $item->name !!}</option>
+						<option value="-1">--Choose--</option>
+						@foreach($employees as $id => $name)
+							<option value="{!! $id !!}">{!! $name !!}</option>
 						@endforeach
 					</select>
 				</div>
@@ -70,8 +71,9 @@ Assign Task
 				<label for="inputEmail3" class="col-sm-2 control-label">Customer</label>
 				<div class="col-sm-10">
 					<select class="form-control mb-10" name="customer_id">
-						@foreach($customers as $item)
-							<option value="{!! $item->id !!}">{!! $item->name !!}</option>
+						<option value="-1">--Choose--</option>
+						@foreach($customers as $id => $name)
+							<option value="{!! $id !!}">{!! $name !!}</option>
 						@endforeach
 					</select>
 				</div>
@@ -80,7 +82,7 @@ Assign Task
 				<label class="col-sm-2 control-label">Description</label>
 				<div class="col-sm-10">
 					<textarea id="description" name="description"></textarea>
-					@ckeditor('detail', ['height' => 500])
+					@ckeditor('description', ['height' => 500])
 				</div>
 			</div>
 			<div class="form-group">
@@ -98,4 +100,11 @@ Assign Task
 
 @section('script')
 @include('admin.assign.script')
+<script>
+	$( document ).ready(function() {
+		$('#add-entry').click(function (e) {
+			$('#form-add').submit();
+		});
+	});
+</script>
 @endsection

@@ -1,4 +1,3 @@
-<!-- === Vendor JavaScripts === -->
 <script src="{!! asset('admin_asset/js/vendor/datatables/extensions/ColReorder/js/dataTables.colReorder.min.js') !!}"></script>
 <script src="{!! asset('admin_asset/js/vendor/datatables/extensions/Responsive/js/dataTables.responsive.min.js') !!}"></script>
 <script src="{!! asset('admin_asset/js/vendor/datatables/extensions/ColVis/js/dataTables.colVis.min.js') !!}"></script>

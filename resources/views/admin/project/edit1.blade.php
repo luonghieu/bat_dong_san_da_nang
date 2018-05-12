@@ -58,12 +58,73 @@ Detail Project
 		<div>
 			<div class="tile-header dvd dvd-btm">
 				<h1 class="custom-font"><strong>Products </strong></h1>
-				<a href="{{ route('admins.product.list', ['projectId' => $obj->id]) }}" role="button" tabindex="0" id="add-product">List Products</a>
+				<ul class="controls">
+					<li>
+						<a href="javascript:void(0)" role="button" tabindex="0" id="add-product"><i class="fa fa-plus mr-5"></i></a>
+						<!-- <a href="{!! route('admins.product.create', ['id' => $obj->id]) !!}" role="button" tabindex="0" id="add-product"><i class="fa fa-plus mr-5"></i></a> -->
+					</li>
+				</ul>
 			</div>
 			<!-- /tile header -->
 			<!-- tile body -->
+			<form role="form" id="form-product" method="post" action="{!! route('admins.product.update') !!}" enctype="multipart/form-data">
+				<input type="hidden" name="_token" value="{{csrf_token()}}" />
+				<div class="tile-body" id = "products">
+					@foreach($products as $product)
+					<div class="alert alert-big alert-lightred alert-dismissable fade in">
+						<button type="button" value="{!! $product->id !!}" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<div class="row">
+							<input type="hidden" name="productId[]" value="{!! $product->id !!}">
+							<div class="col-sm-2">
+								<label for="">Block</label>
+								<input type="number" class="form-control" name="block-{!! $product->id !!}" min="0" max="100" value="{!! $product->block !!}">
+								@if ($errors->has('block'))
+								<div class="alert alert-lightred alert-dismissable fade in">
+									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+									<strong>{!! $errors->first('block') !!}</strong>
+								</div>
+								@endif
+							</div>
+							<div class="col-sm-2">
+								<label for="">Floor</label>
+								<input type="number" class="form-control" name="floor-{!! $product->id !!}" min="0" max="100" value="{!! $product->floor !!}">
+								@if ($errors->has('floor'))
+								<div class="alert alert-lightred alert-dismissable fade in">
+									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+									<strong>{!! $errors->first('floor') !!}</strong>
+								</div>
+								@endif
+							</div>
+							<div class="col-sm-2">
+								<label for="">Price</label>
+								<input type="text" class="form-control" placeholder="Price" name="price-{!! $product->id !!}" value="{!! $product->price !!}">
+								@if ($errors->has('price'))
+								<div class="alert alert-lightred alert-dismissable fade in">
+									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+									<strong>{!! $errors->first('price') !!}</strong>
+								</div>
+								@endif
+							</div>
+							<div class="col-sm-2">
+								<label for="">Area</label>
+								<input type="text" class="form-control" placeholder="Area" name="area-{!! $product->id !!}" value="{!! $product->area !!}">
+								@if ($errors->has('area'))
+								<div class="alert alert-lightred alert-dismissable fade in">
+									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+									<strong>{!! $errors->first('area') !!}</strong>
+								</div>
+								@endif
+							</div>
+						</div>
+						<div>
+							<label for="">Description</label>
+							<textarea class="form-control" name="description-{!! $product->id !!}">{!! $product->description !!}</textarea>
+						</div>
+					</div>
+					@endforeach
+				</div>
+			</form>
 		</div>
-
 		<form role="form" id="form-project" method="post" action="{!! route('admins.project.update', ['id' => $detail->id]) !!}" enctype="multipart/form-data">
 			<input type="hidden" name="_token" value="{{csrf_token()}}" />
 			<input type="hidden" name="projectId" value="{!! $obj->id !!}" />
@@ -260,9 +321,31 @@ Detail Project
 		});
 
 		$('#edit').click(function(){
-			$('#form-project').submit();
+			$.ajax({
+				url: "{!! route('admins.product.update') !!}",
+				method: "POST",
+				data: $("#form-product").serialize(),
+					dataType : 'json',
+					success : function(result){
+						$('#form-project').submit();
+					}
+				});
 		});
 
+		$('#add-product').click(function(){
+			projectId = {{ $obj->id }};
+			$.ajax({
+				url: "{!! route('admins.product.store') !!}",
+				method: "GET",
+				data: {
+					'projectId' : projectId,
+				},
+				dataType : 'html',
+				success : function(result){
+					$('#products').append(result);
+				}
+			});
+		});
 	});
 </script>
 @endsection

@@ -54,7 +54,7 @@ Assign Task
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>Add success!</strong></p>
+					<p><strong>Action success!</strong></p>
 				</div>
 				@endif
 				<table class="table table-custom" id="editable-usage">
@@ -85,10 +85,13 @@ Assign Task
 							<td>{!! $obj->employee->name !!}</td>
 							<td>{!! $obj->customer->name !!}</td>
 							<td>{!! $obj->created_at !!}</td>
-							<td>{{ (!empty($obj->assigner_role)) ? (($obj->assigner_role == 1) ? $obj->assignedByAdmin->name : $obj->assignedByLeader->name) : 'No data' }}</td>
-							<td>{{ (!empty($obj->assigner_role)) ? (($obj->assigner_role == 1) ? 'Admin' : 'Leader') : 'No data'  }}</td>
+							<td>{{ $obj->assigner->username }}</td>
+							<td>{{ ($obj->assigner->role == 1) ? 'Admin' : 'Leader' }}</td>
 							<td>{!! $obj->description !!}</td>
-							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
+							<td class="actions">
+								<a href="{!! route('admins.assign.edit',['id' => $obj->id]) !!}" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a>
+								<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a>
+							</td>
 						</tr>
 						@endforeach
 					</tbody>
@@ -118,23 +121,23 @@ Assign Task
 @include('admin.assign.script')
 <script>
 	// $( document ).ready(function() {
-	$('#select-all').change(function() {
-		if ($(this).is(":checked")) {
-			$('#editable-usage .selectMe').prop('checked', true);
-		} else {
-			$('#editable-usage .selectMe').prop('checked', false);
-		}
-	});
+		$('#select-all').change(function() {
+			if ($(this).is(":checked")) {
+				$('#editable-usage .selectMe').prop('checked', true);
+			} else {
+				$('#editable-usage .selectMe').prop('checked', false);
+			}
+		});
 
-	$('#apply').click(function() {
-		var list = $('input[name="selected"]:checked');
-		if (list.length == 0) {
-			alert('No obj is selected!');
-			return false;
-		}
-		return true;
-	});
+		$('#apply').click(function() {
+			var list = $('input[name="selected"]:checked');
+			if (list.length == 0) {
+				alert('No obj is selected!');
+				return false;
+			}
+			return true;
+		});
 
 // });
-	</script>
-	@endsection
+</script>
+@endsection

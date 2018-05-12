@@ -1,14 +1,15 @@
 <?php
-use Carbon\Carbon;
+use App\Models\NotificationSchedule;
+use App\Models\Transaction;
 
 if (!function_exists('getNotificationScheduleTime')) {
     function getNotificationScheduleTime($value, $data = [])
     {
         switch ($value) {
-            case App\NotificationSchedule::RECURRING_TYPES['daily']:
+            case NotificationSchedule::RECURRING_TYPES['daily']:
                 return "Hằng ngày " . Carbon\Carbon::parse($data['send_time'])->format('H:i');
                 break;
-            case App\NotificationSchedule::RECURRING_TYPES['weekly']:
+            case NotificationSchedule::RECURRING_TYPES['weekly']:
                 switch ($data['date_of_week']) {
                     case (Carbon\Carbon::SUNDAY):
                         return "Chủ Nhật hàng tuần " . Carbon\Carbon::parse($data['send_time'])->format('H:i');
@@ -33,8 +34,8 @@ if (!function_exists('getNotificationScheduleTime')) {
                         break;
                 }
 
-            case App\NotificationSchedule::RECURRING_TYPES['monthly']:
-                return "Hằng tháng" . "Ngày " .$data['day_of_month'] . Carbon\Carbon::parse($data['send_time'])->format('H:i');
+            case NotificationSchedule::RECURRING_TYPES['monthly']:
+                return "Hằng tháng, " . "ngày " .$data['day_of_month'] . ' '. Carbon\Carbon::parse($data['send_time'])->format('H:i');
                 break;
 
             default: 
@@ -48,10 +49,10 @@ if (!function_exists('getNotificationScheduleType')) {
     function getNotificationScheduleType($type)
     {
         switch ($type) {
-            case App\NotificationSchedule::TYPE['customer']:
+            case NotificationSchedule::TYPE['customer']:
                 return "Customer";
                 break;
-            case App\NotificationSchedule::TYPE['employee']:
+            case NotificationSchedule::TYPE['employee']:
                 return "Employee";
                 break;
         }
@@ -62,10 +63,10 @@ if (!function_exists('getNotificationScheduleStatus')) {
     function getNotificationScheduleStatus($status)
     {
         switch ($status) {
-            case App\NotificationSchedule::STATUS['in_progress']:
+            case NotificationSchedule::STATUS['progressing']:
                 return "In progress";
                 break;
-            case App\NotificationSchedule::STATUS['done']:
+            case NotificationSchedule::STATUS['done']:
                 return "Done";
                 break;
         }
@@ -75,14 +76,14 @@ if (!function_exists('getNotificationScheduleStatus')) {
 if (!function_exists('getListNotificationScheduleStatus')) {
     function getListNotificationScheduleStatus()
     {
-        return App\NotificationSchedule::STATUS;
+        return NotificationSchedule::STATUS;
     }
 }
 
 if (!function_exists('getTransactionStatus')) {
     function getTransactionStatus($status)
     {
-        $list = array_flip(\App\Models\Transaction::STATUS);
+        $list = array_flip(Transaction::STATUS);
         return $list[$status];
 
     }
@@ -93,10 +94,10 @@ if (!function_exists('getNotificationScheduleTime')) {
     {
         $today = Carbon::today();
         switch ($value) {
-            case App\NotificationSchedule::RECURRING_TYPES['daily']:
+            case NotificationSchedule::RECURRING_TYPES['daily']:
                 return Carbon\Carbon::parse($data['send_time']);
                 break;
-            case App\NotificationSchedule::RECURRING_TYPES['weekly']:
+            case NotificationSchedule::RECURRING_TYPES['weekly']:
                 switch ($data['date_of_week']) {
                     case (Carbon\Carbon::SUNDAY):
                         if ($today->dayOfWeek == Carbon\Carbon::SUNDAY) {
@@ -149,7 +150,7 @@ if (!function_exists('getNotificationScheduleTime')) {
                         break;
                 }
 
-            case App\NotificationSchedule::RECURRING_TYPES['monthly']:
+            case NotificationSchedule::RECURRING_TYPES['monthly']:
                 return Carbon\Carbon::parse($data['send_time'])->month($data['day_of_month']);
                 break;
 
