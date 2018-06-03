@@ -6,20 +6,20 @@
     
     <nav id="menu">
     	<ul>
-            <li><a href="{!! route('public.trangchu') !!}"><i class="fa fa-home" aria-hidden="true"></i></a></li>
+            <li><a href="{!! route('public.trangchu') !!}">Trang chủ</a></li>
             <li><a href="{!! route('public.gioithieu') !!}">Giới thiệu</a></li>
             <li><a  href="{!! route('public.duan') !!}">Dự án</a></li>
             <li><a  href="{!! route('public.sangiaodich', ['type' => 1]) !!}">BĐS bán</a>
                 <ul>
                     @foreach($bdsBan as $obj)
-                    <li><a href="{!! route('public.sangiaodich.theloai', ['type' => 1, 'id' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
+                    <li><a href="{!! route('public.sangiaodich.theloai', ['id' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
                     @endforeach
                 </ul>   
             </li>
             <li><a  href="{!! route('public.sangiaodich', ['type' => 2]) !!}">BĐS cho thuê</a>
                 <ul>
                     @foreach($bdsChoThue as $obj)
-                    <li><a href="{!! route('public.sangiaodich.theloai', ['type' => 1, 'id' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
+                    <li><a href="{!! route('public.sangiaodich.theloai', ['id' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
                     @endforeach
                 </ul>   
             </li>
@@ -32,6 +32,12 @@
                 </ul>
             </li>
             <li><a  href="{!! route('public.lienhe') !!}">Liên hệ</a></li>
+            <li><a  href="javascript:void(0)">Tìm kiếm</a>
+                <ul>
+                    <li><a href="{!! route('public.timkiem.duan') !!}">Dự án</a></li>
+                    <li><a href="{!! route('public.timkiem.sangiaodich') !!}">Bất động sản</a></li>
+                </ul> 
+            </li>
         </ul>
     </nav>
 </div>
@@ -39,14 +45,18 @@
 <div class="top_op">
     <div class="container">                            
         <a href="{!! route('public.dangky') !!}" class="hot_mail">Đăng ký</a>
+        @if (session()->get('objCustomer') == null)
         <a href="{!! route('public.dangnhap') !!}" class="hot_mail">Đăng nhập</a>
+        @else
+        <a href="{!! route('public.trangcanhan') !!}" class="hot_mail">Trang cá nhân</a>
+        @endif
         <a href="{!! route('public.dangtin') !!}" class="hot_phone" id="dangtin">Đăng tin</a>
         <div class="clear"></div>
     </div>
 </div>
 <script type="text/javascript">
     $('#dangtin').click(function(){
-        @if(session()->get('objUser') == null)
+        @if(session()->get('objCustomer') == null)
         alert('Bạn phải đăng nhập để đăng tin');
         return false;
         @endif
@@ -57,26 +67,26 @@
 
     <div class="container">
 
-        <div class="logo"><a href="{!! route('public.trangchu') !!}"><img src="{!! asset('public_asset/images/logo.png') !!}" alt="logo"/></a></div>
+        <div class="logo"><a href="{!! route('public.trangchu') !!}"><img src="{!! asset('public_asset/images/logo2.png') !!}" alt="logo"/></a></div>
 
         <div class="menu">
 
             <ul class=" hidden-xs">
 
-                <li><a href="{!! route('public.trangchu') !!}"><i class="fa fa-home" aria-hidden="true"></i></a></li>
+                <li><a href="{!! route('public.trangchu') !!}">Trang chủ</a></li>
                 <li><a href="{!! route('public.gioithieu') !!}">Giới thiệu</a></li>
                 <li><a  href="{!! route('public.duan') !!}">Dự án</a></li>
                 <li><a  href="{!! route('public.sangiaodich', ['type' => 1]) !!}">BĐS bán</a>
                     <ul>
                         @foreach($bdsBan as $obj)
-                        <li><a href="{!! route('public.sangiaodich.theloai', ['type' => 1, 'id' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
+                        <li><a href="{!! route('public.sangiaodich.theloai', ['id' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
                         @endforeach
                     </ul>   
                 </li>
                 <li><a  href="{!! route('public.sangiaodich', ['type' => 2]) !!}">BĐS cho thuê</a>
                     <ul>
                         @foreach($bdsChoThue as $obj)
-                        <li><a href="{!! route('public.sangiaodich.theloai', ['type' => 1, 'id' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
+                        <li><a href="{!! route('public.sangiaodich.theloai', ['id' => $obj->id]) !!}">{!! $obj->name !!}</a></li>
                         @endforeach
                     </ul>   
                 </li>
@@ -89,6 +99,12 @@
                     </ul>
                 </li>
                 <li><a  href="{!! route('public.lienhe') !!}">Liên hệ</a></li>
+                <li><a  href="javascript:void(0)">Tìm kiếm</a>
+                <ul>
+                    <li><a href="{!! route('public.timkiem.duan') !!}">Dự án</a></li>
+                    <li><a href="{!! route('public.timkiem.sangiaodich') !!}">Bất động sản</a></li>
+                </ul> 
+            </li>
             </ul>
 
             <div class="searchne">

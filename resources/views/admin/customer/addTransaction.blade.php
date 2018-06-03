@@ -3,6 +3,8 @@
 @include('admin.customer.css')
 @endsection
 @section('title')
+<a href="{!! route('admins.customer.list') !!}">Customer</a> >
+<a href="{!! route('admins.customer.detailTransaction', ['registerId' => $register->id ]) !!}">Transaction</a> >
 Add Transaction
 @endsection
 @section('content')
@@ -49,8 +51,8 @@ Add Transaction
 
     <!-- tile body -->
     <div class="tile-body">
-        <h3>
-            <a href="{!! route('admins.project.status',['project_id' => $register->project->id]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $register->project->name !!}</a>
+        <center><h3>
+            <a href="{!! route('admins.project.status',['project_id' => $register->project->id]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $register->project->name !!}</a></center>
         </h3>
         @if (session('error'))
         <div class="alert alert-danger">
@@ -89,6 +91,14 @@ Add Transaction
                 </div>
             </div>
             <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">Position</label>
+                <div class="col-sm-10">
+                    <select class="form-control" name="position" id="position">
+                        <option value="-1">--Choose--</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
                 <label class="col-sm-2 control-label">Description</label>
                 <div class="col-sm-10">
                  <textarea id="editor1" name="description"></textarea>
@@ -106,7 +116,7 @@ Add Transaction
         </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-rounded btn-primary btn-sm">Cancel</button>
+                <button type="reset" class="btn btn-rounded btn-primary btn-sm">Cancel</button>
             </div>
         </div>
     </form>
@@ -125,10 +135,14 @@ Add Transaction
         });
 
         $('#block').change(function () {
+            $("#land").html('<option value="-1">--Choose--</option>');
+            $("#floor").html('<option value="-1">--Choose--</option>');
+            $("#position").html('<option value="-1">--Choose--</option>');
             block = $(this).val();
             if (block == -1) {
                 $("#land").html('<option value="-1">--Choose--</option>');
                 $("#floor").html('<option value="-1">--Choose--</option>');
+                $("#position").html('<option value="-1">--Choose--</option>');
                 return false;
             }
             $.ajax({
@@ -150,9 +164,12 @@ Add Transaction
         });
 
         $('#land').change(function () {
+            $("#floor").html('<option value="-1">--Choose--</option>');
+            $("#position").html('<option value="-1">--Choose--</option>');
             land = $(this).val();
             if (land == -1) {
                 $("#floor").html('<option value="-1">--Choose--</option>');
+                $("#position").html('<option value="-1">--Choose--</option>');
                 return false;
             }
             $.ajax({
@@ -165,11 +182,43 @@ Add Transaction
                 },
                 dataType : 'json',
                 success : function(result){
+                 if (result == 0) {
+                    html = '<option value="0">--Choose--</option>';
+                    $('#position').html(html);
+                } else {
                     html = '<option value="-1">--Choose--</option>';
                     $.each (result, function (key, item){
                         html += '<option value="' + item + '">' + item + '</option>'
                     });
-                    $('#floor').html(html);
+                }
+                $('#floor').html(html);
+            }
+        });
+        });
+
+        $('#floor').change(function () {
+            $("#position").html('<option value="-1">--Choose--</option>');
+            floor = $(this).val();
+            if (floor == -1) {
+                $("#position").html('<option value="-1">--Choose--</option>');
+                return false;
+            }
+            $.ajax({
+                url: "{{ route('admins.project.getApartmentByFloor') }}",
+                method: "GET",
+                data: {
+                    'block' : $('#block').val(),
+                    'land' : $('#land').val(),
+                    'floor' : $('#floor').val(),
+                    'projectId' : $('#projectId').val(),
+                },
+                dataType : 'json',
+                success : function(result){
+                    html = '<option value="-1">--Choose--</option>';
+                    $.each (result, function (key, item){
+                        html += '<option value="' + item + '">' + item + '</option>'
+                    });
+                    $('#position').html(html);
                 }
             });
         });

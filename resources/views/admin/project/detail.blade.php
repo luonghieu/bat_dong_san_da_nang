@@ -3,7 +3,8 @@
 @include('admin.project.css')
 @endsection
 @section('title')
-Detail Project
+<a href="{!! route('admins.project.list') !!}">Project</a> >
+<a href="{!! route('admins.project.detail', ['id' => $project->id ]) !!}">{{ $project->name }}</a>
 @endsection
 @section('content')
 <!-- tile -->

@@ -3,7 +3,7 @@
 @include('admin.contact.css')
 @endsection
 @section('title')
-Contact
+<a href="{!! route('admins.contact.list') !!}">Contact</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -91,7 +91,11 @@ Contact
 								@endif
 							</td>
 							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
-							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
+							<td class="actions">
+								@if(!isEmployee())
+								<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a>
+								@endif
+							</td>
 						</tr>
 						@endforeach
 					</tbody>
@@ -105,7 +109,9 @@ Contact
 
 				<div class="col-sm-5 hidden-xs">
 					<select class="input-sm form-control w-sm inline" name="option">
+						@if(!isEmployee())
 						<option value="1">Delete selected</option>
+						@endif
 						<option value="2">Change to reply</option>
 					</select>
 					<input type="submit" id="apply" class="btn btn-sm btn-default" value="Apply">
@@ -131,7 +137,7 @@ Contact
 	});
 
 	$('#apply').click(function() {
-		var list = $('input[name="selected"]:checked');
+		var list = $('input[name="selected[]"]:checked');
 		if (list.length == 0) {
 			alert('No obj is selected!');
 			return false;

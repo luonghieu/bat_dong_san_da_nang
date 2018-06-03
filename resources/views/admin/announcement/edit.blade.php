@@ -3,7 +3,7 @@
 @include('admin.announcement.css')
 @endsection
 @section('title')
-Announcement
+<a href="{!! route('admins.announcement.list') !!}">Announcement</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -83,7 +83,7 @@ Announcement
 			</div>
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-10">
-					<button type="submit" class="btn btn-rounded btn-primary btn-sm">Cancel</button>
+					<button type="reset" class="btn btn-rounded btn-primary btn-sm">Cancel</button>
 				</div>
 			</div>
 		</form>

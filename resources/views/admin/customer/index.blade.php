@@ -3,7 +3,7 @@
 @include('admin.customer.css')
 @endsection
 @section('title')
-Customer
+<a href="{!! route('admins.customer.list') !!}">Customer</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -17,34 +17,7 @@ Customer
 				<a href="{!! route('admins.customer.addRegister') !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
 			</li>
 			<li>
-				<a href="{!! route('admins.customer.list') !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Refresh</a>
-			</li>
-			<li class="dropdown">
-
-				<a role="button" tabindex="0" class="dropdown-toggle settings" data-toggle="dropdown">
-					<i class="fa fa-cog"></i>
-					<i class="fa fa-spinner fa-spin"></i>
-				</a>
-
-				<ul class="dropdown-menu pull-right with-arrow animated littleFadeInUp">
-					<li>
-						<a role="button" tabindex="0" class="tile-toggle">
-							<span class="minimize"><i class="fa fa-angle-down"></i>&nbsp;&nbsp;&nbsp;Minimize</span>
-							<span class="expand"><i class="fa fa-angle-up"></i>&nbsp;&nbsp;&nbsp;Expand</span>
-						</a>
-					</li>
-					<li>
-						<a role="button" tabindex="0" class="tile-refresh">
-							<i class="fa fa-refresh"></i> Refresh
-						</a>
-					</li>
-					<li>
-						<a role="button" tabindex="0" class="tile-fullscreen">
-							<i class="fa fa-expand"></i> Fullscreen
-						</a>
-					</li>
-				</ul>
-
+				<a href="{!! route('admins.customer.list') !!}" role="button" tabindex="0" id="add-entry"><img src="{{ asset('images/refresh.png') }}" width="20px" height="20px" /> Refresh</a>
 			</li>
 		</ul>
 	</div>
@@ -57,7 +30,7 @@ Customer
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>Add success!</strong></p>
+					<p><strong>session('success')</strong></p>
 				</div>
 				@endif
 				<table class="table table-custom" id="editable-usage">
@@ -75,21 +48,21 @@ Customer
 							<th>Personal information</th>
 							<th>Project</th>
 							<th>Created at</th>
-							<th>Actions</th>
-							<th>Add</th>
+							<th>Each Action</th>
+							<th>All actions</th>
 						</tr>
 					</thead>
 					<tbody>
 						@foreach($list as $obj)
 						<tr class="odd gradeX">
-							<td rowspan="{!! $obj->registers->count() !!}">
+							<td>
 								<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0"><input type="checkbox" class="selectMe" name="selected[]" value="{!! $obj->id !!}" ><i></i></label>
 							</td>
-							<td rowspan="{!! $obj->registers->count() !!}">{!! $obj->id !!}</td>
-							<td rowspan="{!! $obj->registers->count() !!}">{!! $obj->name !!}</td>
-							<td rowspan="{!! $obj->registers->count() !!}">{!! $obj->email !!}</td>
-							<td rowspan="{!! $obj->registers->count() !!}">{!! $obj->phone !!}</td>
-							<td rowspan="{!! $obj->registers->count() !!}">
+							<td>{!! $obj->id !!}</td>
+							<td>{!! $obj->name !!}</td>
+							<td>{!! $obj->email !!}</td>
+							<td>{!! $obj->phone !!}</td>
+							<td>
 								<a href="{!! route('admins.customer.detail', ['customer_id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
 							</td>
 							<td>
@@ -107,7 +80,7 @@ Customer
 								<div style="height: 50px;"><a href="javascript:void(0)" onclick="removeRegister({!! $item->id !!})" role="button" tabindex="0" class="text-danger text-uppercase text-strong text-sm mr-10">Remove</a></div>
 								@endforeach
 							</td>
-							<td rowspan="{!! $obj->registers->count() !!}">
+							<td>
 								<a href="javascript:void(0)" onclick="addRegister({!! $obj->id !!})" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Add</a>
 								<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
 							</td>

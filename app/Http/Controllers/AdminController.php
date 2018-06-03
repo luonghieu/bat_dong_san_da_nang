@@ -16,6 +16,7 @@ use App\Http\Requests\ScheduleCreateRequest;
 use App\Http\Requests\ProjectCreateRequest;
 use App\Http\Requests\SliderCreateRequest;
 use App\Http\Requests\AnnouncementCreateRequest;
+use App\Http\Requests\ApartmentCreateRequest;
 use App\Models\Employee;
 use App\Models\Customer;
 use App\Models\User;
@@ -30,10 +31,13 @@ use App\Models\Contact;
 use App\Models\Introduce;
 use App\Models\DetailProject;
 use App\Models\Project;
+use App\Models\Apartment;
 use App\Models\Slider;
 use App\Models\Consult;
 use App\Models\Register;
 use App\Models\PersonalInformation;
+use App\Models\NotificationSchedule;
+use App\Models\UnitPrice;
 use Carbon\Carbon;
 use PurchaseTransaction;
 use App\Models\Announcement;
@@ -41,13 +45,14 @@ use App\Models\AnnouncementRecieves;
 
 class AdminController extends Controller
 {
+    //=====================profile======================
     //profile
     public function profile()
     {
         return view('admin.auth.profile');
     }
 
-    //profile
+    //update profile
     public function updateProfile(Request $request)
     {
         $objUser = session()->get('objUser');
@@ -56,12 +61,13 @@ class AdminController extends Controller
         if($objUser->role == 1) {
             $rules = $this->validate($request,
                 [
-                    'email' => 'required|email',
+                    'email' => 'required|email|unique:users,email,' . $objUser->id . ',id',
                     'password' => 'nullable|min:6|max:15'
                 ],
                 [
                     'email.required' => 'Email is required',
                     'email.email' => 'Email is not valid',
+                    'email.unique' => 'Email is exist',
                     'password.min' => 'Password is not less than 6 character',
                     'password.max' => 'Password is not greater than 15 character',
                 ]
@@ -72,12 +78,15 @@ class AdminController extends Controller
                 'password' => empty($request->password) ? $objUser->password : md5($request->password)
             ];
             if ($request->hasFile('image')) {
+                if (!empty($objUser->image)) {
+                    unlink($objUser->image);
+                }
                 $path = "images/users/";
                 $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
                 $request->image->move($path, $fileName);
                 $data['image'] = $path . $fileName;
             } else {
-                $data['image'] = "";
+                $data['image'] = $objUser->image;
             }
 
             $objUser->update($data);
@@ -86,7 +95,7 @@ class AdminController extends Controller
             $rules = $this->validate($request,
                 [
                     'name.required' => 'Name is required',
-                    'email' => 'required|email',
+                    'email' => 'required|email|unique:users,email,' . $objUser->id . ',id',
                     'phone' => 'required|numeric',
                     'address' => 'required',
                     'password' => 'nullable|min:6|max:15'
@@ -95,6 +104,7 @@ class AdminController extends Controller
                     'name.required' => 'Name is required',
                     'email.required' => 'Email is required',
                     'email.email' => 'Email is not valid',
+                    'email.unique' => 'Email is exist',
                     'phone.required' => 'Phone is required',
                     'phone.numeric' => 'Phone must be number',
                     'address.required' => 'Address is required',
@@ -108,12 +118,15 @@ class AdminController extends Controller
                 'password' => empty($request->password) ? $objUser->password : md5($request->password)
             ];
             if ($request->hasFile('image')) {
+                if (!empty($objUser->image)) {
+                    unlink($objUser->image);
+                }
                 $path = "images/users/";
                 $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
                 $request->image->move($path, $fileName);
                 $data['image'] = $path . $fileName;
             } else {
-                $data['image'] = "";
+                $data['image'] = $objUser->image;
             }
             $objUser->update($data);
 
@@ -126,11 +139,10 @@ class AdminController extends Controller
             Employee::where('user_id', $objUser->id)->update($data);
 
             session()->put('objUser', $objUser);
-
         }
-
-        return redirect()->route('admins.profile')->with('success', 'Success');
+        return redirect()->route('admins.profile')->with('success', 'Update success!');
     }
+
     // =======leader management========
     // list
     public function listLeaders()
@@ -145,7 +157,7 @@ class AdminController extends Controller
         return view('admin.employee.leader.add');
     }
 
-    // create or edit
+    // create
     public function storeLeader(EmployeeCreateRequest $request)
     {
         $data = $request->all();
@@ -174,7 +186,7 @@ class AdminController extends Controller
             ]);
 
             $obj->update(['user_id' => $objUser->id]);
-            return redirect()->route('admins.leader.list')->with('success', 'Success');
+            return redirect()->route('admins.leader.list')->with('success', 'Add success');
         } else {
             return redirect()->back()->withInput()->with('error', 'Fail');
         }
@@ -187,7 +199,7 @@ class AdminController extends Controller
         return view('admin.employee.leader.edit', ['obj' => $obj]);
     }
 
-    // create or edit
+    // create
     public function updateLeader(EmployeeUpdateRequest $request, $id)
     {
         $data = $request->all();
@@ -201,6 +213,9 @@ class AdminController extends Controller
         if ($oldEmployee->update($data)) {
             $oldUser = User::find($oldEmployee->user_id);
             if ($request->hasFile('image')) {
+                if (!empty($oldUser->image)) {
+                    unlink($oldUser->image);
+                }
                 $path = "images/employees/";
                 $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
                 $request->image->move($path, $fileName);
@@ -222,7 +237,7 @@ class AdminController extends Controller
                 'image' => $image
             ]);
 
-            return redirect()->route('admins.leader.list')->with('success', 'Success');
+            return redirect()->route('admins.leader.list')->with('success', 'Update success');
         } else {
             return redirect()->back()->withInput()->with('error', 'Fail');
         }
@@ -234,6 +249,10 @@ class AdminController extends Controller
         $obj = Employee::find($request->id);
         if (Employee::find($request->id)->delete()) {
             $objUser = User::find($obj->user_id);
+            NotificationSchedule::where('type', NotificationSchedule::TYPE['employee'])
+            ->where('reciever_id', $objUser->id)->delete();
+            AnnouncementRecieves::where('reciever_id', $objUser->id)->delete();
+
             if ($objUser->delete()) {
                 if (!empty($objUser->image)) {
                     unlink($objUser->image);
@@ -253,6 +272,10 @@ class AdminController extends Controller
                 foreach ($listObj as $item) {
                     $objUser = User::find($item->user_id);
                     $objUser->delete();
+                    NotificationSchedule::where('type', NotificationSchedule::TYPE['employee'])
+                    ->where('reciever_id', $objUser->id)->delete();
+                    AnnouncementRecieves::where('reciever_id', $objUser->id)->delete();
+
                     if (!empty($objUser->image)) {
                         unlink($objUser->image);
                     }
@@ -270,7 +293,7 @@ class AdminController extends Controller
                 }
                 break;
             }
-            return redirect()->route('admins.leader.list')->with('success', 'Success');
+            return redirect()->route('admins.leader.list')->with('success', 'Action success');
         } else {
 
         }
@@ -308,7 +331,7 @@ class AdminController extends Controller
         return view('admin.employee.sale.edit', ['obj' => $obj]);
     }
 
-    // create or edit
+    // create
     public function storeSale(EmployeeCreateRequest $request)
     {
         $data = $request->all();
@@ -337,7 +360,7 @@ class AdminController extends Controller
             ]);
 
             $obj->update(['user_id' => $objUser->id]);
-            return redirect()->route('admins.sale.list')->with('success', 'Success');
+            return redirect()->route('admins.sale.list')->with('success', 'Add success');
         } else {
             return redirect()->back()->withInput()->with('error', 'Fail');
         }
@@ -378,7 +401,7 @@ class AdminController extends Controller
                 'image' => $image
             ]);
 
-            return redirect()->route('admins.sale.list')->with('success', 'Success');
+            return redirect()->route('admins.sale.list')->with('success', 'Update success');
         } else {
             return redirect()->back()->withInput()->with('error', 'Fail');
         }
@@ -390,6 +413,9 @@ class AdminController extends Controller
         $obj = Employee::find($request->id);
         if (Employee::find($request->id)->delete()) {
             AssignTask::where('employee_id', $obj->id)->delete();
+            NotificationSchedule::where('type', NotificationSchedule::TYPE['employee'])
+            ->where('reciever_id', $obj->user_id)->delete();
+            AnnouncementRecieves::where('reciever_id', $obj->user_id)->delete();
             $objUser = User::find($obj->user_id);
             if ($objUser->delete()) {
                 if (!empty($objUser->image)) {
@@ -410,11 +436,15 @@ class AdminController extends Controller
                 foreach ($listObj as $item) {
                     AssignTask::where('employee_id', $item->id)->delete();
                     $objUser = User::find($item->user_id);
+                    NotificationSchedule::where('type', NotificationSchedule::TYPE['employee'])
+                    ->where('reciever_id', $objUser->id)->delete();
+                    AnnouncementRecieves::where('reciever_id', $objUser->id)->delete();
+                    $item->delete();
                     $objUser->delete();
                     if (!empty($objUser->image)) {
                         unlink($objUser->image);
                     }
-                    $item->delete();
+
                 }
                 break;
                 case 2:
@@ -428,7 +458,7 @@ class AdminController extends Controller
                 }
                 break;
             }
-            return redirect()->route('admins.sale.list')->with('success', 'Success');
+            return redirect()->route('admins.sale.list')->with('success', 'Action success');
         } else {
 
         }
@@ -462,8 +492,8 @@ class AdminController extends Controller
                 case 1:
                 foreach ($listObj as $item) {
                     if ($item->delete()) {
+                        Post::where('poster_id', $item->id)->delete();
                         User::find($item->user_id)->delete();
-                        Poster::where('poster_id', $item->id)->delete();
                     }
                 }
                 break;
@@ -478,7 +508,7 @@ class AdminController extends Controller
                 }
                 break;
             }
-            return redirect()->route('admins.post.poster.list')->with('success', 'Success');
+            return redirect()->route('admins.poster.list')->with('success', 'Action success');
         } else {
 
         }
@@ -498,7 +528,7 @@ class AdminController extends Controller
     {
         $obj = Poster::find($request->id);
         if ($obj->delete()) {
-            Poster::where('poster_id', $obj->id)->delete();
+            Post::where('poster_id', $obj->id)->delete();
             if (User::find($obj->user_id)->delete()) {
                 echo json_encode('ok');
             }
@@ -512,261 +542,37 @@ class AdminController extends Controller
         return view('admin.post.posts.index', ['list' => $list]);
     }
 
-    // =========Products=============
-    // =========Sale Products=============
-
-    // sale products
-    public function listSaleProducts()
-    {
-        $list  = Product::select('products.*')->join('categories','products.cat_id','categories.id')->where('categories.type_transaction',1)->get();
-        return view('admin.product.sale.index', ['list' => $list]);
-    }
-
-
-    // status
-    public function statusSaleProduct(Request $request)
-    {
-        $objUpdate = Product::find($request->id);
-        $objUpdate->update(['status' => $request->status]);
-        echo json_encode('ok');
-    }
-
-    // sale edit
-    public function createSaleProduct()
-    {
-        $listCat = Category::all()->where('type_transaction',1);
-        $villages = Village::all();
-        $streets = Street::all();
-        $districts = District::all();
-        $direction = Product::DIRECTION;
-        return view('admin.product.sale.add', [
-            'listCat' => $listCat,
-            'villages' => $villages,
-            'streets' => $streets,
-            'districts' => $districts,
-            'direction' => $direction
-        ]);
-    }
-
-    // store
-    public function storeSaleProduct(ProductCreateRequest $request)
-    {
-        $data = $request->all();
-
-        if ($request->hasFile('image')) {
-            $path = "images/products/";
-            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-            $request->image->move($path, $fileName);
-            $data['image'] = $path . $fileName;
-        } else {
-            $data['image'] = "";
-        }
-
-        if (Product::create($data)) {
-            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
-    }
-
-    // edit
-    public function editSaleProduct($id)
-    {
-        $listCat = Category::all()->where('type_transaction',1);
-        $villages = Village::all();
-        $streets = Street::all();
-        $districts = District::all();
-        $direction = Product::DIRECTION;
-        $obj = Product::find($id);
-        return view('admin.product.sale.edit', [
-            'listCat' => $listCat,
-            'villages' => $villages,
-            'streets' => $streets,
-            'districts' => $districts,
-            'direction' => $direction,
-            'obj' => $obj
-        ]);
-    }
-
-    // update
-    public function updateSaleProduct(ProductCreateRequest $request, $id)
-    {
-        $oldObj = Product::find($id);
-        $data = $request->all();
-
-        if ($request->hasFile('image')) {
-            if (!empty($oldObj->image)) {
-                unlink($oldObj->image);
-            }
-            $path = "images/news/";
-            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-            $request->image->move($path, $fileName);
-            $data['image'] = $path . $fileName;
-        } else {
-            $data['image'] = $oldObj->image;
-        }
-
-        if ($oldObj->update($data)) {
-            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
-    }
-
-    //delete
-    public function deleteSaleProduct($id)
-    {
-        $obj = Product::find($id);
-        if ($obj->delete()) {
-            if (!empty($obj->image)) {
-                unlink($obj->image);
-            }
-            ProductTransaction::where('product_id', $obj->id)->delete();
-            PurchaseTransaction::where('product_id', $obj->id)->delete();
-            echo json_encode('ok');
-        }
-    }
-
-    // apply action
-    public function actionSaleProduct(Request $request)
-    {
-        $listObj = Product::whereIn('id', $request->selected)->get();
-        if (!empty($listObj)) {
-            switch ($request->option) {
-                case 1:
-                foreach ($listObj as $item) {
-                    if (!empty($item->image)) {
-                        unlink($item->image);
-                    }
-                    ProductTransaction::where('product_id', $item->id)->delete();
-                    PurchaseTransaction::where('product_id', $item->id)->delete();
-                    $item->delete();
-                }
-                break;
-            }
-            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
-        } else {
-
-        }
-
-    }
-
     // =========Post=============
 
-    // lease products
+    // list
     public function listPost()
     {
         $direction = Post::DIRECTION;
-        $list  = Post::all();
+        $list  = Post::whereNull('deleted_at')->orderBy('id','desc')->get();
         return view('admin.post.posts.index', ['list' => $list, 'direction' => $direction]);
     }
 
     public function listPostByPoster($posterId)
     {
-        $direction = Post::DIRECTION;
         $list  = Post::where('poster_id', $posterId)->get();
-        return view('admin.post.posts.index', ['list' => $list, 'direction' => $direction]);
+        return view('admin.post.posts.index', ['list' => $list]);
     }
-
 
     // status
     public function statusPost(Request $request)
     {
-        $objUpdate = Product::find($request->id);
+        $objUpdate = Post::find($request->id);
         $objUpdate->update(['status' => $request->status]);
         echo json_encode('ok');
     }
 
-    // sale edit
-    public function createLeaseProduct()
-    {
-        $listCat = Category::all()->where('type_transaction',2);
-        $villages = Village::all();
-        $streets = Street::all();
-        $districts = District::all();
-        $direction = Product::DIRECTION;
-        return view('admin.product.sale.add', [
-            'listCat' => $listCat,
-            'villages' => $villages,
-            'streets' => $streets,
-            'districts' => $districts,
-            'direction' => $direction
-        ]);
-    }
-
-    // store
-    public function storeLeaseProduct(ProductCreateRequest $request)
-    {
-        $data = $request->all();
-
-        if ($request->hasFile('image')) {
-            $path = "images/products/";
-            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-            $request->image->move($path, $fileName);
-            $data['image'] = $path . $fileName;
-        } else {
-            $data['image'] = "";
-        }
-
-        if (Product::create($data)) {
-            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
-    }
-
-    // edit
-    public function editLeaseProduct($id)
-    {
-        $listCat = Category::all()->where('type_transaction',1);
-        $villages = Village::all();
-        $streets = Street::all();
-        $districts = District::all();
-        $direction = Product::DIRECTION;
-        $obj = Product::find($id);
-        return view('admin.product.sale.edit', [
-            'listCat' => $listCat,
-            'villages' => $villages,
-            'streets' => $streets,
-            'districts' => $districts,
-            'direction' => $direction,
-            'obj' => $obj
-        ]);
-    }
-
-    // update
-    public function updateLeaseProduct(ProductCreateRequest $request, $id)
-    {
-        $oldObj = Product::find($id);
-        $data = $request->all();
-
-        if ($request->hasFile('image')) {
-            if (!empty($oldObj->image)) {
-                unlink($oldObj->image);
-            }
-            $path = "images/products/";
-            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-            $request->image->move($path, $fileName);
-            $data['image'] = $path . $fileName;
-        } else {
-            $data['image'] = $oldObj->image;
-        }
-
-        if ($oldObj->update($data)) {
-            return redirect()->route('admins.product.sale.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
-    }
-
     //delete
-    public function deletePost($id)
+    public function deletePost(Request $request)
     {
-        $obj = Post::find($id);
-        if ($obj->delete()) {
-            if (!empty($obj->image)) {
-                unlink($obj->image);
-            }
+        $obj = Post::find($request->id);
+        Consult::where('type', Consult::TYPE['post'])
+        ->where('product_id', $request->id)->delete();
+        if ($obj->update(['deleted_at'=> Carbon::now()])) {
             echo json_encode('ok');
         }
     }
@@ -782,21 +588,23 @@ class AdminController extends Controller
                     if (!empty($item->image)) {
                         unlink($item->image);
                     }
-                    $item->update(['deleted_at', Carbon::now()]);
+                    Consult::where('type', Consult::TYPE['post'])
+                    ->where('product_id', $item->id)->delete();
+                    $item->update(['deleted_at' => Carbon::now()]);
                 }
                 break;
                 case 2:
                 foreach ($listObj as $item) {
-                    $item->update(['status', Post::STATUS['processed']]);
+                    $item->update(['status'=> Post::STATUS['processed']]);
                 }
                 break;
                 case 3:
                 foreach ($listObj as $item) {
-                    $item->update(['status', Post::STATUS['cancel']]);
+                    $item->update(['status'=> Post::STATUS['cancel']]);
                 }
                 break;
             }
-            return redirect()->route('admins.post.posts.list')->with('success', 'Success');
+            return redirect()->route('admins.post.list')->with('success', 'Action success');
         } else {
 
         }
@@ -807,7 +615,15 @@ class AdminController extends Controller
     // list
     public function listCustomer()
     {
-        $list  = Customer::all();
+        $objUser = getUserLogin();
+        if (isEmployee()) {
+            $list  = Customer::select('customers.*')
+            ->join('assign_task', 'assign_task.customer_id', 'customers.id')
+            ->where('assign_task.employee_id', $objUser->employee->id)
+            ->get();
+        } else {
+            $list  = Customer::all();
+        }
         return view('admin.customer.index', ['list' => $list]);
     }
 
@@ -884,7 +700,7 @@ class AdminController extends Controller
                 }
                 break;
             }
-            return redirect()->route('admins.customer.detail', ['id' => $request->customerId])->with('success', 'Success');
+            return redirect()->route('admins.customer.detail', ['id' => $request->customerId])->with('success', 'Action success');
         } else {
 
         }
@@ -917,6 +733,7 @@ class AdminController extends Controller
     public function removeRegister(Request $request)
     {
         $obj = Register::find($request->id)->delete();
+        Transaction::where('register_id', $request->id)->delete();
         echo json_encode('ok');
     }
 
@@ -977,6 +794,7 @@ class AdminController extends Controller
                     $registerId = Register::where('customer_id', $item->id)->pluck('id')->toArray();
                     Register::where('customer_id', $item->id)->delete();
                     Transaction::whereIn('register_id', $registerId)->delete();
+                    PersonalInformation::where('customer_id', $item->id)->delete();
                 }
                 break;
             }
@@ -994,6 +812,9 @@ class AdminController extends Controller
             $registerId = Register::where('customer_id', $obj->id)->pluck('id')->toArray();
             Register::where('customer_id', $obj->id)->delete();
             Transaction::whereIn('register_id', $registerId)->delete();
+            PersonalInformation::where('customer_id', $obj->id)->delete();
+            NotificationSchedule::where('type', 2)->where('reciever_id', $obj->id)->delele();
+            AssignTask::where('customer_id', $obj->id)->delete();
             echo json_encode('ok');
         }
     }
@@ -1022,20 +843,41 @@ class AdminController extends Controller
     // detail purchase transaction
     public function storeTransaction(Request $request)
     {
-        if ($request->block == -1 || $request->land == -1 || $request->floor == -1) {
+        if ($request->block == -1 || $request->land == -1 || $request->floor == -1 || $request->position == -1) {
             return redirect()->back()->withInput()->with('error', 'Please Choose');
         }
         $productId = Product::where('block', $request->block)
         ->where('land', $request->land)
         ->where('project_id', $request->projectId)->first()->id;
 
+        if ($request->floor != -1 && $request->position != -1 && $request->floor != 0 && $request->position != '0') {
+            $apartmentId = Apartment::where('product_id', $productId)
+            ->where('floor', $request->floor)
+            ->where('position', 'like', "$request->position")
+            ->first()->id;
+        }
+
         //processing nhuwng neu cung la customer ddo thi k lay nuwa
-        $transaction = Transaction::where('product_id', $productId)
-        ->where('status', '!=', Transaction::STATUS['processing'])
-        ->where('register_id', '!=', $request->registerId)->first();
-        if(!$transaction) {
+        $transaction1 = Transaction::where('product_id', $productId)
+        ->where('status', '!=', Transaction::STATUS['processing']);
+        if (!empty($apartmentId)) {
+            $transaction1 = $transaction1->where('apartment_id', $apartmentId);
+        }
+        $transaction1 = $transaction1->first();
+
+        $transaction2 = Transaction::where('product_id', $productId)
+        ->where('status', Transaction::STATUS['processing'])
+        ->where('register_id', $request->registerId);
+        if (!empty($apartmentId)) {
+            $transaction2 = $transaction2->where('apartment_id', $apartmentId);
+        }
+        $transaction2 = $transaction2->first();
+        if($transaction1 || $transaction2) {
+            return redirect()->back()->withInput()->with('error', 'Transaction is exist');
+        } else {
             $data = [
                 'floor' => $request->floor,
+                'apartment_id' => $apartmentId ?? 0,
                 'status' => Transaction::STATUS['processing'],
                 'created_at' => Carbon::now(),
                 'register_id' => $request->registerId,
@@ -1044,12 +886,10 @@ class AdminController extends Controller
                 'rating' => 0
             ];
             if (Transaction::create($data)) {
-                return redirect()->route('admins.customer.detailTransaction', ['registerId' => $request->registerId])->with('success', 'Success');
+                return redirect()->route('admins.customer.detailTransaction', ['registerId' => $request->registerId])->with('success', 'Add Success');
             } else {
                 return redirect()->back()->withInput()->with('error', 'Fail');
             }
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Transaction is exist');
         }
     }
 
@@ -1057,81 +897,117 @@ class AdminController extends Controller
     public function editTransaction($transactionId)
     {
         $transaction = Transaction::find($transactionId);
+        if ($transaction->status != Transaction::STATUS['processing']) {
+            return back()->with('success', 'Transaction is not edit');
+        }
         $projectId = $transaction->product->project->id;
-        $products = Product::where('project_id', $projectId)->get();
-        $floorFirst = $transaction->product->floor;
-        return view('admin.customer.editTransaction', ['products' => $products, 'transaction' => $transaction, 'floor' => $floorFirst]);
+        $products = Product::where('project_id', $projectId);
+        $blocks = array_unique($products->pluck('block')->toArray());
+        $lands = $products->where('block', $transaction->product->block)->pluck('land')->toArray();
+        $floors = $transaction->product->floor ?? 0;
+        $apartment = 0;
+        if (isset($transaction->apartment)) {
+            $apartment = Apartment::where('product_id', $transaction->apartment->product_id)
+            ->where('floor', $transaction->apartment->floor)->pluck('position')->toArray();
+        }
+        return view('admin.customer.editTransaction', ['products' => $products, 'transaction' => $transaction, 'blocks' => $blocks, 'floors' => $floors, 'lands' => $lands, 'apartment' => $apartment]);
     }
 
     // detail purchase transaction
     public function updateTransaction(Request $request)
     {
-        $transaction = Transaction::find($request->transactionId);
-        
-        $data = [
-            'product_id' => $request->block,
-            'floor' => $request->floor,
-            'description' => $request->description,
-            'created_at' => Carbon::now(),
-        ];
+        if ($request->block == -1 || $request->land == -1 || $request->floor == -1 || $request->position == -1) {
+            return redirect()->back()->withInput()->with('error', 'Please Choose');
+        }
+        $productId = Product::where('block', $request->block)
+        ->where('land', $request->land)
+        ->where('project_id', $request->projectId)->first()->id;
 
-        if ($transaction->update($data)) {
-            return redirect()->route('admins.customer.detailTransaction', ['registerId' => $transaction->register_id])->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
+        if ($request->floor != -1 && $request->position != -1 && $request->floor != 0 && $request->position != '0') {
+            $apartmentId = Apartment::where('product_id', $productId)
+            ->where('floor', $request->floor)
+            ->where('position', 'like', "$request->position")
+            ->first()->id;
         }
 
+        //processing nhuwng neu cung la customer ddo thi k lay nuwa
+        $transaction1 = Transaction::where('id', '!=', $request->transactionId)
+        ->where('product_id', $productId)
+        ->where('status', '!=', Transaction::STATUS['processing']);
+        if (!empty($apartmentId)) {
+            $transaction1 = $transaction1->where('apartment_id', $apartmentId);
+        }
+        $transaction1 = $transaction1->first();
+
+        $transaction2 = Transaction::where('id', '!=', $request->transactionId)
+        ->where('product_id', $productId)
+        ->where('status', Transaction::STATUS['processing'])
+        ->where('register_id', $request->registerId);
+        if (!empty($apartmentId)) {
+            $transaction2 = $transaction2->where('apartment_id', $apartmentId);
+        }
+        $transaction2 = $transaction2->first();
+        if($transaction1 || $transaction2) {
+            return redirect()->back()->withInput()->with('error', 'Transaction is exist');
+        } else {
+            $transaction = Transaction::find($request->transactionId);
+
+            $data = [
+                'product_id' => $productId,
+                'floor' => $request->floor,
+                'apartment_id' => $apartmentId ?? 0,
+                'description' => $request->description ?? '',
+                'created_at' => Carbon::now(),
+                'rating' => 0
+            ];
+
+            if ($transaction->update($data)) {
+                return redirect()->route('admins.customer.detailTransaction', ['registerId' => $transaction->register_id])->with('success', 'Update Success');
+            } else {
+                return redirect()->back()->withInput()->with('error', 'Fail');
+            }
+        }
     }
 
     // detail purchase transaction
     public function ratingTransaction(Request $request)
     {
-        $transaction = Transaction::find($request->id)->update(['rating' => $request->rating]);
+        $obj = Transaction::find($request->id);
+        if ($obj->status != Transaction::STATUS['processing']) {
+            echo json_encode('not ok');
+        }
+        $obj->update(['rating' => $request->rating]);
         echo json_encode('ok');
-
     }
-
-    // detail purchase transaction
-    public function getDataByBlock(Request $request)
-    {
-        // $floorTrans = Transaction::where('product_id', $request->productId)->where('status', '!=', Transaction::STATUS['processing'])->pluck('floor')->toArray();
-        // $floorAll = range(1, Product::find($request->productId)->floor);
-
-        // $floorValid = array_diff($floorAll, $floorTrans);
-
-        $lands = Product::where('block', $request->block)
-        ->pluck('land')->toArray();
-        $floorFirst = Product::where('land', $lands[0])
-        ->first()->floor;
-
-        $floors = ($floorFirst!=0) ? range(1, $floorFirst) : [0 => 0];
-
-        echo json_encode([
-            'lands' => $lands,
-            'floors' => $floors
-        ]);
-
-    }
-
-    // // detail purchase transaction
-    // public function getFloorByLand(Request $request)
-    // {
-    //     $floorFirst = Product::where('land', $request->land)
-    //         ->first()->floor;
-
-    //     $floors = ($floorFirst!=0) ? range(1, $floorFirst) : [0 => 0];
-
-    //     echo json_encode($floors);    
-    // }
 
     //delete
     public function deleteTransaction(Request $request)
     {
         $obj = Transaction::find($request->id);
+        if($obj->status != Transaction::STATUS['processing']) {
+            echo json_encode('yes');
+        } else {
+            if ($obj->delete()) {
+                echo json_encode('ok');
+            }
+        }
+    }
+
+    //delete
+    public function deleteConfirmTransaction(Request $request)
+    {
+        $obj = Transaction::find($request->id);
+        if ($obj->status != Transaction::STATUS['processing']) {
+            if ($obj->apartment_id != 0 && $obj->apartment_id != -1) {
+                Apartment::find($obj->apartment_id)->update(['status' => 1]);
+            }
+            Product::find($obj->product_id)->update(['status' => 1]);
+        }
         if ($obj->delete()) {
             echo json_encode('ok');
         }
     }
+
 
     // apply action
     public function actionTransaction(Request $request)
@@ -1141,254 +1017,429 @@ class AdminController extends Controller
             switch ($request->option) {
                 case 1:
                 foreach ($listObj as $item) {
-                    $item->delete();
+                    if ($item->status == Transaction::STATUS['processing']) {
+                    // if ($item->apartment_id != 0 && $item->apartment_id != -1) {
+                    //     Apartment::find($item->apartment_id)->update(['status' => 1]);
+                    // }
+                    // Product::find($item->product_id)->update(['status' => 1]);
+                        $item->delete();
                 }
-                break;
-                case 2:
-                foreach ($listObj as $item) {
-                    $item->update(['status' => Transaction::STATUS['registered']]);
-                }
-                break;
-                case 3:
-                foreach ($listObj as $item) {
-                    $item->update(['status' => Transaction::STATUS['deposit']]);
-                }
-                break;
-                case 4:
-                foreach ($listObj as $item) {
-                    $item->update(['status' => Transaction::STATUS['payment']]);
-                }
-                break;
+                
             }
-            return redirect()->route('admins.customer.detailTransaction',['registerId' => $request->registerId])->with('success', 'Success');
-        } else {
-
+            break;
+            case 2:
+            foreach ($listObj as $item) {
+                $item->update(['status' => Transaction::STATUS['registered']]);
+                if ($item->apartment_id != 0 && $item->apartment_id != -1) {
+                    Apartment::find($item->apartment_id)->update(['status' => 0]);
+                    $product = Product::find($item->product_id);
+                    $apartmentIds =  Apartment::where('product_id', $product->id)
+                    ->pluck('id')->toArray();
+                    $isRemaing = false;
+                    foreach ($apartmentIds as $apartmentId) {
+                        $status = Apartment::find($apartmentId)->status;
+                        if ($status == 1) {
+                            $isRemaing = true;
+                            break;
+                        }
+                    }
+                    if($isRemaing) {
+                        $product->update(['status' => 1]);
+                    } else {
+                        $product->update(['status' => 0]);
+                    }
+                } else {
+                    $product->update(['status' => 0]);
+                }
+                
+            }
+            break;
+            case 3:
+            foreach ($listObj as $item) {
+                $item->update(['status' => Transaction::STATUS['deposit']]);
+                if ($item->apartment_id != 0 && $item->apartment_id != -1) {
+                    Apartment::find($item->apartment_id)->update(['status' => 0]);
+                    $product = Product::find($item->product_id);
+                    $apartmentIds =  Apartment::where('product_id', $product->id)
+                    ->pluck('id')->toArray();
+                    $isRemaing = false;
+                    foreach ($apartmentIds as $apartmentId) {
+                        $status = Apartment::find($apartmentId)->status;
+                        if ($status == 1) {
+                            $isRemaing = true;
+                            break;
+                        }
+                    }
+                    if($isRemaing) {
+                        $product->update(['status' => 1]);
+                    } else {
+                        $product->update(['status' => 0]);
+                    }
+                } else {
+                    $product->update(['status' => 0]);
+                }
+                
+            }
+            break;
+            case 4:
+            foreach ($listObj as $item) {
+                $item->update(['status' => Transaction::STATUS['payment']]);
+                if ($item->apartment_id != 0 && $item->apartment_id != -1) {
+                    Apartment::find($item->apartment_id)->update(['status' => 0]);
+                    $product = Product::find($item->product_id);
+                    $apartmentIds =  Apartment::where('product_id', $product->id)
+                    ->pluck('id')->toArray();
+                    $isRemaing = false;
+                    foreach ($apartmentIds as $apartmentId) {
+                        $status = Apartment::find($apartmentId)->status;
+                        if ($status == 1) {
+                            $isRemaing = true;
+                            break;
+                        }
+                    }
+                    if($isRemaing) {
+                        $product->update(['status' => 1]);
+                    } else {
+                        $product->update(['status' => 0]);
+                    }
+                } else {
+                    $product->update(['status' => 0]);
+                }
+                
+            }
+            break;
         }
+        return redirect()->route('admins.customer.detailTransaction',['registerId' => $request->registerId])->with('success', 'Success');
+    } else {
 
     }
+
+}
 
     // apply action
-    public function statusTransaction(Request $request)
-    {
-        $obj = Transaction::find($request->id)->update(['status' => $request->status]);
-        echo json_encode('ok');
+public function statusTransaction(Request $request)
+{
+    $obj = Transaction::find($request->id);
+    $obj->update(['status' => $request->status]);
+    switch ($request->status) {
+        case Transaction::STATUS['processing']:
+        if ($obj->apartment_id != 0 && $obj->apartment_id != -1) {
+            Apartment::find($obj->apartment_id)->update(['status' => 1]);
+        }
+        Product::find($obj->product_id)->update(['status' => 1]);
+        break;
+
+        default:
+        $product = Product::find($obj->product_id);
+        if ($obj->apartment_id != 0 && $obj->apartment_id != -1) {
+            Apartment::find($obj->apartment_id)->update(['status' => 0]);
+            $apartmentIds =  Apartment::where('product_id', $product->id)
+            ->pluck('id')->toArray();
+            $isRemaing = false;
+            foreach ($apartmentIds as $apartmentId) {
+                // $transaction = Transaction::where('product_id', $product->id)
+                // ->where('apartment_id', $apartmentId)
+                // ->where('status', '!=', Transaction::STATUS['processing'])->first();
+                $status = Apartment::find($apartmentId)->status;
+                if ($status == 1) {
+                    $isRemaing = true;
+                    break;
+                }
+                // if ($transaction == null) {
+                //     $isRemaing = true;
+                //     break;
+                // }
+            }
+
+            if($isRemaing) {
+                $product->update(['status' => 1]);
+            } else {
+                $product->update(['status' => 0]);
+            }
+        } else {
+            $product->update(['status' => 0]);
+        }
+        break;
     }
+    
+    echo json_encode('ok');
+
+}
 
     // detail Customer
     // detail
-    public function detailCustomer($customerId)
-    {
-        $obj = Customer::find($customerId);
-        $list = PersonalInformation::where('customer_id', $customerId)->get();
-        return view('admin.customer.detail', ['obj' => $obj, 'list' => $list]);
-    }
+public function detailCustomer($customerId)
+{
+    $obj = Customer::find($customerId);
+    $list = PersonalInformation::where('customer_id', $customerId)->get();
+    return view('admin.customer.detail', ['obj' => $obj, 'list' => $list]);
+}
 
     // ==========News management=============
     // news
-    public function listNews()
-    {
-        $list  = News::all();
-        return view('admin.news.index', ['list' => $list]);
-    }
+public function listNews()
+{
+    $list  = News::all();
+    return view('admin.news.index', ['list' => $list]);
+}
 
     // edit
-    public function createNews()
-    {
-        $listCat = CatNew::where('active',1)->get();
-        return view('admin.news.add', ['listCat' => $listCat]);
-    }
+public function createNews()
+{
+    $listCat = CatNew::where('active',1)->get();
+    return view('admin.news.add', ['listCat' => $listCat]);
+}
 
     // store
-    public function storeNews(NewsCreateRequest $request)
-    {
-        $data = $request->all();
-        $data['created_at'] = Carbon::now();;
+public function storeNews(NewsCreateRequest $request)
+{
+    $data = $request->all();
+    $data['created_at'] = Carbon::now();;
 
-        if ($request->hasFile('image')) {
-            $path = "images/news/";
-            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-            $request->image->move($path, $fileName);
-            $data['image'] = $path . $fileName;
-        } else {
-            $data['image'] = "";
-        }
-
-        if (News::create($data)) {
-            return redirect()->route('admins.news.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
+    if ($request->hasFile('image')) {
+        $path = "images/news/";
+        $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+        $request->image->move($path, $fileName);
+        $data['image'] = $path . $fileName;
+    } else {
+        $data['image'] = "";
     }
+
+    if (News::create($data)) {
+        return redirect()->route('admins.news.list')->with('success', 'Add success');
+    } else {
+        return redirect()->back()->withInput()->with('error', 'Fail');
+    }
+}
 
     // create or edit
-    public function editNews($id)
-    {
-        $listCat = CatNew::where('active',1)->get();
-        $obj = News::find($id);
-        return view('admin.news.edit', ['obj' => $obj, 'listCat' => $listCat]);
-    }
+public function editNews($id)
+{
+    $listCat = CatNew::where('active',1)->get();
+    $obj = News::find($id);
+    return view('admin.news.edit', ['obj' => $obj, 'listCat' => $listCat]);
+}
 
     // update
-    public function updateNews(NewsCreateRequest $request, $id)
-    {
-        $oldObj = News::find($id);
-        $data = $request->all();
+public function updateNews(NewsCreateRequest $request, $id)
+{
+    $oldObj = News::find($id);
+    $data = $request->all();
 
-        if ($request->hasFile('image')) {
-            if (!empty($oldObj->image)) {
-                unlink($oldObj->image);
-            }
-            $path = "images/news/";
-            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-            $request->image->move($path, $fileName);
-            $data['image'] = $path . $fileName;
-        } else {
-            $data['image'] = $oldObj->image;
+    if ($request->hasFile('image')) {
+        if (!empty($oldObj->image)) {
+            unlink($oldObj->image);
         }
-
-        if ($oldObj->update($data)) {
-            return redirect()->route('admins.news.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
+        $path = "images/news/";
+        $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+        $request->image->move($path, $fileName);
+        $data['image'] = $path . $fileName;
+    } else {
+        $data['image'] = $oldObj->image;
     }
+
+    if ($oldObj->update($data)) {
+        return redirect()->route('admins.news.list')->with('success', 'Update success');
+    } else {
+        return redirect()->back()->withInput()->with('error', 'Fail');
+    }
+}
 
     //delete
-    public function deleteNews(Request $request)
-    {
-        $obj = News::find($request->id);
-        if ($obj->delete()) {
-            if (!empty($obj->image)) {
-                unlink($obj->image);
-            }
-            echo json_encode('ok');
+public function deleteNews(Request $request)
+{
+    $obj = News::find($request->id);
+    if ($obj->delete()) {
+        if (!empty($obj->image)) {
+            unlink($obj->image);
         }
-    }
-
-    // apply action
-    public function action(Request $request)
-    {
-        $listObj = News::whereIn('id', $request->selected)->get();
-        if (!empty($listObj)) {
-            switch ($request->option) {
-                case 1:
-                foreach ($listObj as $item) {
-                    if (!empty($item->image)) {
-                        unlink($item->image);
-                    }
-                    $item->delete();
-                }
-                break;
-                case 2:
-                foreach ($listObj as $item) {
-                    $item->update(['active' => 1]);
-                }
-                break;
-                case 3:
-                foreach ($listObj as $item) {
-                    $item->update(['active' => 0]);
-                }
-                break;
-            }
-            return redirect()->route('admins.news.list')->with('success', 'Success');
-        } else {
-
-        }
-
-    }
-
-    // active
-    public function activeNews(Request $request)
-    {
-        $objUpdate = News::find($request->id);
-        $objUpdate->update(['active' => !($objUpdate->active)]);
         echo json_encode('ok');
     }
+}
+
+    // apply action
+public function action(Request $request)
+{
+    $listObj = News::whereIn('id', $request->selected)->get();
+    if (!empty($listObj)) {
+        switch ($request->option) {
+            case 1:
+            foreach ($listObj as $item) {
+                if (!empty($item->image)) {
+                    unlink($item->image);
+                }
+                $item->delete();
+            }
+            break;
+            case 2:
+            foreach ($listObj as $item) {
+                $item->update(['active' => 1]);
+            }
+            break;
+            case 3:
+            foreach ($listObj as $item) {
+                $item->update(['active' => 0]);
+            }
+            break;
+        }
+        return redirect()->route('admins.news.list')->with('success', 'Action success');
+    } else {
+
+    }
+
+}
+
+    // active
+public function activeNews(Request $request)
+{
+    $objUpdate = News::find($request->id);
+    $objUpdate->update(['active' => !($objUpdate->active)]);
+    echo json_encode('ok');
+}
 
     // ==========assign task management=============
     // assign
-    public function listAssignTask()
-    {
-        $objUSer = session()->get('objUser');
-        if ($objUser == User::ROLE['admin']) {
-            $list = AssignTask::all();
-        } else {
-            $list  = AssignTask::where('employee_id', $objUser->id)->get();
-        }
-        
-        return view('admin.assign.index', ['list' => $list]);
+public function listAssignTask()
+{
+    $objUser = session()->get('objUser');
+        // if ($objUser == User::ROLE['admin']) {
+    if (!isEmployee()) {
+        $list = AssignTask::all();
+    } else {
+        $list  = AssignTask::where('employee_id', $objUser->employee->id)->get();
     }
+
+    return view('admin.assign.index', ['list' => $list]);
+}
 
     // create
-    public function createAssignTask()
-    {
-        $employees = Employee::join('users', 'employees.user_id', 'users.id')->where('users.role', User::ROLE['sale'])->pluck('employees.name', 'employees.id')->toArray();
-        $customerIds = AssignTask::select('customer_id')->get()->toArray();
-        $customers = Customer::whereNotIn('id', $customerIds)->pluck('customers.name', 'customers.id')->toArray();
-        return view('admin.assign.add', ['employees' => $employees, 'customers' => $customers]);
-    }
+public function createAssignTask()
+{
+    $employees = Employee::join('users', 'employees.user_id', 'users.id')->where('users.role', User::ROLE['sale'])->pluck('employees.name', 'employees.id')->toArray();
+    $customerIds = AssignTask::select('customer_id')->get()->toArray();
+    $customers = Customer::whereNotIn('id', $customerIds)->pluck('customers.name', 'customers.id')->toArray();
+    return view('admin.assign.add', ['employees' => $employees, 'customers' => $customers]);
+}
 
     // store
-    public function storeAssignTask(Request $request)
-    {
-        if ($request->employee_id == -1 || $request->customer_id == -1) {
-            return redirect()->back()->withInput()->with('error', 'Please choose');
-        }
-        $objUser = session()->get('objUser');
-        $data = [
-            'employee_id' => $request->employee_id,
-            'customer_id' => $request->customer_id,
-            'created_at' => Carbon::now(),
-            'assigner_id' => $objUser->id,
-            'description' => ($request->description) ?? ''
-        ];
-        if ($assign = AssignTask::create($data)) {
-            $createAnnouncement = [
-                'title' => Announcement::TITLE['employee'],
-                'content' => Announcement::CONTENT['employee'],
-                'active' => 1,
-                'created_at' => Carbon::now(),
-                'causer_id' => $objUser->id,
-            ];
-
-            $announcement = Announcement::create($createAnnouncement);
-            AnnouncementRecieves::create([
-                'announcement_id' => $announcement->id,
-                'reciever_id' => $assign->employee_id,
-                'is_read' => 0
-            ]);
-
-            return redirect()->route('admins.assign.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
+public function storeAssignTask(Request $request)
+{
+    if ($request->employee_id == -1 || $request->customer_id == -1) {
+        return redirect()->back()->withInput()->with('error', 'Please choose');
     }
+    $objUser = session()->get('objUser');
+    $data = [
+        'employee_id' => $request->employee_id,
+        'customer_id' => $request->customer_id,
+        'created_at' => Carbon::now(),
+        'assigner_id' => $objUser->id,
+        'description' => ($request->description) ?? ''
+    ];
+    if ($assign = AssignTask::create($data)) {
+        $createAnnouncement = [
+            'title' => Announcement::TITLE['employee'],
+            'content' => Announcement::CONTENT['employee'],
+            'active' => 1,
+            'created_at' => Carbon::now(),
+            'causer_id' => $objUser->id,
+        ];
+
+        $announcement = Announcement::create($createAnnouncement);
+        AnnouncementRecieves::create([
+            'announcement_id' => $announcement->id,
+            'reciever_id' => $assign->employee->user->id,
+            'is_read' => 0
+        ]);
+
+        return redirect()->route('admins.assign.list')->with('success', 'Success');
+    } else {
+        return redirect()->back()->withInput()->with('error', 'Fail');
+    }
+}
 
     // edit
-    public function editAssignTask($id)
-    {
-        $obj = AssignTask::find($id);
-        $employees = Employee::join('users', 'employees.user_id', 'users.id')->where('users.role', User::ROLE['sale'])->select(['employees.id', 'employees.name'])->get();
-        $customer = Customer::find($obj->customer_id);
-        $employee = Employee::find($obj->employee_id);
-        return view('admin.assign.edit', ['obj' => $obj, 'employees' => $employees, 'customer' => $customer, 'employee' => $employee]);
-    }
+public function editAssignTask($id)
+{
+    $obj = AssignTask::find($id);
+    $employees = Employee::join('users', 'employees.user_id', 'users.id')->where('users.role', User::ROLE['sale'])->select(['employees.id', 'employees.name'])->get();
+    $customer = Customer::find($obj->customer_id);
+    $employee = Employee::find($obj->employee_id);
+    return view('admin.assign.edit', ['obj' => $obj, 'employees' => $employees, 'customer' => $customer, 'employee' => $employee]);
+}
 
     // update
-    public function updateAssignTask(Request $request)
-    {
-        $objUser = session()->get('objUser');
-        $oldObj = AssignTask::find($request->assignId);
-        $data = [
-            'employee_id' => $request->employee_id,
-            'customer_id' => $request->customer_id,
+public function updateAssignTask(Request $request)
+{
+    $objUser = session()->get('objUser');
+    $oldObj = AssignTask::find($request->assignId);
+    $oldEmployeeId = $oldObj->employee_id;
+    $data = [
+        'employee_id' => $request->employee_id,
+        'customer_id' => $request->customer_id,
+        'created_at' => Carbon::now(),
+        'assigner_id' => $objUser->id,
+        'description' => ($request->description) ?? ''
+    ];
+
+    if ($oldObj->update($data)) {
+        $createAnnouncement = [
+            'title' => Announcement::TITLE['employee'],
+            'content' => 'update task ' . $oldObj->id,
+            'active' => 1,
             'created_at' => Carbon::now(),
-            'assigner_id' => $objUser->id,
-            'description' => ($request->description) ?? ''
+            'causer_id' => $objUser->id,
         ];
 
-        if ($oldObj->update($data)) {
-            $createAnnouncement = [
+        $announcement = Announcement::create($createAnnouncement);
+        AnnouncementRecieves::create([
+            'announcement_id' => $announcement->id,
+            'reciever_id' => Employee::find($request->employee_id)->user->id,
+            'is_read' => 0
+        ]);
+        AnnouncementRecieves::create([
+            'announcement_id' => $announcement->id,
+            'reciever_id' => Employee::find($oldEmployeeId)->user->id,
+            'is_read' => 0
+        ]);
+        return redirect()->route('admins.assign.list')->with('success', 'Success');
+    } else {
+        return redirect()->back()->withInput()->with('error', 'Fail');
+    }
+}
+
+    //delete
+public function deleteAssignTask(Request $request)
+{
+    $obj = AssignTask::find($request->id);
+    $employeeId = $obj->employee_id;
+    if ($obj->delete()) {
+        $createAnnouncement = [
+            'title' => Announcement::TITLE['employee'],
+            'content' => 'update task ' . $oldObj->id,
+            'active' => 1,
+            'created_at' => Carbon::now(),
+            'causer_id' => $objUser->id,
+        ];
+
+        $announcement = Announcement::create($createAnnouncement);
+        AnnouncementRecieves::create([
+            'announcement_id' => $announcement->id,
+            'reciever_id' => Employee::find($employeeId)->user->id,
+            'is_read' => 0
+        ]);
+        echo json_encode('ok');
+    }
+}
+
+    // apply action
+public function actionAssignTask(Request $request)
+{
+    $listObj = AssignTask::whereIn('id', $request->selected)->get();
+    if (!empty($listObj)) {
+        switch ($request->option) {
+            case 1:
+            foreach ($listObj as $item) {
+               $createAnnouncement = [
                 'title' => Announcement::TITLE['employee'],
                 'content' => 'update task ' . $oldObj->id,
                 'active' => 1,
@@ -1399,400 +1450,429 @@ class AdminController extends Controller
             $announcement = Announcement::create($createAnnouncement);
             AnnouncementRecieves::create([
                 'announcement_id' => $announcement->id,
-                'reciever_id' => $oldObj->employee_id,
+                'reciever_id' => Employee::find($item->employee_id)->user->id,
                 'is_read' => 0
             ]);
-            return redirect()->route('admins.assign.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
+            $item->delete();
         }
+        break;
     }
+    return redirect()->route('admins.assign.list')->with('success', 'Success');
+} else {
 
-    //delete
-    public function deleteAssignTask(Request $request)
-    {
-        $obj = AssignTask::find($request->id);
-        if ($obj->delete()) {
-            echo json_encode('ok');
-        }
-    }
+}
 
-    // apply action
-    public function actionAssignTask(Request $request)
-    {
-        $listObj = AssignTask::whereIn('id', $request->selected)->get();
-        if (!empty($listObj)) {
-            switch ($request->option) {
-                case 1:
-                foreach ($listObj as $item) {
-                    $item->delete();
-                }
-                break;
-            }
-            return redirect()->route('admins.assign.list')->with('success', 'Success');
-        } else {
-
-        }
-
-    }
+}
 
     // ==========contact management=============
     // contact
-    public function listContact()
-    {
-        $list  = Contact::all();
-        return view('admin.contact.index', ['list' => $list]);
-    }
+public function listContact()
+{
+    $list  = Contact::all();
+    return view('admin.contact.index', ['list' => $list]);
+}
 
     //delete
-    public function deleteContact($id)
-    {
-        $obj = Contact::find($id);
-        if ($obj->delete()) {
-            echo json_encode('ok');
-        }
-    }
-
-    // apply action
-    public function actionContact(Request $request)
-    {
-        $listObj = Assign::whereIn('id', $request->selected)->get();
-        if (!empty($listObj)) {
-            switch ($request->option) {
-                case 1:
-                foreach ($listObj as $item) {
-                    $item->delete();
-                }
-                break;
-                case 2:
-                foreach ($listObj as $item) {
-                    $item->update(['is_reply', 1]);
-                }
-                break;
-            }
-            return redirect()->route('admins.contact.list')->with('success', 'Success');
-        } else {
-
-        }
-
-    }
-
-    //active
-    public function activeContact(Request $request)
-    {
-        $objUpdate = Contact::find($request->id);
-        $objUpdate->update(['active' => !($objUpdate->active)]);
+public function deleteContact($id)
+{
+    $obj = Contact::find($id);
+    if ($obj->delete()) {
         echo json_encode('ok');
     }
+}
+
+    // apply action
+public function actionContact(Request $request)
+{
+    $listObj = Contact::whereIn('id', $request->selected)->get();
+    if (!empty($listObj)) {
+        switch ($request->option) {
+            case 1:
+            foreach ($listObj as $item) {
+                $item->delete();
+            }
+            break;
+            case 2:
+            foreach ($listObj as $item) {
+                $item->update(['is_reply'=> 1]);
+            }
+            break;
+        }
+        return redirect()->route('admins.contact.list')->with('success', 'Success');
+    } else {
+
+    }
+
+}
+
+    //active
+public function activeContact(Request $request)
+{
+    $objUpdate = Contact::find($request->id);
+    $objUpdate->update(['is_reply' => !($objUpdate->active)]);
+    echo json_encode('ok');
+}
 
     // ==========News management=============
     // news
-    public function listIntroduce()
-    {
-        $list  = Introduce::all();
-        return view('admin.introduce.index', ['list' => $list]);
-    }
+public function listIntroduce()
+{
+    $list  = Introduce::all();
+    return view('admin.introduce.index', ['list' => $list]);
+}
 
     // edit
-    public function createIntroduce()
-    {
-        return view('admin.introduce.add');
-    }
+public function createIntroduce()
+{
+    return view('admin.introduce.add');
+}
 
     // store
-    public function storeIntroduce(IntroduceCreateRequest $request)
-    {
-        $data = $request->all();
-        $data['created_at'] = Carbon::now();;
+public function storeIntroduce(IntroduceCreateRequest $request)
+{
+    $data = $request->all();
+    $data['created_at'] = Carbon::now();;
 
-        if (Introduce::create($data)) {
-            return redirect()->route('admins.introduce.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
+    if (Introduce::create($data)) {
+        return redirect()->route('admins.introduce.list')->with('success', 'Add success');
+    } else {
+        return redirect()->back()->withInput()->with('error', 'Fail');
     }
+}
 
     // create or edit
-    public function editIntroduce($id)
-    {
-        $obj = Introduce::find($id);
-        return view('admin.introduce.edit', ['obj' => $obj]);
-    }
+public function editIntroduce($id)
+{
+    $obj = Introduce::find($id);
+    return view('admin.introduce.edit', ['obj' => $obj]);
+}
 
     // update
-    public function updateIntroduce(IntroduceCreateRequest $request, $id)
-    {
-        $oldObj = Introduce::find($id);
-        $data = $request->all();
+public function updateIntroduce(IntroduceCreateRequest $request, $id)
+{
+    $oldObj = Introduce::find($id);
+    $data = $request->all();
 
-        if ($oldObj->update($data)) {
-            return redirect()->route('admins.introduce.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
+    if ($oldObj->update($data)) {
+        return redirect()->route('admins.introduce.list')->with('success', 'Update success');
+    } else {
+        return redirect()->back()->withInput()->with('error', 'Fail');
     }
+}
 
     //delete
-    public function deleteIntroduce($id)
-    {
-        $obj = Introduce::find($id)->delete();
-        echo json_encode('ok');
-    }
+public function deleteIntroduce(Request $request)
+{
+    $obj = Introduce::find($request->id)->delete();
+    echo json_encode('ok');
+}
 
     // apply action
-    public function actionIntroduce(Request $request)
-    {
-        $listObj = Introduce::whereIn('id', $request->selected)->get();
-        if (!empty($listObj)) {
-            switch ($request->option) {
-                case 1:
-                foreach ($listObj as $item) {
-                    $item->delete();
-                }
-                break;
-                case 2:
-                foreach ($listObj as $item) {
-                    $item->update(['active' => 1]);
-                }
-                break;
-                case 3:
-                foreach ($listObj as $item) {
-                    $item->update(['active' => 0]);
-                }
-                break;
+public function actionIntroduce(Request $request)
+{
+    $listObj = Introduce::whereIn('id', $request->selected)->get();
+    if (!empty($listObj)) {
+        switch ($request->option) {
+            case 1:
+            foreach ($listObj as $item) {
+                $item->delete();
             }
-            return redirect()->route('admins.introduce.list')->with('success', 'Success');
-        } else {
-
+            break;
+            case 2:
+            foreach ($listObj as $item) {
+                $item->update(['active' => 1]);
+            }
+            break;
+            case 3:
+            foreach ($listObj as $item) {
+                $item->update(['active' => 0]);
+            }
+            break;
         }
+        return redirect()->route('admins.introduce.list')->with('success', 'Success');
+    } else {
 
     }
+
+}
 
     // active
-    public function activeIntroduce(Request $request)
-    {
-        $objUpdate = Introduce::find($request->id);
-        $objUpdate->update(['active' => !($objUpdate->active)]);
-        echo json_encode('ok');
-    }
-
-
-    // ==========Schedule management=============
-    // schedule
-    public function listSchedule()
-    {
-        $list  = Schedule::orderBy('time', 'DESC')->get();
-        return view('admin.schedule.index', ['list' => $list]);
-    }
-
-    // edit
-    public function createSchedule()
-    {
-        return view('admin.schedule.add');
-    }
-
-    // store
-    public function storeSchedule(ScheduleCreateRequest $request)
-    {
-        // get user login
-        $data = $request->all();
-
-        if (Schedule::create($data)) {
-            return redirect()->route('admins.schedule.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
-    }
-
-    // create or edit
-    public function editSchedule($id)
-    {
-        $obj = Schedule::find($id);
-        return view('admin.schedule.edit', ['obj' => $obj]);
-    }
-
-    // update
-    public function updateSchedule(ScheduleCreateRequest $request, $id)
-    {
-        $oldObj = Schedule::find($id);
-        $data = $request->all();
-
-        if ($oldObj->update($data)) {
-            return redirect()->route('admins.schedule.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
-    }
-
-    //delete
-    public function deleteSchedule($id)
-    {
-        $obj = Schedule::find($id)->delete();
-        echo json_encode('ok');
-    }
-
-    // apply action
-    public function actionSchedule(Request $request)
-    {
-        $listObj = Schedule::whereIn('id', $request->selected)->get();
-        if (!empty($listObj)) {
-            switch ($request->option) {
-                case 1:
-                foreach ($listObj as $item) {
-                    $item->delete();
-                }
-                break;
-                case 2:
-                foreach ($listObj as $item) {
-                    $item->update(['is_done' => 1]);
-                }
-                break;
-                case 3:
-                foreach ($listObj as $item) {
-                    $item->update(['is_done' => 0]);
-                }
-                break;
-            }
-            return redirect()->route('admins.schedule.list')->with('success', 'Success');
-        } else {
-
-        }
-
-    }
-
-    // active
-    public function activeSchedule(Request $request)
-    {
-        $objUpdate = Schedule::find($request->id);
-        $objUpdate->update(['active' => !($objUpdate->active)]);
-        echo json_encode('ok');
-    }
+public function activeIntroduce(Request $request)
+{
+    $objUpdate = Introduce::find($request->id);
+    $objUpdate->update(['active' => !($objUpdate->active)]);
+    echo json_encode('ok');
+}
 
     // ==========project management=============
     // schedule
-    public function listProject()
-    {
-        $status = Project::STATUS;
-        $list  = Project::all();
-        return view('admin.project.index', ['list' => $list, 'status' => $status]);
-    }
+public function listProject()
+{
+    $status = Project::STATUS;
+    $list  = Project::all();
+    $districts = District::pluck('name', 'id')->toArray();
+    return view('admin.project.index', ['list' => $list, 'status' => $status, 'districts' => $districts]);
+}
 
     // detail
-    public function detailProject($id)
-    {
-        $obj = Project::find($id);
-        $detail = DetailProject::find($obj->detail_project_id);
+public function detailProject($id)
+{
+    $obj = Project::find($id);
+    $detail = DetailProject::find($obj->detail_project_id);
 
-        return view('admin.project.edit', ['obj' => $obj, 'detail' => $detail]);
-    }
+    return view('admin.project.edit', ['obj' => $obj, 'detail' => $detail]);
+}
 
-    // edit
-    public function createProject()
-    {
-        return view('admin.project.add');
-    }
+// edit
+public function createProject()
+{
+    $districts = District::pluck('name', 'id')->toArray();
+    return view('admin.project.add', ['districts' => $districts]);
+}
 
-    // store
-    public function storeProject(ProjectCreateRequest $request)
-    {
+// store
+public function storeProject(ProjectCreateRequest $request)
+{
         // get user login
-        $data = $request->all();
+    $data = $request->all();
+    $dataDetail = [
+        'introduce' => $request->introduce,
+        'overview' => $request->overview,
+        'position' => $request->position,
+        'utilities' => $request->utilities,
+        'progress' => $request->progress,
+        'price_payment' => $request->price_payment,
+
+    ];
+    if ($detailProject = DetailProject::create($dataDetail)) {
+        if ($request->hasFile('image')) {
+            $path = "images/projects/";
+            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move($path, $fileName);
+            $imagePath = $path . $fileName;
+        } else {
+            $imagePath = '';
+        }
+        $data['image'] = $imagePath;
+        $images = [];
+        if ($files = $request->file('images')) {
+            if (count($files) > 3) {
+                return redirect()->back()->withInput()->with('error', 'Fail');
+            }
+            if (!empty($files)) {
+                foreach ($files as $file) {
+                    $path = "images/projects/";
+                    $fileName = str_random('10') . time() . '.' . $file->getClientOriginalExtension();
+                    $file->move($path, $fileName);
+                    $imagePath = $path . $fileName;
+                    $images[] = $imagePath;
+                }
+                $data['library_images'] = implode("|", $images);
+            }
+        } else {
+            $data['library_images'] = '';
+        }
+
+        $data['name'] = $request->name;
+        $data['detail_project_id'] = $detailProject->id;
+        $data['status'] = Project::STATUS['comingsoon'];
+        $data['created_at'] = Carbon::now();
+        $data['district_id'] = $request->district_id;
+        $data['village_id'] = $request->village_id;
+        $data['street_id'] = $request->street_id;
+
+        $district = District::find($request->district_id)->name;
+        $village = Village::find($request->village_id)->name;
+        $street = Street::find($request->street_id)->name;
+        $address = $street . ' ' . $village . ' ' . $district;
+        $map = getMap($address);
+        $data['map'] = $map['latitude'] . '|' . $map['longitude'];
 
         if (Project::create($data)) {
-            return redirect()->route('admins.Project.list')->with('success', 'Success');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Fail');
-        }
-    }
-
-    // create or edit
-    public function editProject($id)
-    {
-        $project = Project::find($id);
-        $detail = DetailProject::find($project->detail_project_id);
-        $products = Product::where('project_id', $project->id)->get();
-
-        return view('admin.project.edit', ['project' => $project, 'detail' => $detail, 'products' => $products]);
-    }
-
-    // update
-    public function updateProject(ProjectCreateRequest $request, $id)
-    {
-        $data = $request->all();
-
-        if (DetailProject::find($id)->update($request->except(['name', 'image', 'projectId']))) {
-            $oldObj = Project::find($request->projectId);
-            if ($request->hasFile('image')) {
-                if (!empty($oldObj->image)) {
-                    unlink($oldObj->image);
-                }
-                $path = "images/projects/";
-                $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
-                $request->image->move($path, $fileName);
-                $imagePath = $path . $fileName;
-            } else {
-                $imagePath = $oldObj->image;
-            }
-
-            $oldObj->update(['name' => $request->name, 'image' => $imagePath]);
             return redirect()->route('admins.project.list')->with('success', 'Success');
         } else {
             return redirect()->back()->withInput()->with('error', 'Fail');
         }
     }
+}
 
-     // apply action
-    public function changeStatusProject(Request $request)
-    {
+// create or edit
+public function editProject($id)
+{
+    $obj = Project::find($id);
+    $detail = DetailProject::find($obj->detail_project_id);
+    $district = District::pluck('name', 'id')->toArray();
+    $village = Village::where('district_id', $obj->district_id)->pluck('name', 'id')->toArray();
+    $street = Street::where('village_id', $obj->village_id)->pluck('name', 'id')->toArray();
+    return view('admin.project.edit', ['obj' => $obj, 'detail' => $detail, 'districts' => $district, 'villages' => $village, 'streets' => $street]);
+}
+
+    // update
+public function updateProject(ProjectCreateRequest $request, $id)
+{
+    $data = $request->all();
+
+    $dataDetail = [
+        'introduce' => $request->introduce,
+        'overview' => $request->overview,
+        'position' => $request->position,
+        'utilities' => $request->utilities,
+        'progress' => $request->progress,
+        'price_payment' => $request->price_payment,
+
+    ];
+    if (DetailProject::find($id)->update($dataDetail)) {
+        $oldObj = Project::find($request->projectId);
+        if ($request->hasFile('image')) {
+            if (!empty($oldObj->image)) {
+                unlink($oldObj->image);
+            }
+            $path = "images/projects/";
+            $fileName = str_random('10') . time() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move($path, $fileName);
+            $imagePath = $path . $fileName;
+        } else {
+            $imagePath = $oldObj->image;
+        }
+        $data['image'] = $imagePath;
+        $images = [];
+        if ($files = $request->file('images')) {
+            if (count($files) > 3) {
+                return redirect()->back()->withInput()->with('error', 'Fail');
+            }
+            if (!empty($files)) {
+                foreach(explode("|", $oldObj->library_images) as $item) {
+                    if (!empty($item)) {
+                        unlink($item);
+                    }
+                }
+
+                foreach ($files as $file) {
+                    $path = "images/projects/";
+                    $fileName = str_random('10') . time() . '.' . $file->getClientOriginalExtension();
+                    $file->move($path, $fileName);
+                    $imagePath = $path . $fileName;
+                    $images[] = $imagePath;
+                }
+                $data['library_images'] = implode("|", $images);
+            }
+        }
+
+        $data['name'] = $request->name;
+        $data['district_id'] = $request->district_id;
+        $data['village_id'] = $request->village_id;
+        $data['street_id'] = $request->street_id;
+
+        $district = District::find($request->district_id)->name;
+        $village = Village::find($request->village_id)->name;
+        $street = Street::find($request->street_id)->name;
+        $address = $street . ' ' . $village . ' ' . $district;
+        $map = getMap($address);
+        $data['map'] = $map['latitude'] . '|' . $map['longitude'];
+
+        if ($oldObj->update($data)) {
+            return redirect()->route('admins.project.list')->with('success', 'Update Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+}
+
+    // apply action
+public function changeStatusProject(Request $request)
+{
+    $transactions = Transaction::join('registers', 'registers.id', 'transactions.register_id')
+    ->join('projects', 'projects.id', 'registers.project_id')
+    ->where('project_id', $request->id)->first();
+    if(isset($transactions)) {
+        echo json_encode('not ok');
+    } else {
         $obj = Project::find($request->id)->update(['status' => $request->status]);
         echo json_encode('ok');
     }
+}
 
 
     //delete
-    public function deleteProject(Request $request)
-    {
-        $obj = Project::find($request->id)->delete();
+public function deleteProject(Request $request)
+{
+    $transactions = Transaction::join('registers', 'registers.id', 'transactions.register_id')
+    ->join('projects', 'projects.id', 'registers.project_id')
+    ->where('project_id', $request->id)->first();
+    if(isset($transactions)) {
+        echo json_encode('not ok');
+    } else {
+        $obj = Project::find($request->id);
+        DetailProject::find($obj->detail_project_id)->delete();
+        $productIds = Product::where('project_id', $request->id)->pluck('id')->toArray();
+        Apartment::whereIn('product_id', $productIds)->delete();
+        Product::where('project_id', $request->id)->delete();
+        $registerIds = Register::where('project_id', $request->id)->pluck('id')->toArray();
+        Register::where('project_id', $request->id)->delete();
+        Transaction::whereIn('register_id', $registerIds)->delete();
+        $obj->delete();
         echo json_encode('ok');
     }
+}
 
     // apply action
-    public function actionProject(Request $request)
-    {
-        $listObj = Project::whereIn('id', $request->selected)->get();
-        if (!empty($listObj)) {
-            switch ($request->option) {
-                case 1:
-                foreach ($listObj as $item) {
+public function actionProject(Request $request)
+{
+    $listObj = Project::whereIn('id', $request->selected)->get();
+    if (!empty($listObj)) {
+        switch ($request->option) {
+            case 1:
+            foreach ($listObj as $item) {
+                $transactions = Transaction::join('registers', 'registers.id', 'transactions.register_id')
+                ->join('projects', 'projects.id', 'registers.project_id')
+                ->where('project_id', $item->id)->first();
+                if(!isset($transactions)) {
+                    $productIds = Product::where('project_id', $item->id)->pluck('id')->toArray();
+                    Apartment::whereIn('product_id', $productIds)->delete();
+                    Product::where('project_id', $item->id)->delete();
+                    $registerIds = Register::where('project_id', $item->id)->pluck('id')->toArray();
+                    Register::where('project_id', $item->id)->delete();
+                    Transaction::whereIn('register_id', $registerIds)->delete();
                     $item->delete();
                 }
-                break;
-                case 2:
-                foreach ($listObj as $item) {
-                    $item->update(['status' => Project::STATUS['ready']]);
-                }
-                break;
-                case 3:
-                foreach ($listObj as $item) {
-                 $item->update(['status' => Project::STATUS['salling']]);
-             }
-             break;
-             case 4:
-             foreach ($listObj as $item) {
-                 $item->update(['status' => Project::STATUS['comingsoon']]);
-             }
-             break;
-         }
-         return redirect()->route('admins.project.list')->with('success', 'Success');
-     } else {
+            }
+            break;
+            case 2:
+            foreach ($listObj as $item) {
+                $item->update(['status' => Project::STATUS['ready']]);
+            }
+            break;
+            case 3:
+            foreach ($listObj as $item) {
+                $item->update(['status' => Project::STATUS['saling']]);
+            }
+            break;
+            case 4:
+            foreach ($listObj as $item) {
+                $item->update(['status' => Project::STATUS['comingsoon']]);
+            }
+            break;
+            case 5:
+            foreach ($listObj as $item) {
+                $transactions = Transaction::join('registers', 'registers.id', 'transactions.register_id')
+                ->join('projects', 'projects.id', 'registers.project_id')
+                ->where('project_id', $item->id)->first();
+                if(!isset($transactions)) {
+                    $item->update(['status' => Project::STATUS['stop']]);
+                } 
+            }
+            break;
+        }
+        return redirect()->route('admins.project.list')->with('success', 'Action Success');
+    } else {
 
-     }
+    }
 
- }
+}
 
     // active
- public function activeProject(Request $request)
- {
+public function activeProject(Request $request)
+{
     $objUpdate = Project::find($request->id);
     $objUpdate->update(['active' => !($objUpdate->active)]);
     echo json_encode('ok');
@@ -1803,17 +1883,15 @@ public function statusProject($id)
 {
     $status = Transaction::STATUS;
     $obj = Project::find($id);
+    $cats = Category::where('type_transaction', Category::TYPETRANSACTION['sale'])
+    ->pluck('name', 'id')->toArray();
     $products = Product::where('project_id', $id);
     $blocks = array_unique($products->pluck('block')->toArray());
-    // $lands = $products->where('block', $blocks[0])->pluck('land')->toArray();
-    // $floor = $products->where('land', $lands[0])->first()->floor;
-    // $floors = ($floor) ? range(1,$floor) : [0 => 0]; 
     $transactions = Transaction::select('transactions.*')->join('products', 'products.id', 'transactions.product_id')
     ->join('projects', 'products.project_id', 'projects.id')
     ->where('projects.id', $id)->get();
 
-    // return view('admin.project.status', ['obj' => $obj, 'products' => $products->get(), 'transactions' => $transactions, 'status' => $status, 'blocks' => $blocks, 'lands' => $lands, 'floors' => $floors]);
-    return view('admin.project.status', ['obj' => $obj, 'products' => $products->get(), 'transactions' => $transactions, 'status' => $status, 'blocks' => $blocks]);
+    return view('admin.project.status', ['obj' => $obj, 'products' => $products->get(), 'transactions' => $transactions, 'status' => $status, 'cats' => $cats, 'blocks' => $blocks]);
 }
 
     // detail purchase transaction
@@ -1843,31 +1921,57 @@ public function getFloorByLand(Request $request)
     $floor = Product::where('project_id', $request->projectId)
     ->where('block', $request->block)
     ->where('land', $request->land)->first()->floor;
-    $floors = ($floor) ? range(1, $floor) : [0 => 0];
+    $floors = ($floor) ? range(1, $floor) : 0;
     echo json_encode($floors);
 
 }
 
-//     // status
-// public function getFloorByBlock(Request $request)
-// {
-//     $floors = Product::find($request->id)->floor;
+    // detail purchase transaction
+public function getApartmentByFloor(Request $request)
+{
+    $productId = Product::where('project_id', $request->projectId)
+    ->where('block', $request->block)
+    ->where('land', $request->land)->first()->id;
+    $apartment = Apartment::where('product_id', $productId)->where('floor', $request->floor)->pluck('position')->toArray();
+    $apartment = !empty($apartment) ? $apartment : 0;
+    echo json_encode($apartment);
 
-//     echo json_encode(range(1, $floors));
-// }
+}
+
+public function getVillageByDistrict(Request $request)
+{
+    $villages = Village::where('district_id', $request->district_id)
+    ->pluck('name', 'id')->toArray();
+    echo json_encode($villages);
+
+}
+
+public function getStreetByVillage(Request $request)
+{
+    $streets = Street::where('village_id', $request->village_id)
+    ->pluck('name', 'id')->toArray();
+    echo json_encode($streets);
+
+}
 
     // searchTransaction
 public function searchTransaction(Request $request)
 {
-    $transaction = new Transaction;
+    $transaction = Transaction::select('transactions.*')
+    ->join('products', 'products.id', 'transactions.product_id')
+    ->where('project_id', $request->projectId);
+    $cats = Category::where('type_transaction', Category::TYPETRANSACTION['sale'])
+    ->pluck('name', 'id')->toArray();
     $blocks = $lands = $floors = [];
     $blocks = Product::where('project_id', $request->projectId)
     ->pluck('block')->toArray();
-    if ($request->block != -1) {
-        $transaction = $transaction->select('transactions.*')->join('products', 'products.id', 'transactions.product_id')
-        ->where('project_id', $request->projectId)
-        ->where('block', $request->block);
 
+    if ($request->cat_id != -1) {
+        $transaction = $transaction->where('cat_id', $request->cat_id);
+    }
+
+    if ($request->block != -1) {
+        $transaction = $transaction->where('block', $request->block);
 
         $lands = Product::where('project_id', $request->projectId)
         ->where('block', $request->block)
@@ -1877,7 +1981,6 @@ public function searchTransaction(Request $request)
     if ($request->land != -1) {
         $transaction = $transaction->where('land', $request->land);
 
-
         $floor = Product::where('project_id', $request->projectId)
         ->where('block', $request->block)
         ->where('land', $request->land)->first()->floor;
@@ -1886,7 +1989,8 @@ public function searchTransaction(Request $request)
     }
 
     if ($request->floor != -1) {
-        $transaction = $transaction->where('transactions.floor', $request->floor);
+        $transaction = $transaction->join('apartments', 'apartments.id', 'transactions.apartment_id')
+        ->where('apartments.floor', $request->floor);
     }
 
     if ($request->status != -1) {
@@ -1899,30 +2003,213 @@ public function searchTransaction(Request $request)
 
     $transactions = $transaction->get();
     $search = [
-     'block' => $request->block,
-     'floor' => $request->floor,
-     'land' => $request->land,
-     'status' => $request->status,
- ];
+        'block' => $request->block,
+        'floor' => $request->floor,
+        'land' => $request->land,
+        'status' => $request->status,
+        'cat_id' => $request->cat_id,
+    ];
 
- return view('admin.project.status', ['obj' => $obj, 'products' => $products, 'transactions' => $transactions, 'status' => $status, 'search' => $search, 'floors' => $floors, 'lands' => $lands, 'blocks' => $blocks]);
+    return view('admin.project.status', ['obj' => $obj, 'products' => $products, 'transactions' => $transactions, 'status' => $status, 'search' => $search, 'floors' => $floors, 'lands' => $lands, 'blocks' => $blocks, 'cats' => $cats]);
 
 }
 
+// searchTransaction
+public function searchProject(Request $request)
+{
+    $project = new Project;
+    $districts = $villages = $streets = [];
+    $districts = District::pluck('name', 'id')->toArray();
+
+    if ($request->district_id != -1) {
+        $project = $project->where('district_id', $request->district_id);
+
+        $villages = Village::where('district_id', $request->district_id)
+        ->pluck('name', 'id')->toArray();
+    }
+
+    if ($request->village_id != -1) {
+        $project = $project->where('village_id', $request->village_id);
+
+        $streets = Street::where('village_id', $request->village_id)
+        ->pluck('name', 'id')->toArray();
+    }
+
+    if ($request->street_id != -1) {
+        $project = $project->where('street_id', $request->street_id);
+    }
+
+    if ($request->status != -1) {
+        $project = $project->where('status', $request->status);
+    }
+
+    $status = Project::STATUS;
+
+    $list = $project->get();
+    $search = [
+        'district_id' => $request->district_id,
+        'village_id' => $request->village_id,
+        'street_id' => $request->street_id,
+        'status' => $request->status,
+    ];
+
+    return view('admin.project.index', ['list' => $list, 'status' => $status, 'search' => $search, 'districts' => $districts, 'villages' => $villages, 'streets' => $streets]);
+
+}
     //=====product====
     // edit
 public function listProduct($projectId)
 {
-    $direction = Product::DIRECTION;
-    $list = Product::where('project_id', $projectId)->orderBy('block')->get();
-    return view('admin.product.index', ['list' => $list, 'direction' => $direction, 'projectId' => $projectId]);
+    $project = Project::find($projectId);
+    $list = Product::where('project_id', $projectId)->orderBy('id')->get();
+    $cats = Category::where('type_transaction', Category::TYPETRANSACTION['sale'])
+    ->pluck('name', 'id')->toArray();
+
+    $directions = Product::DIRECTION;
+    $prices = [
+        'Thỏa thuận',
+        '< 500 triệu',
+        '500 - 800 triệu',
+        '800 - 1 tỷ',
+        '1 - 5 tỷ',
+        '> 5 tỷ'
+    ];
+    $areas = [
+        'Không xác định',
+        '<= 30 m2',
+        '30-80 m2',
+        '80-150 m2',
+        '150-300 m2',
+        '300-500 m2',
+        '> 500 m2',
+    ];
+    $statuses = Product::STATUS;
+    return view('admin.product.index', [
+        'list' => $list,
+        'project' => $project,
+        'cats' => $cats,
+        'prices' => $prices,
+        'areas' => $areas,
+        'statuses' => $statuses,
+        'directions' => $directions,
+    ]);
+}
+
+// searchTransaction
+public function searchProduct(Request $request)
+{
+    $product = Product::where('project_id', $request->projectId);
+    $project = Project::find($request->projectId);
+    $cats = Category::where('type_transaction', Category::TYPETRANSACTION['sale'])
+    ->pluck('name', 'id')->toArray();
+
+    $directions = Product::DIRECTION;
+    $prices = [
+        'Thỏa thuận',
+        '< 500 triệu',
+        '500 - 800 triệu',
+        '800 - 1 tỷ',
+        '1 - 5 tỷ',
+        '> 5 tỷ'
+    ];
+    $areas = [
+        'Không xác định',
+        '<= 30 m2',
+        '30-80 m2',
+        '80-150 m2',
+        '150-300 m2',
+        '300-500 m2',
+        '> 500 m2',
+    ];
+    $statuses = Product::STATUS;
+
+    if ($request->cat_id != -1) {
+        $product = $product->where('cat_id', $request->cat_id);
+    }
+
+    if ($request->area != -1) {
+        switch ($request->area) {
+            case 0: $product = $product->where('area', 0);
+            break;
+            case 1: $product = $product->where('area', '<=', 30);
+            break;
+            case 2: $product = $product->whereBetween('area', [30, 80]);
+            break;
+            case 3: $product = $product->whereBetween('area', [80, 150]);
+            break;
+            case 4: $product = $product->whereBetween('area', [150, 300]);
+            break;
+            case 5: $product = $product->whereBetween('area', [300, 500]);
+            break;
+            case 6: $product = $product->where('area', '>', 500);
+            break;
+        }
+    }
+
+    if ($request->price != -1) {
+        switch ($request->price) {
+            case 0: $product = $product->where('unit_price_id', 1);
+            break;
+            case 1: $product = $product->where('unit_price_id', 2)->where('price', '<', 500);
+            break;
+            case 2: $product = $product->where('unit_price_id', 2)->whereBetween('price', [500, 800]);
+            break;
+            case 3: $product = $product->where(function ($query) {
+                $query->where('unit_price_id', 2)
+                ->whereBetween('price', [800, 999]);
+            })->orWhere(function ($query) {
+                $query->where('unit_price_id', 3)
+                ->where('price', 1);
+            });
+            break;
+            case 4: $product = $product->where('unit_price_id', 3)
+            ->whereBetween('price', [1, 5]);
+            break;
+            case 5: $product = $product->where('unit_price_id', 3)
+            ->where('price', '>', 5);
+            break;
+        }
+    }
+
+    if ($request->status != -1) {
+        $product = $product->where('status', $request->status);
+    }
+
+    if ($request->direction != -1) {
+        $product = $product->where('direction', $request->direction);
+    }
+
+    $list = $product->get();
+    $search = [
+        'price' => $request->price,
+        'direction' => $request->direction,
+        'status' => $request->status,
+        'area' => $request->area,
+        'cat_id' => $request->cat_id,
+    ];
+
+    return view('admin.product.index', [
+        'list' => $list,
+        'project' => $project,
+        'cats' => $cats,
+        'prices' => $prices,
+        'areas' => $areas,
+        'statuses' => $statuses,
+        'directions' => $directions,
+        'search' => $search
+    ]);
 }
 
     // edit
 public function createProduct($projectId)
 {
     $direction = Product::DIRECTION;
-    return view('admin.product.add', ['direction' => $direction, 'projectId' => $projectId]);
+    $unitPrice = UnitPrice::where('type_transaction', 1)
+    ->pluck('name', 'id')->toArray();
+    $project = Project::find($projectId);
+    $categories = Category::where('type_transaction', 1)
+    ->pluck('name', 'id')->toArray();
+    return view('admin.product.add', ['direction' => $direction, 'project' => $project, 'unitPrice' => $unitPrice, 'categories' => $categories]);
 }
     // store
 public function storeProduct(ProductCreateRequest $request, $projectId)
@@ -1938,28 +2225,63 @@ public function storeProduct(ProductCreateRequest $request, $projectId)
             'block' => $request->block,
             'land' => $request->land,
             'floor' => $request->floor,
-            'price' => $request->price,
+            'apartment' => $request->apartment,
+            'price' => ($request->unit_price_id == 1) ? 0 : $request->price,
+            'unit_price_id' => $request->unit_price_id,
             'area' => $request->area,
-            'description' => $request->description,
+            'cat_id' => $request->cat_id,
+            'description' => $request->description ?? '',
             'direction' => $request->direction,
+            'status' => 1,
         ];
+        $images = [];
+        if ($files = $request->file('images')) {
+            if (count($files) > 3) {
+                return redirect()->back()->withInput()->with('error', 'Fail');
+            }
+            if (!empty($files)) {
+                foreach ($files as $file) {
+                    $path = "images/products/";
+                    $fileName = str_random('10') . time() . '.' . $file->getClientOriginalExtension();
+                    $file->move($path, $fileName);
+                    $imagePath = $path . $fileName;
+                    $images[] = $imagePath;
+                }
+                $data['images'] = implode("|", $images);
+            } else {
+                $data['images'] = '';
+            }
+        } else {
+            $data['images'] = '';
+        }
         if (Product::create($data)) {
-            return redirect()->route('admins.product.list', ['projectId' => $projectId])->with('success', 'Success');
+            return redirect()->route('admins.product.list', ['projectId' => $projectId])->with('success', 'Add Success');
         } else {
             return redirect()->back()->withInput()->with('error', 'Fail');
         }
     } else {
         return redirect()->back()->withInput()->with('error', 'Product is exist');
     }
-    
+
 }
 
     // edit
 public function editProduct($id)
 {
+    $objTransaction = Transaction::join('products', 'products.id', 'transactions.product_id')
+    ->where('product_id', $id)
+    ->where('transactions.status', '!=', Transaction::STATUS['processing'])
+    ->where('floor', 0)->where('apartment_id', 0)->first();
+    if (isset($objTransaction)) {
+        return back()->with('success', 'This product is in transaction');
+    }
     $direction = Product::DIRECTION;
+    $unitPrice = UnitPrice::where('type_transaction', 1)
+    ->pluck('name', 'id')->toArray();
+    $categories = Category::where('type_transaction', 1)
+    ->pluck('name', 'id')->toArray();
     $obj = Product::find($id);
-    return view('admin.product.edit', ['direction' => $direction, 'obj' => $obj]);
+    return view('admin.product.edit', ['direction' => $direction, 'obj' => $obj, 'unitPrice' => $unitPrice, 'categories' => $categories]);
 }
 
     // update
@@ -1967,38 +2289,91 @@ public function updateProduct(ProductCreateRequest $request)
 {
     $data =  $request->all();
     $oldProduct = Product::find($request->productId);
+    
     $product = Product::where('project_id', $oldProduct->project_id)
     ->where('block', $request->block)
     ->where('land', $request->land)
     ->where('id', '!=', $request->productId)
     ->first();
     if (!$product) {
-        $data = [
-            'block' => $request->block,
-            'land' => $request->land,
-            'floor' => $request->floor,
-            'price' => $request->price,
-            'area' => $request->area,
-            'description' => $request->description,
-            'direction' => $request->direction,
-        ];
-        if ($oldProduct->update($data)) {
-            return redirect()->route('admins.product.list', ['projectId' => $oldProduct->project_id])->with('success', 'Success');
-        } else {
+        if ($oldProduct->floor != 0 && $oldProduct->floor != -1 && $oldProduct->apartment != 0 && $oldProduct->apartment  != -1) {
+            $transaction = Transaction::select('apartments.floor')
+            ->join('apartments', 'apartments.id', 'transactions.apartment_id')
+            ->where('transactions.product_id', $oldProduct->id)
+            ->orderBy('floor', 'DESC')->first();
+            if (isset($transaction)) {
+             if($request->floor < $transaction->floor) {
+                return back()->with('error', 'Error');
+            } 
+        }
+
+        $countApartment = Transaction::select('floor')
+        ->join('apartments', 'apartments.id', 'transactions.apartment_id')
+        ->where('transactions.product_id', $oldProduct->id)->count();
+        if($request->apartment < $countApartment ) {
+            return back()->with('error', 'Error');
+        }
+
+    }
+    $data = [
+        'block' => $request->block,
+        'land' => $request->land,
+        'floor' => $request->floor,
+        'apartment' => $request->apartment,
+        'price' => ($request->unit_price_id == 1) ? 0 : $request->price,
+        'area' => $request->area,
+        'description' => $request->description ?? '',
+        'direction' => $request->direction,
+        'cat_id' => $request->cat_id,
+        'unit_price_id' => $request->unit_price_id,
+    ];
+
+    $images = [];
+    if ($files = $request->file('images')) {
+        if (count($files) > 3) {
             return redirect()->back()->withInput()->with('error', 'Fail');
         }
-    } else {
-        return redirect()->back()->withInput()->with('error', 'Product is exist');
+        if (!empty($files)) {
+            foreach(explode("|", $oldProduct->images) as $item) {
+                if (!empty($item)) {
+                    unlink($item);
+                }
+            }
+
+            foreach ($files as $file) {
+                $path = "images/products/";
+                $fileName = str_random('10') . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $fileName);
+                $imagePath = $path . $fileName;
+                $images[] = $imagePath;
+            }
+            $data['images'] = implode("|", $images);
+        }
     }
+    if ($oldProduct->update($data)) {
+        return redirect()->route('admins.product.list', ['projectId' => $oldProduct->project_id])->with('success', 'Update Success');
+    } else {
+        return redirect()->back()->withInput()->with('error', 'Fail');
+    }
+} else {
+    return redirect()->back()->withInput()->with('error', 'Product is exist');
+}
 
 }
 
     //delete
 public function deleteProduct(Request $request)
 {
-    $obj = Product::find($request->id)->delete();
-    Transaction::where('product_id', $request->id)->delete();
-    echo json_encode('ok');
+    $transaction = Transaction::where('product_id', $request->id)
+    ->first();
+    if(isset($transaction)) {
+        echo json_encode('not ok');
+    } else {
+     $obj = Product::find($request->id)->delete();
+     Apartment::where('product_id', $request->id)->delete();
+     Transaction::where('product_id', $request->id)->delete();
+     echo json_encode('ok');
+ }
 }
 
     // apply action
@@ -2009,17 +2384,354 @@ public function actionProduct(Request $request)
         switch ($request->option) {
             case 1:
             foreach ($listObj as $item) {
-                Transaction::where('product_id', $item->id)->delete();
-                $item->delete();
+                $transaction = Transaction::where('product_id', $item->id)
+                ->first();
+                if($transaction == null) {
+                    Transaction::where('product_id', $item->id)->delete();
+                    $item->delete();
+                }
             }
             break;
         }
-        return redirect()->route('admins.slider.list')->with('success', 'Success');
+        return redirect()->route('admins.product.list', ['projectId' => $request->projectId])->with('success', 'Action Success');
     } else {
 
     }
 }
 
+// status
+public function statusProduct($id)
+{
+    $statuses = Transaction::STATUS;
+    $obj = Product::find($id);
+
+    $transactions = Transaction::select('transactions.*')->where('product_id', $id)->get();
+
+    return view('admin.product.status', ['obj' => $obj, 'transactions' => $transactions, 'statuses' => $statuses]);
+}
+
+    // searchTransaction
+public function searchTransactionProduct(Request $request)
+{
+    $statuses = Transaction::STATUS;
+    $obj = Product::find($request->productId);
+    $transaction = Transaction::where('transactions.product_id', $obj->id);
+    if ($request->status != -1) {
+        $transaction = $transaction->where('transactions.status', $request->status);
+    }
+
+    if (isset($request->floor) && $request->floor != -1) {
+        $transaction = $transaction->join('apartments', 'apartments.id', 'transactions.apartment_id')->where('apartments.floor', $request->floor);
+    }
+
+    $transactions = $transaction->get();
+    $search = [
+        'status' => $request->status,
+        'floor' => $request->floor ?? 0,
+    ];
+
+    return view('admin.product.status', ['obj' => $obj, 'transactions' => $transactions, 'statuses' => $statuses, 'search' => $search]);
+
+}
+
+//========================apartment=========================================
+//=====apartment====
+public function listApartment($productId)
+{
+    $product = Product::find($productId);
+    $list = Apartment::where('product_id', $productId)->orderBy('id')->get();
+
+    $floors = range(1, $product->floor);
+    $positions = Apartment::where('product_id', $productId)->pluck('position')->toArray();
+    $directions = Apartment::DIRECTION;
+    $prices = [
+        'Thỏa thuận',
+        '< 500 triệu',
+        '500 - 800 triệu',
+        '800 - 1 tỷ',
+        '1 - 5 tỷ',
+        '> 5 tỷ'
+    ];
+    $areas = [
+        'Không xác định',
+        '<= 30 m2',
+        '30-80 m2',
+        '80-150 m2',
+        '150-300 m2',
+        '300-500 m2',
+        '> 500 m2',
+    ];
+
+    return view('admin.apartment.index', [
+        'list' => $list,
+        'floors' => $floors,
+        'positions' => $positions,
+        'product' => $product,
+        'prices' => $prices,
+        'areas' => $areas,
+        'directions' => $directions,
+    ]);
+}
+
+// searchTransaction
+public function searchApartment(Request $request)
+{
+    $product = Product::find($request->productId);
+    $floors = range(1, $product->floor);
+    $positions = Apartment::where('product_id', $product->id)->pluck('position')->toArray();
+    $apartment = Apartment::where('product_id', $product->id);
+
+    $directions = Apartment::DIRECTION;
+    $prices = [
+        'Thỏa thuận',
+        '< 500 triệu',
+        '500 - 800 triệu',
+        '800 - 1 tỷ',
+        '1 - 5 tỷ',
+        '> 5 tỷ'
+    ];
+    $areas = [
+        'Không xác định',
+        '<= 30 m2',
+        '30-80 m2',
+        '80-150 m2',
+        '150-300 m2',
+        '300-500 m2',
+        '> 500 m2',
+    ];
+
+    if ($request->area != -1) {
+        switch ($request->area) {
+            case 0: $apartment = $apartment->where('area', 0);
+            break;
+            case 1: $apartment = $apartment->where('area', '<=', 30);
+            break;
+            case 2: $apartment = $apartment->whereBetween('area', [30, 80]);
+            break;
+            case 3: $apartment = $apartment->whereBetween('area', [80, 150]);
+            break;
+            case 4: $apartment = $apartment->whereBetween('area', [150, 300]);
+            break;
+            case 5: $apartment = $apartment->whereBetween('area', [300, 500]);
+            break;
+            case 6: $apartment = $apartment->where('area', '>', 500);
+            break;
+        }
+    }
+
+    if ($request->price != -1) {
+        switch ($request->price) {
+            case 0: $apartment = $apartment->where('unit_price_id', 1);
+            break;
+            case 1: $apartment = $apartment->where('unit_price_id', 2)->where('price', '<', 500);
+            break;
+            case 2: $apartment = $apartment->where('unit_price_id', 2)->whereBetween('price', [500, 800]);
+            break;
+            case 3: $apartment = $apartment->where(function ($query) {
+                $query->where('unit_price_id', 2)
+                ->whereBetween('price', [800, 999]);
+            })->orWhere(function ($query) {
+                $query->where('unit_price_id', 3)
+                ->where('price', 1);
+            });
+            break;
+            case 4: $apartment = $apartment->where('unit_price_id', 3)
+            ->whereBetween('price', [1, 5]);
+            break;
+            case 5: $apartment = $apartment->where('unit_price_id', 3)
+            ->where('price', '>', 5);
+            break;
+        }
+    }
+
+    if ($request->direction != -1) {
+        $apartment = $apartment->where('direction', $request->direction);
+    }
+
+    if ($request->floor != -1) {
+        $apartment = $apartment->where('floor', $request->floor);
+    }
+
+    if ($request->position != -1) {
+        $apartment = $apartment->where('position', 'like', "$request->position");
+    }
+
+    $list = $apartment->get();
+    $search = [
+        'price' => $request->price,
+        'direction' => $request->direction,
+        'floor' => $request->floor,
+        'position' => $request->position,
+        'area' => $request->area,
+    ];
+
+    return view('admin.apartment.index', [
+        'list' => $list,
+        'product' => $product,
+        'prices' => $prices,
+        'areas' => $areas,
+        'directions' => $directions,
+        'positions' => $positions,
+        'floors' => $floors,
+        'search' => $search
+    ]);
+}
+
+    // edit
+public function createApartment($productId)
+{
+    $direction = Apartment::DIRECTION;
+    $unitPrice = UnitPrice::where('type_transaction', 1)
+    ->pluck('name', 'id')->toArray();
+    $product = Product::find($productId);
+    $floors = range(1, $product->floor);
+
+    return view('admin.apartment.add', ['direction' => $direction, 'product' => $product, 'unitPrice' => $unitPrice, 'floors' => $floors]);
+}
+    // store
+public function storeApartment(ApartmentCreateRequest $request, $productId)
+{
+    $data =  $request->all();
+    $apartment = Apartment::where('product_id', $productId)
+    ->where('floor', $request->floor)
+    ->where('position','like', "$request->position")->first();
+    if (!$apartment) {
+        $data = [
+            'product_id' => $productId,
+            'floor' => $request->floor,
+            'position' => $request->position,
+            'price' => ($request->unit_price_id == 1) ? 0 : $request->price,
+            'unit_price_id' => $request->unit_price_id,
+            'area' => $request->area,
+            'description' => $request->description ?? '',
+            'direction' => $request->direction,
+            'status' => 1,
+        ];
+        if (Apartment::create($data)) {
+            return redirect()->route('admins.apartment.list', ['productId' => $productId])->with('success', 'Add Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    } else {
+        return redirect()->back()->withInput()->with('error', 'Apartment is exist');
+    }
+
+}
+
+    // edit
+public function editApartment($id)
+{
+    $objTransaction = Transaction::where('apartment_id', $id)
+    ->where('transactions.status', '!=', Transaction::STATUS['processing'])->first();
+    if ($objTransaction != null) {
+        return back()->with('success', 'This apartment is in transaction');
+    }
+    $direction = Apartment::DIRECTION;
+    $unitPrice = UnitPrice::where('type_transaction', 1)
+    ->pluck('name', 'id')->toArray();
+    $obj = Apartment::find($id);
+    $floors = range(1, $obj->product->floor);
+
+    return view('admin.apartment.edit', ['direction' => $direction, 'obj' => $obj, 'unitPrice' => $unitPrice, 'floors' => $floors]);
+}
+
+    // update
+public function updateApartment(ApartmentCreateRequest $request)
+{
+    $data =  $request->all();
+    $oldApartment = Apartment::find($request->apartmentId);
+    $apartment = Apartment::where('product_id', $oldApartment->product_id)
+    ->where('floor', $request->floor)
+    ->where('position', $request->position)
+    ->where('id', '!=', $request->apartmentId)
+    ->first();
+    if (!$apartment) {
+        $data = [
+            'floor' => $request->floor,
+            'position' => $request->position,
+            'price' => ($request->unit_price_id == 1) ? 0 : $request->price,
+            'area' => $request->area,
+            'description' => $request->description ?? '',
+            'direction' => $request->direction,
+            'unit_price_id' => $request->unit_price_id,
+        ];
+        if ($oldProduct->update($data)) {
+            return redirect()->route('admins.apartment.list', ['productId' => $oldApartment->product_id])->with('success', 'Update Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    } else {
+        return redirect()->back()->withInput()->with('error', 'Apartment is exist');
+    }
+
+}
+
+    //delete
+public function deleteApartment(Request $request)
+{
+    $transactions = Transaction::where('apartment_id', $request->id)->first();
+    if(isset($transactions)) {
+        echo json_encode('not ok');
+    } else {
+        $obj = Apartment::find($request->id)->delete();
+        Transaction::where('apartment_id', $request->id)->delete();
+        echo json_encode('ok');
+    }
+}
+
+    // apply action
+public function actionApartment(Request $request)
+{
+    $listObj = Apartment::whereIn('id', $request->selected)->get();
+    if (!empty($listObj)) {
+        switch ($request->option) {
+            case 1:
+            foreach ($listObj as $item) {
+                $transactions = Transaction::where('apartment_id', $item->id)->first();
+                if(!isset($transactions)) {
+                 Transaction::where('apartment_id', $item->id)->delete();
+                 $item->delete();
+             }
+
+         }
+         break;
+     }
+     return redirect()->route('admins.apartment.list', ['productId' => $request->productId])->with('success', 'Action Success');
+ } else {
+
+ }
+}
+
+// status
+public function statusApartment($id)
+{
+    $statuses = Transaction::STATUS;
+    $obj = Apartment::find($id);
+
+    $transactions = Transaction::select('transactions.*')->where('apartment_id', $id)->get();
+
+    return view('admin.apartment.status', ['obj' => $obj, 'transactions' => $transactions, 'statuses' => $statuses]);
+}
+
+    // searchTransaction
+public function searchTransactionApartment(Request $request)
+{
+    $statuses = Transaction::STATUS;
+    $obj = Apartment::find($request->apartmentId);
+    $transaction = Transaction::where('apartment_id', $obj->id);
+    if ($request->status != -1) {
+        $transaction = $transaction->where('status', $request->status);
+    }
+
+    $transactions = $transaction->get();
+    $search = [
+        'status' => $request->status,
+    ];
+
+    return view('admin.apartment.status', ['obj' => $obj, 'transactions' => $transactions, 'statuses' => $statuses, 'search' => $search]);
+
+}
+//======================================================================
     // ==========Slider management=============
     // sliders
 public function listSlider()
@@ -2050,7 +2762,7 @@ public function storeSlider(SliderCreateRequest $request)
     }
 
     if (Slider::create($data)) {
-        return redirect()->route('admins.slider.list')->with('success', 'Success');
+        return redirect()->route('admins.slider.list')->with('success', 'Add Success');
     } else {
         return redirect()->back()->withInput()->with('error', 'Fail');
     }
@@ -2082,7 +2794,7 @@ public function updateSlider(SliderCreateRequest $request, $id)
     }
 
     if ($oldObj->update($data)) {
-        return redirect()->route('admins.slider.list')->with('success', 'Success');
+        return redirect()->route('admins.slider.list')->with('success', 'Update Success');
     } else {
         return redirect()->back()->withInput()->with('error', 'Fail');
     }
@@ -2125,7 +2837,7 @@ public function actionSlider(Request $request)
             }
             break;
         }
-        return redirect()->route('admins.slider.list')->with('success', 'Success');
+        return redirect()->route('admins.slider.list')->with('success', 'Action Success');
     } else {
 
     }
@@ -2144,20 +2856,19 @@ public function activeSlider(Request $request)
     // announcements
 public function listAnnouncement()
 {
-    $objLogin = session()->get('objUser');
-    if ($objLogin->role == User::ROLE['admin']) {
-        $list = Announcement::all();
+    $objLogin = getUserLogin();
+    if (isAdmin()) {
+            //adim get all
+        $list = Announcement::select(['announcements.*',\DB::raw('1  as is_read'),\DB::raw('1  as active_edit')])->orderBy('created_at', 'DESC')->get();
     } else {
-        $list1 = Announcement::select(['announcements.*',\DB::raw('1  as is_read')])->Where('causer_id', $objLogin->id)->where('active', 1)->orderBy('created_at', 'DESC')->get();
-        $list2  = Announcement::select(['announcements.*', 'is_read'])
+        $list1 = Announcement::select(['announcements.*',\DB::raw('1  as is_read'),\DB::raw('1  as active_edit')])->Where('causer_id', $objLogin->id)->where('active', 1)->orderBy('created_at', 'DESC')->get();
+        $list2  = Announcement::select(['announcements.*', 'is_read',\DB::raw('0  as active_edit')])
         ->join('announcement_recieves', 'announcements.id', 'announcement_recieves.announcement_id')
         ->where('reciever_id', $objLogin->id)->where('active', 1)
         ->orderBy('is_read', 'ASC')->orderBy('created_at', 'DESC')->get();
-
-        $list = $list1->merge($list2);
+        $list = $list2->merge($list1);
         AnnouncementRecieves::where('reciever_id', $objLogin->id)->update(['is_read' => 1]);
     }
-
     return view('admin.announcement.index', ['list' => $list]);
 }
 
@@ -2170,13 +2881,16 @@ public function createAnnouncement()
     // store
 public function storeAnnouncement(AnnouncementCreateRequest $request)
 {
-    $loginUser = session()->get('objUser');
+    $loginUser = getUserLogin();
     $data = $request->all();
     $data['created_at'] = Carbon::now();
     $data['causer_id'] = $loginUser->id;
 
     if ($announcement = Announcement::create($data)) {
-        $userId = User::where('role', '!=', User::ROLE['admin'])->where('role', '!=', User::ROLE['customer'])->pluck('id')->toArray();
+        $userId = User::where('role', '!=', User::ROLE['admin'])
+        ->where('role', '!=', User::ROLE['customer'])
+        ->where('id', '!=', $loginUser->id)
+        ->pluck('id')->toArray();
         foreach ($userId as $id) {
             AnnouncementRecieves::create([
                 'announcement_id' => $announcement->id,
@@ -2185,7 +2899,7 @@ public function storeAnnouncement(AnnouncementCreateRequest $request)
             ]);
         }
 
-        return redirect()->route('admins.announcement.list')->with('success', 'Success');
+        return redirect()->route('admins.announcement.list')->with('success', 'Add success');
     } else {
         return redirect()->back()->withInput()->with('error', 'Fail');
     }
@@ -2203,9 +2917,11 @@ public function updateAnnouncement(AnnouncementCreateRequest $request, $id)
 {
     $oldObj = Announcement::find($id);
     $data = $request->all();
+    $data['created_at'] = Carbon::now();
 
     if ($oldObj->update($data)) {
-        return redirect()->route('admins.announcement.list')->with('success', 'Success');
+        AnnouncementRecieves::where('announcement_id', $oldObj->id)->update(['is_read' => 0]);
+        return redirect()->route('admins.announcement.list')->with('success', 'Update success');
     } else {
         return redirect()->back()->withInput()->with('error', 'Fail');
     }
@@ -2214,9 +2930,9 @@ public function updateAnnouncement(AnnouncementCreateRequest $request, $id)
     //delete
 public function deleteAnnouncement(Request $request)
 {
-    $objLogin = session()->get('objUser');
+    $objLogin = getUserLogin();
     $obj = Announcement::find($request->id);
-    if ($objLogin->role == User::ROLE['admin'] || $objLogin->id == $obj->causer_id) {
+    if (isAdmin() || $objLogin->id == $obj->causer_id) {
         if ($obj->delete()) {
             AnnouncementRecieves::where('announcement_id', $request->id)->delete();
             echo json_encode('ok');
@@ -2237,7 +2953,7 @@ public function actionAnnouncement(Request $request)
         switch ($request->option) {
             case 1:
             foreach ($listObj as $item) {
-                if ($objLogin->role == User::ROLE['admin'] || $objLogin->id == $obj->causer_id) {
+                if (isAdmin() || $objLogin->id == $obj->causer_id) {
                     if ($item->delete()) {
                         AnnouncementRecieves::where('announcement_id', $item->id)->delete();
                     }
@@ -2249,14 +2965,14 @@ public function actionAnnouncement(Request $request)
             break;
             case 2:
             foreach ($listObj as $item) {
-                if ($objLogin->role == User::ROLE['admin'] || $objLogin->id == $item->causer_id) {
+                if (isAdmin() || $objLogin->id == $item->causer_id) {
                     $item->update(['active' => 1]);
                 }
             }
             break;
             case 3:
             foreach ($listObj as $item) {
-                if ($objLogin->role == User::ROLE['admin'] || $objLogin->id == $item->causer_id) {
+                if (isAdmin() || $objLogin->id == $item->causer_id) {
                     $item->update(['active' => 0]);
                 }
             }
@@ -2281,7 +2997,7 @@ public function activeAnnouncement(Request $request)
     // consult
 public function listConsult()
 {
-    $list  = Consult::all();
+    $list  = Consult::orderBy('type', 'desc')->orderBy('created_at', 'desc')->get();
     return view('admin.consult.index', ['list' => $list]);
 }
 
@@ -2303,11 +3019,23 @@ public function saveConsult($id)
         'project_id' => $consult->product_id,
         'created_at' => Carbon::now()
     ];
-    Register::create($data);
+    $register = Register::create($data);
 
-    return redirect()->route('admins.consult.list')->with('success', 'Success');
+    if (!empty($consult->sub_product_id)) {
+        $transaction = [
+            'product_id' => $consult->sub_product_id,
+            'transaction_id' => 0,
+            'register_id' => $register->id,
+            'status' => Transaction::STATUS['processing'],
+            'created_at' => Carbon::now(),
+            'description' => $consult->message,
+        ];
+        Transaction::create($transaction);
+    }
+    $consult->delete();
+
+    return redirect()->route('admins.consult.list')->with('success', 'Save success');
 }
-
 
     //delete
 public function deleteConsult(Request $request)
@@ -2340,32 +3068,56 @@ public function actionConsult(Request $request)
 // transaction
 public function listAllTransaction()
 {
-    $list  = Transaction::all();
+    $objUser = session()->get('objUser');
+
+    if (isEmployee()) {
+        $employeeId = $objUser->employee->id;
+        $list  = Transaction::select(
+            [
+                'transactions.*',
+                \DB::raw("case when assign_task.employee_id = $employeeId then true else false end as isPermit")
+            ]
+        )
+        ->join('registers', 'registers.id', 'transactions.register_id')
+        ->join('assign_task', 'assign_task.customer_id', 'registers.customer_id')
+        // ->where('assign_task.employee_id', $objUser->employee->id)
+        ->get();
+    } else {
+        $list  = Transaction::select(['transactions.*',\DB::raw("true as isPermit")])->get();
+    }
     $status  = Transaction::STATUS;
     $projects = Project::pluck('name', 'id')->toArray();
-    return view('admin.transaction.index', ['list' => $list, 'status' => $status, 'projects' => $projects]);
+    $cats = Category::where('type_transaction', Category::TYPETRANSACTION['sale'])
+    ->pluck('name', 'id')->toArray();
+    return view('admin.transaction.index', ['list' => $list, 'status' => $status, 'cats' => $cats, 'projects' => $projects]);
 }
 
     // transaction
 public function searchAllTransaction(Request $request)
 {
-    $transaction = new Transaction;
+    $transaction = Transaction::select('transactions.*')
+    ->join('products', 'products.id', 'transactions.product_id');
+    $cats = Category::where('type_transaction', Category::TYPETRANSACTION['sale'])
+    ->pluck('name', 'id')->toArray();
     $projects = $blocks = $lands = $floors = [];
     $projects = Project::pluck('name', 'id')->toArray();
-    
-    if ($request->project != -1) {
-        $transaction = $transaction->select('transactions.*')->join('products', 'products.id', 'transactions.product_id')
-        ->where('project_id', $request->project);
 
-        $blocks = Product::where('project_id', $request->project)
-        ->pluck('block')->toArray();
+    if ($request->project != -1) {
+        $transaction = $transaction->where('project_id', $request->project);
+
+        $blocks = array_unique(Product::where('project_id', $request->project)
+            ->pluck('block')->toArray());
+    }
+
+    if ($request->cat_id != -1) {
+        $transaction = $transaction->where('cat_id', $request->cat_id);
     }
 
     if ($request->block != -1) {
         $transaction = $transaction->where('block', $request->block);
 
 
-        $lands = Product::where('project_id', $request->projectId)
+        $lands = Product::where('project_id', $request->project)
         ->where('block', $request->block)
         ->pluck('land')->toArray();
     }
@@ -2374,7 +3126,7 @@ public function searchAllTransaction(Request $request)
         $transaction = $transaction->where('land', $request->land);
 
 
-        $floor = Product::where('project_id', $request->projectId)
+        $floor = Product::where('project_id', $request->project)
         ->where('block', $request->block)
         ->where('land', $request->land)->first()->floor;
         $floors = ($floor) ? range(1, $floor) : [];
@@ -2382,7 +3134,7 @@ public function searchAllTransaction(Request $request)
     }
 
     if ($request->floor != -1) {
-        $transaction = $transaction->where('transactions.floor', $request->floor);
+        $transaction = $transaction->join('apartments', 'apartments.id', 'transactions.apartment_id')->where('apartments.floor', $request->floor);
     }
 
     if ($request->status != -1) {
@@ -2391,122 +3143,345 @@ public function searchAllTransaction(Request $request)
 
     $status = Transaction::STATUS;
 
-    $transactions = $transaction->get();
-    $search = [
-     'project' => $request->project,
-     'block' => $request->block,
-     'floor' => $request->floor,
-     'land' => $request->land,
-     'status' => $request->status,
- ];
+    if (isEmployee()) {
+        $list  = $transaction->join('registers', 'registers.id', 'transactions.register_id')
+        ->join('assign_task', 'assign_task.customer_id', 'registers.customer_id')
+        ->where('assign_task.employee_id', $objUser->id)
+        ->get();
+    } else {
+        $list = $transaction->get();
+    }
 
- return view('admin.transaction.index', ['list' => $transactions, 'status' => $status, 'search' => $search, 'floors' => $floors, 'lands' => $lands, 'blocks' => $blocks, 'projects' => $projects]);
+    $search = [
+        'project' => $request->project,
+        'block' => $request->block,
+        'floor' => $request->floor,
+        'land' => $request->land,
+        'status' => $request->status,
+        'cat_id' => $request->cat_id,
+    ];
+
+    return view('admin.transaction.index', ['list' => $list, 'status' => $status, 'search' => $search, 'floors' => $floors, 'lands' => $lands, 'blocks' => $blocks, 'cats' => $cats, 'projects' => $projects]);
 
 }
 
 // apply action
-    public function actionAllTransaction(Request $request)
-    {
-        $listObj = Transaction::whereIn('id', $request->selected)->get();
-        if (!empty($listObj)) {
-            switch ($request->option) {
-                case 1:
-                foreach ($listObj as $item) {
-                    $item->delete();
-                }
-                break;
-                case 2:
-                foreach ($listObj as $item) {
-                    $item->update(['status' => Transaction::STATUS['registered']]);
-                }
-                break;
-                case 3:
-                foreach ($listObj as $item) {
-                    $item->update(['status' => Transaction::STATUS['deposit']]);
-                }
-                break;
-                case 4:
-                foreach ($listObj as $item) {
-                    $item->update(['status' => Transaction::STATUS['payment']]);
-                }
-                break;
+public function actionAllTransaction(Request $request)
+{
+    $objUser = getUserLogin();
+    $listObj = Transaction::whereIn('id', $request->selected)->get();
+    if (!empty($listObj)) {
+        switch ($request->option) {
+            case 1:
+            if (isEmployee()) {
+                $transaction->join('registers', 'registers.id', 'transactions.register_id')
+                ->join('assign_task', 'assign_task.customer_id', 'registers.customer_id')
+                ->where('assign_task.employee_id', $objUser->employee->id)
+                ->where('transactions.status', Transaction::STATUS['processing'])
+                ->whereIn('id', $request->selected)->delete();
+            } else {
+                Transaction::whereIn('id', $request->selected)->where('transactions.status', Transaction::STATUS['processing'])->delete();
             }
-            return redirect()->route('admins.transaction.listAll')->with('success', 'Success');
-        } else {
-
+            
+            break;
+            case 2:
+            foreach ($listObj as $item) {
+                if ($item->apartment_id != 0 && $item->apartment_id != -1) {
+                    Apartment::find($item->apartment_id)->update(['status' => 0]);
+                    $product = Product::find($item->product_id);
+                    $apartmentIds =  Apartment::where('product_id', $product->id)
+                    ->pluck('id')->toArray();
+                    $isRemaing = false;
+                    foreach ($apartmentIds as $apartmentId) {
+                        $transaction = Transaction::where('product_id', $product->id)
+                        ->where('apartment_id', $apartmentId)
+                        ->where('status', '!=', Transaction::STATUS['processing'])->first();
+                        if ($transaction == null) {
+                            $isRemaing = true;
+                            break;
+                        }
+                    }
+                    if($isRemaing) {
+                        $product->update(['status' => 1]);
+                    } else {
+                        $product->update(['status' => 0]);
+                    }
+                } else {
+                    $product->update(['status' => 0]);
+                }
+                $item->update(['status' => Transaction::STATUS['registered']]);
+            }
+            break;
+            case 3:
+            foreach ($listObj as $item) {
+                if ($item->apartment_id != 0 && $item->apartment_id != -1) {
+                    Apartment::find($item->apartment_id)->update(['status' => 0]);
+                    $product = Product::find($item->product_id);
+                    $apartmentIds =  Apartment::where('product_id', $product->id)
+                    ->pluck('id')->toArray();
+                    $isRemaing = false;
+                    foreach ($apartmentIds as $apartmentId) {
+                        $transaction = Transaction::where('product_id', $product->id)
+                        ->where('apartment_id', $apartmentId)
+                        ->where('status', '!=', Transaction::STATUS['processing'])->first();
+                        if ($transaction == null) {
+                            $isRemaing = true;
+                            break;
+                        }
+                    }
+                    if($isRemaing) {
+                        $product->update(['status' => 1]);
+                    } else {
+                        $product->update(['status' => 0]);
+                    }
+                } else {
+                    $product->update(['status' => 0]);
+                }
+                $item->update(['status' => Transaction::STATUS['deposit']]);
+            }
+            break;
+            case 4:
+            foreach ($listObj as $item) {
+                if ($item->apartment_id != 0 && $item->apartment_id != -1) {
+                    Apartment::find($item->apartment_id)->update(['status' => 0]);
+                    $product = Product::find($item->product_id);
+                    $apartmentIds =  Apartment::where('product_id', $product->id)
+                    ->pluck('id')->toArray();
+                    $isRemaing = false;
+                    foreach ($apartmentIds as $apartmentId) {
+                        $transaction = Transaction::where('product_id', $product->id)
+                        ->where('apartment_id', $apartmentId)
+                        ->where('status', '!=', Transaction::STATUS['processing'])->first();
+                        if ($transaction == null) {
+                            $isRemaing = true;
+                            break;
+                        }
+                    }
+                    if($isRemaing) {
+                        $product->update(['status' => 1]);
+                    } else {
+                        $product->update(['status' => 0]);
+                    }
+                } else {
+                    $product->update(['status' => 0]);
+                }
+                $item->update(['status' => Transaction::STATUS['payment']]);
+            }
+            break;
         }
+        return redirect()->route('admins.transaction.listAll')->with('success', 'Success');
+    } else {
 
     }
+
+}
 
     // transaction
-    public function createAllTransaction()
-    {
-        $projects = Project::pluck('name', 'id')->toArray();
-        return view('admin.transaction.add', ['projects' => $projects]);
+public function createAllTransaction()
+{
+    $projects = Project::pluck('name', 'id')->toArray();
+    return view('admin.transaction.add', ['projects' => $projects]);
+}
+
+    // transaction
+public function storeAllTransaction(Request $request)
+{
+
+    if ($request->project == -1 || $request->block == -1 || $request->land == -1 || $request->floor == -1 || $request->position = -1) {
+        return redirect()->back()->withInput()->with('error', 'Please Choose');
     }
 
-     // transaction
-    public function storeAllTransaction(Request $request)
-    {
-        if ($request->project == -1 || $request->block == -1 || $request->land == -1 || $request->floor == -1) {
-            return redirect()->back()->withInput()->with('error', 'Please Choose');
-        }
+    $rules = $this->validate($request,
+        [
+            'name' => 'required|min:3|max:50',
+            'email' => 'required|email',
+            'phone' => 'required|numeric'
+        ],
+        [
+            'name.required' => 'Name is required',
+            'name.min' => 'Name is not less than 3 character',
+            'name.max' => 'Name is not greater than 50 character',
+            'email.required' => 'Email is required',
+            'email.email' => 'Email is not valid',
+            'phone.required' => 'Phone is required',
+            'phone.numeric' => 'Phone must be number',
+        ]
+    );
 
-        $rules = $this->validate($request,
-            [
-                'name' => 'required|min:3|max:50',
-                'email' => 'required|email',
-                'phone' => 'required|numeric'
-            ],
-            [
-                'name.required' => 'Name is required',
-                'name.min' => 'Name is not less than 3 character',
-                'name.max' => 'Name is not greater than 50 character',
-                'email.required' => 'Email is required',
-                'email.email' => 'Email is not valid',
-                'phone.required' => 'Phone is required',
-                'phone.numeric' => 'Phone must be number',
-            ]
-        );
+    $productId = Product::where('block', $request->block)
+    ->where('land', $request->land)
+    ->where('project_id', $request->project)->first()->id;
 
-        $productId = Product::where('block', $request->block)
-        ->where('land', $request->land)
-        ->where('project_id', $request->project)->first()->id;
+    if ($request->floor != -1 && $request->position != -1 && $request->floor != 0 && $request->position != '0') {
+        $apartmentId = Apartment::where('product_id', $productId)
+        ->where('floor', $request->floor)
+        ->where('position', 'like', "$request->position")
+        ->first()->id;
+    }
 
         //processing nhuwng neu cung la customer ddo thi k lay nuwa
-        $transaction = Transaction::where('product_id', $productId)
-        ->where('status', '!=', Transaction::STATUS['processing'])->first();
-        if(!$transaction) {
-            $customerData = [
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'created_at' => Carbon::now()
-            ];
+    $transaction = Transaction::where('product_id', $productId)
+    ->where('status', '!=', Transaction::STATUS['processing']);
+    if (!empty($apartmentId)) {
+        $transaction = $transaction->where('apartment_id', $apartmentId);
+    }
+    $transaction = $transaction->first();
 
-            $customer = Customer::create($customerData);
-            $register = Register::create([
-                'customer_id' => $customer->id,
-                'project_id' => $request->project,
-                'created_at' => Carbon::now()
-            ]);
-            $data = [
-                'floor' => $request->floor,
-                'status' => Transaction::STATUS['processing'],
-                'created_at' => Carbon::now(),
-                'register_id' => $register->id,
-                'product_id' => $productId,
-                'description' => $request->description ?? '',
-                'rating' => 0
-            ];
-            if (Transaction::create($data)) {
-                return redirect()->route('admins.transaction.listAll')->with('success', 'Success');
-            } else {
-                return redirect()->back()->withInput()->with('error', 'Fail');
-            }
+    if(!$transaction) {
+        $customerData = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'created_at' => Carbon::now()
+        ];
+
+        $customer = Customer::create($customerData);
+        $register = Register::create([
+            'customer_id' => $customer->id,
+            'project_id' => $request->project,
+            'created_at' => Carbon::now()
+        ]);
+        $data = [
+            'floor' => $request->floor,
+            'apartment_id' => $apartmentId ?? 0,
+            'status' => Transaction::STATUS['processing'],
+            'created_at' => Carbon::now(),
+            'register_id' => $register->id,
+            'product_id' => $productId,
+            'description' => $request->description ?? '',
+            'rating' => 0
+        ];
+        if (Transaction::create($data)) {
+            return redirect()->route('admins.transaction.listAll')->with('success', 'Success');
         } else {
-            return redirect()->back()->withInput()->with('error', 'Transaction is exist');
+            return redirect()->back()->withInput()->with('error', 'Fail');
         }
+    } else {
+        return redirect()->back()->withInput()->with('error', 'Transaction is exist');
+    }
+}
+
+// edit purchase transaction
+public function editAllTransaction($transactionId)
+{
+    $transaction = Transaction::find($transactionId);
+    if ($transaction->status != Transaction::STATUS['processing']) {
+        return back()->with('success', 'Transaction is not edit');
+    }
+    $transaction = Transaction::find($transactionId);
+    $projectId = $transaction->product->project->id;
+    $products = Product::where('project_id', $projectId);
+    $blocks = array_unique($products->pluck('block')->toArray());
+    $lands = $products->where('block', $transaction->product->block)->pluck('land')->toArray();
+    $floors = $transaction->product->floor ?? 0;
+    $apartment = 0;
+    if (isset($transaction->apartment)) {
+        $apartment = Apartment::where('product_id', $transaction->apartment->product_id)
+        ->where('floor', $transaction->apartment->floor)->pluck('position')->toArray();
+    }
+    return view('admin.transaction.edit', ['products' => $products, 'transaction' => $transaction, 'blocks' => $blocks, 'floors' => $floors, 'lands' => $lands, 'apartment' => $apartment]);
+}
+
+// detail purchase transaction
+public function updateAllTransaction(Request $request)
+{
+    if ($request->block == -1 || $request->land == -1 || $request->floor == -1) {
+        return redirect()->back()->withInput()->with('error', 'Please Choose');
+    }
+    $productId = Product::where('block', $request->block)
+    ->where('land', $request->land)
+    ->where('project_id', $request->projectId)->first()->id;
+
+    if ($request->floor != -1 && $request->position != -1 && $request->floor != 0 && $request->position != '0') {
+        $apartmentId = Apartment::where('product_id', $productId)
+        ->where('floor', $request->floor)
+        ->where('position', 'like', "$request->position")
+        ->first()->id;
     }
 
+        //processing nhuwng neu cung la customer ddo thi k lay nuwa
+    $transaction1 = Transaction::where('id', '!=', $request->transactionId)
+    ->where('product_id', $productId)
+    ->where('status', '!=', Transaction::STATUS['processing']);
+    if (!empty($apartmentId)) {
+        $transaction1 = $transaction1->where('apartment_id', $apartmentId);
+    }
+    $transaction1 = $transaction1->first();
+
+    $transaction2 = Transaction::where('id', '!=', $request->transactionId)
+    ->where('product_id', $productId)
+    ->where('status', Transaction::STATUS['processing'])
+    ->where('register_id', $request->registerId);
+    if (!empty($apartmentId)) {
+        $transaction2 = $transaction2->where('apartment_id', $apartmentId);
+    }
+    $transaction2 = $transaction2->first();
+
+    if($transaction1 || $transaction2) {
+        return redirect()->back()->withInput()->with('error', 'Transaction is exist');
+    } else {
+        $transaction = Transaction::find($request->transactionId);
+
+        $data = [
+            'product_id' => $productId,
+            'floor' => $request->floor,
+            'apartment_id' => $apartmentId ?? 0,
+            'description' => $request->description ?? '',
+            'created_at' => Carbon::now(),
+            'rating' => 0
+        ];
+
+        if ($transaction->update($data)) {
+            return redirect()->route('admins.transaction.listAll')->with('success', 'Update Success');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Fail');
+        }
+    }
+}
+    // ==========consult management=============
+    // consult
+public function listReport()
+{
+    $projects = Project::pluck('name', 'id')->toArray();
+    $report = [];
+    foreach ($projects as $id => $name) {
+        $report[$id] = Transaction::select([
+            \DB::raw('count(transactions.id) as total'),
+            \DB::raw('count(case when transactions.status = 0 then 1 else NULL end) as sum_processing'),
+            \DB::raw('count(case when transactions.status = 1 then 1 else NULL end) as sum_registered'),
+            \DB::raw('count(case when transactions.status = 2 then 1 else NULL end) as sum_deposit'),
+            \DB::raw('count(case when transactions.status = 3 then 1 else NULL end) as sum_payment'),
+        ])->join('registers', 'registers.id', 'transactions.register_id')
+        ->where('registers.project_id', $id)->first();
+    }
+
+    return view('admin.report.index', ['projects' => $projects, 'report' => $report]);
+}
+
+    // consult
+public function searchReport(Request $request)
+{
+    $data = $request->all();
+    $projects = Project::pluck('name', 'id')->toArray();
+    $report = [];
+    foreach ($projects as $id => $name) {
+        $query = Transaction::select([
+            \DB::raw('count(transactions.id) as total'),
+            \DB::raw('count(case when transactions.status = 0 then 1 else NULL end) as sum_processing'),
+            \DB::raw('count(case when transactions.status = 1 then 1 else NULL end) as sum_registered'),
+            \DB::raw('count(case when transactions.status = 2 then 1 else NULL end) as sum_deposit'),
+            \DB::raw('count(case when transactions.status = 3 then 1 else NULL end) as sum_payment'),
+        ])->join('registers', 'registers.id', 'transactions.register_id')
+        ->where('registers.project_id', $id);
+        if ($data['date_from'] != '') {
+            $query = $query->where('transactions.created_at', '>=', $data['date_from']);
+        }
+        if ($data['date_to'] != '') {
+            $query = $query->where('transactions.created_at', '<=', $data['date_to']);
+        }
+        $report[$id] = $query->first();
+    }
+
+    return view('admin.report.index', ['projects' => $projects, 'report' => $report]);
+}
 }

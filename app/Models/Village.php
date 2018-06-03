@@ -8,7 +8,7 @@ class Village extends Model
 {
     protected $table = 'village';
 
-	protected $fillable = [
+    protected $fillable = [
         'name', 'district_id'
     ];
 
@@ -23,10 +23,18 @@ class Village extends Model
     }
 
     /**
+     * Get street relationship
+     */
+    public function streets()
+    {
+        return $this->hasMany('App\Models\Street', 'district_id', 'id');
+    }
+
+    /**
      * Get products relationship
      */
     public function products()
     {
         return $this->hasMany('App\Models\Product', 'village_id', 'id');
     }
-}
+} 

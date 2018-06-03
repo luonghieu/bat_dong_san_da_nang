@@ -3,7 +3,7 @@
 @include('admin.employee.sale.css')
 @endsection
 @section('title')
-Employee
+<a href="{!! route('admins.sale.list') !!}">Sales</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +11,7 @@ Employee
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Employee {!! $obj->name !!}</strong></h1>
+		<h1 class="custom-font"><strong>Edit sale {!! $obj->name !!}</strong></h1>
 		<ul class="controls">
 			<li>
 				<a role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Edit</a>
@@ -115,7 +115,7 @@ Employee
 				<label class="col-sm-2 control-label">Image</label>
 				<div class="col-sm-10">
 					<div class="img-container mb-10">
-						<img src="{!! asset((empty($obj->image)) ? '/images/default.jpg' : $obj->user->image ) !!}" class="img-responsive" alt="Picture"">
+						<img src="{!! asset((empty($obj->user->image)) ? '/images/default.jpg' : $obj->user->image ) !!}" class="img-responsive" alt="Picture"">
 					</div>
 					<input type="file" name="image" class="filestyle" data-buttonText="Find file" data-iconName="fa fa-inbox">
 					@if ($errors->has('image'))

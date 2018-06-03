@@ -21,17 +21,23 @@ class CommonController extends Controller
     }
 
     // getItemByDistrict
-    public function getItemByDistrict(Request $request)
+    public function getVillageByDistrict(Request $request)
     {
         $districtId = $request->districtId;
 
-        $listVillages = Village::all()->where('district_id',$districtId);
-        $listStreets = Street::all()->where('district_id',$districtId);
+        $listVillages = Village::where('district_id',$districtId)->pluck('name', 'id')->toArray();
 
-        echo json_encode([
-            'villages' => $listVillages,
-            'streets' => $listStreets
-        ]);
+        echo json_encode($listVillages);
+    }
+
+ // getItemByDistrict
+    public function getStreetByVillage(Request $request)
+    {
+        $villageId = $request->villageId;
+
+        $listStreets = Street::where('village_id',$villageId)->pluck('name', 'id')->toArray();
+
+        echo json_encode($listStreets);
     }
 
     // gioithieu

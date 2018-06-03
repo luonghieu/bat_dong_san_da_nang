@@ -12,7 +12,7 @@
                     <hr>
                     <input  type="hidden" name="id" id="id" />
                     <div class="form-group">
-                        <input  type="text" name="name" placeholder="Họ tên" id="name"/>
+                        <input  type="text" name="name" placeholder="Họ tên" id="fullname"/>
                         <br/><br/>
                         <div id="name_warning_msg" style="margin-top: 10px;">
                         </div>
@@ -53,7 +53,7 @@
         }
     }
 
-    $("#name").blur(function() {
+    $("#fullname").blur(function() {
       name=$(this).val();
       if(name==''){
         $('#name_warning_msg').html('<span style="color:red"><strong>Họ tên</strong> không được để trống !</span>');

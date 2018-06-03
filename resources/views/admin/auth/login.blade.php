@@ -5,7 +5,7 @@
 
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Minovate - Admin Dashboard</title>
+        <title>Bất động sản Đà Nẵng</title>
         <link rel="icon" type="image/ico" href="assets/images/favicon.ico" />
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -27,8 +27,6 @@
         <div id="wrap" class="animsition">
 
             <div class="page page-core page-login">
-
-                <div class="text-center"><h3 class="text-light text-white"><span class="text-lightred">M</span>INOVATE</h3></div>
 
                 <div class="container w-420 p-15 bg-white mt-40 text-center">
 

@@ -14,9 +14,9 @@ class NotificationScheduleController extends Controller
 
     public function listNotification()
     {
-        $objLogin = session()->get('objUser');
+        $objLogin = getUserLogin();
 
-        if ($objLogin->role == User::ROLE['admin']) {
+        if (isAdmin()) {
             $list  = NotificationSchedule::orderBy('status', 'ASC')->orderBy('id', 'DESC')->get();
         } else {
             $customerId = AssignTask::where('employee_id', $objLogin->employee->id)->pluck('id')->toArray();
@@ -29,9 +29,9 @@ class NotificationScheduleController extends Controller
     public function createNotification($type)
     {
         if ($type == NotificationSchedule::TYPE['customer']) {
-           $objLogin = session()->get('objUser');
+         $objLogin = session()->get('objUser');
 
-           if ($objLogin->role == User::ROLE['admin']) {
+         if (isAdmin()) {
             $listCustomer  = Customer::paginate(5);
         } else {
             $listCustomer = Customer::select('customers.*')
@@ -135,11 +135,9 @@ public function validateDateTime($request)
 
         $send_date = $year . "-" . $month . "-" . $date;
         $send_time = $hour . ":" . $minute;
-
         if (Carbon::now()->gt(Carbon::parse($send_date . ' ' . $send_time))) {
             return false;
         }
-       
         $time = [
             'send_year' => $year,
             'send_month' => $month,
@@ -160,8 +158,8 @@ public function validateDateTime($request)
         "title" => $request->title,
         "content" => $request->content,
         "time" => $time,
-        "recurring" => $recurring,
-        "reciever_id" => ($request->type == 1) ? $objUser->id : (($request->type == 2) ? $request->selected : ''),
+        "recurring" => $recurring, 
+        "reciever_id" => ($request->type == 1) ? $objUser->id : (($request->type == 2) ? $request->customer : ''),
 
     ];
     return $data;
@@ -224,11 +222,9 @@ public function saveNotificationSchedules($notificationSchedule, $request)
         $notificationSchedule->save();
     } else {
         if ($data['type'] == 2) {
-            foreach ($data['reciever_id'] as $id) {
-                $notificationSchedule->reciever_id = $id;
-                $notificationSchedule->created_at = Carbon::now();
-                $notificationSchedule->save();
-            }
+            $notificationSchedule->reciever_id = $data['reciever_id'];
+            $notificationSchedule->created_at = Carbon::now();
+            $notificationSchedule->save();
         } else {
             $notificationSchedule->created_at = Carbon::now();
             $notificationSchedule->save();

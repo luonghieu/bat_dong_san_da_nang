@@ -35,13 +35,17 @@
         },
         dataType : 'json',
         success : function(result){
-          oTable.row(nRow).remove().draw();
-          alert("Deleted!");
+          if(result == 'ok') {
+            oTable.row(nRow).remove().draw();
+            alert("Deleted!");
+          } else {
+            alert('Project is in transaction');
+          }
         }
       });
     });
 
-});
+  });
 
 </script>
 <!--/ Page Specific Scripts -->

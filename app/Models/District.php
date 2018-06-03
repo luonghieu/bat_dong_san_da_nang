@@ -25,14 +25,6 @@ class District extends Model
     /**
      * Get street relationship
      */
-    public function streets()
-    {
-        return $this->hasMany('App\Models\Street', 'district_id', 'id');
-    }
-
-    /**
-     * Get street relationship
-     */
     public function products()
     {
         return $this->hasMany('App\Models\Product', 'district_id', 'id');

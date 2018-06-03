@@ -3,7 +3,7 @@
 @include('admin.employee.leader.css')
 @endsection
 @section('title')
-Employee
+<a href="{!! route('admins.leader.list') !!}">Managers</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +11,7 @@ Employee
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Sale</strong></h1>
+		<h1 class="custom-font"><strong>Managers</strong></h1>
 		<ul class="controls">
 			<li>
 				<a href="{!! route('admins.leader.create') !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
@@ -54,7 +54,7 @@ Employee
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>Action success!</strong></p>
+					<p><strong>{{ session('success') }}</strong></p>
 				</div>
 				@endif
 				<table class="table table-custom" id="editable-usage">

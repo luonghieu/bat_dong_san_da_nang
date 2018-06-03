@@ -3,7 +3,7 @@
 @include('admin.news.css')
 @endsection
 @section('title')
-News
+<a href="{!! route('admins.news.list') !!}">News</a>
 @endsection
 @section('content')
 <!-- tile -->

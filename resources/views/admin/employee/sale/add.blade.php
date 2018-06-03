@@ -3,7 +3,7 @@
 @include('admin.employee.sale.css')
 @endsection
 @section('title')
-Employee
+<a href="{!! route('admins.sale.list') !!}">Sales</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +11,7 @@ Employee
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Employee</strong></h1>
+		<h1 class="custom-font"><strong>Add sale</strong></h1>
 		<ul class="controls">
 			<li>
 				<a role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>

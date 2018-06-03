@@ -34,11 +34,6 @@
                     <div class="bt-suces mb20 clearfix">
                         <input type="submit" id="btnLogin" class="white bold uppercase font13 nobor pt5 pb5 pl10 pr10 radius font-roboto font15 underline-none normal" value="Đăng nhập" />
                     </div>
-                    <div class="mb20 clearfix">
-                        <label class="clearfix">
-                            Bạn chưa có tài khoản? Đăng ký <a class="blue2" href="/dang-ky.htm" title="Đăng ký"> tại đây</a>
-                        </label>
-                    </div>
 
                 </div>
             </form>

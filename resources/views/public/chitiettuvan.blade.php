@@ -1,9 +1,9 @@
 
 @extends('public.inc.index')
 @section('content')
-@if (session('objUser'))
+@if (session('objCustomer'))
 @php      
-$objUser = Session::get("objUser");
+$objCustomer = Session::get("objCustomer");
 @endphp
 @endif
 <div class="content_wrapper">
@@ -22,14 +22,19 @@ $objUser = Session::get("objUser");
 
                     <div class="w-700 fr">
                         <div class="box-cont">
-
+                            @if (session('success'))
+                            <div class="alert alert-success">
+                                <p>{{ session('success') }}</p>
+                            </div>
+                            @endif
                             <table id="example" class="table table-striped table-bordered" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th>STT</th>
+                                        <th>Họ tên</th>
                                         <th>Email</th>
                                         <th>Số điện thoại</th>
-                                        <th>Created_at</th>
+                                        <th>Ngày đăng ký</th>
                                         <th>Xóa</th>
                                     </tr>
                                 </thead>
@@ -37,10 +42,14 @@ $objUser = Session::get("objUser");
                                     @foreach($list as $item)
                                     <tr>
                                         <td>{!! $item->id !!}</td>
+                                        <td>{!! $item->name !!}</td>
                                         <td>{!! $item->email !!}</td>
                                         <td>{!! $item->phone !!}</td>
                                         <td>{!! $item->created_at !!}</td>
-                                        <td>{!! $item->created_at !!}</td>
+                                        <td>
+                                            <a class='mr5 font13' href="{{ route('public.trangcanhan.xoatuvan', ['id' => $item->id]) }}"><s class="ic-edit mr5 fl"></s>Xóa</a>
+                                            <span class="imgPost"></span>
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>

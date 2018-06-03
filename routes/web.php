@@ -1,7 +1,16 @@
 <?php
+Route::pattern('id', '([0-9]*)');
+Route::pattern('name', '(.*)');
+Route::pattern('catId', '([0-9]*)');
 // auth - managements
 // Route::group(['middleware' => 'auth', 'prefix' => 'managements'], function () {
-Route::group(['prefix' => 'managements'], function () {
+// Route::group(['middleware' =>'access'],function(){
+Route::group(['middleware' =>'access'], function () {
+    Route::get('', 'AdminController@profile')->name('admins.profile');
+});
+Route::group(['prefix' => 'managements', 'middleware' =>'access'], function () {
+
+    Route::get('', 'AdminController@profile')->name('admins.profile');
     //profile
     Route::get('profile', 'AdminController@profile')->name('admins.profile');
     Route::post('profile', 'AdminController@updateProfile')->name('admins.profile.update');
@@ -60,14 +69,12 @@ Route::group(['prefix' => 'managements'], function () {
         Route::post('transaction/create', 'AdminController@storeTransaction')->name('admins.customer.storeTransaction');
         Route::get('transaction/edit/{transactionId}', 'AdminController@editTransaction')->name('admins.customer.editTransaction');
         Route::post('transaction/update', 'AdminController@updateTransaction')->name('admins.customer.updateTransaction');
-        Route::get('transaction/getDataByBlock', 'AdminController@getDataByBlock')->name('admins.customer.getDataByBlock');
-        Route::get('transaction/getFloorByLand', 'AdminController@getFloorByLand')->name('admins.customer.getFloorByLand');
         Route::post('actionTransaction', 'AdminController@actionTransaction')->name('admins.customer.actionTransaction');
         Route::get('statusTransaction', 'AdminController@statusTransaction')->name('admins.customer.statusTransaction');
         Route::get('ratingTransaction', 'AdminController@ratingTransaction')->name('admins.customer.ratingTransaction');
         Route::get('deleteTransaction', 'AdminController@deleteTransaction')->name('admins.customer.deleteTransaction');
+        Route::get('deleteConfirmTransaction', 'AdminController@deleteConfirmTransaction')->name('admins.customer.deleteConfirmTransaction');
 
-        
 
     });
 
@@ -124,7 +131,7 @@ Route::group(['prefix' => 'managements'], function () {
     Route::group(['prefix' => 'contact'], function () {
         Route::get('list', 'AdminController@listContact')->name('admins.contact.list');
         Route::get('delete', 'AdminController@deleteContact')->name('admins.contact.delete');
-        Route::post('active', 'AdminController@activeContact')->name('admins.contact.active');
+        Route::get('active', 'AdminController@activeContact')->name('admins.contact.active');
         Route::post('action', 'AdminController@actionContact')->name('admins.contact.action');
     });
 
@@ -164,6 +171,8 @@ Route::group(['prefix' => 'managements'], function () {
         Route::post('action', 'AdminController@actionProject')->name('admins.project.action');
         Route::get('active', 'AdminController@activeProject')->name('admins.project.active');
         Route::get('status/{id}', 'AdminController@statusProject')->name('admins.project.status');
+
+        Route::get('searchProject', 'AdminController@searchProject')->name('admins.project.searchProject');
         
         Route::get('search', 'AdminController@searchTransaction')->name('admins.project.searchTransaction');
         Route::get('statusProject', 'AdminController@changeStatusProject')->name('admins.project.statusProject');
@@ -171,6 +180,10 @@ Route::group(['prefix' => 'managements'], function () {
         Route::get('getBlockByProject', 'AdminController@getBlockByProject')->name('admins.project.getBlockByProject');
         Route::get('getLandByBlock', 'AdminController@getLandByBlock')->name('admins.project.getLandByBlock');
         Route::get('getFloorByLand', 'AdminController@getFloorByLand')->name('admins.project.getFloorByLand');
+        Route::get('getApartmentByFloor', 'AdminController@getApartmentByFloor')->name('admins.project.getApartmentByFloor');
+
+        Route::get('getVillageByDistrict', 'AdminController@getVillageByDistrict')->name('admins.project.getVillageByDistrict');
+        Route::get('getStreetByVillage', 'AdminController@getStreetByVillage')->name('admins.project.getStreetByVillage');
     });
 
      // product
@@ -182,7 +195,26 @@ Route::group(['prefix' => 'managements'], function () {
         Route::get('{id}/edit', 'AdminController@editProduct')->name('admins.product.edit');
         Route::post('update', 'AdminController@updateProduct')->name('admins.product.update');
         Route::get('delete', 'AdminController@deleteProduct')->name('admins.product.delete');
-        Route::get('action', 'AdminController@actionProduct')->name('admins.product.action');
+        Route::post('action', 'AdminController@actionProduct')->name('admins.product.action');
+
+        Route::get('search', 'AdminController@searchProduct')->name('admins.product.searchProduct');
+        Route::get('status/{id}', 'AdminController@statusProduct')->name('admins.product.status');
+        Route::get('searchTransactionProduct', 'AdminController@searchTransactionProduct')->name('admins.product.searchTransaction');
+    });
+
+     // product
+    Route::group(['prefix' => 'apartment'], function () {
+        Route::get('list/{productId}', 'AdminController@listApartment')->name('admins.apartment.list');
+        Route::get('create/{productId}', 'AdminController@createApartment')->name('admins.apartment.create');
+        Route::post('create/{productId}', 'AdminController@storeApartment')->name('admins.apartment.store');
+        Route::get('{id}/edit', 'AdminController@editApartment')->name('admins.apartment.edit');
+        Route::post('update', 'AdminController@updateApartment')->name('admins.apartment.update');
+        Route::get('delete', 'AdminController@deleteApartment')->name('admins.apartment.delete');
+        Route::post('action', 'AdminController@actionApartment')->name('admins.apartment.action');
+
+        Route::get('search', 'AdminController@searchApartment')->name('admins.apartment.searchApartment');
+        Route::get('status/{id}', 'AdminController@statusApartment')->name('admins.apartment.status');
+        Route::get('searchTransactionApartment', 'AdminController@searchTransactionApartment')->name('admins.apartment.searchTransaction');
     });
 
      // slider
@@ -240,8 +272,17 @@ Route::group(['prefix' => 'managements'], function () {
         Route::get('list', 'AdminController@listAllTransaction')->name('admins.transaction.listAll');
         Route::get('create', 'AdminController@createAllTransaction')->name('admins.transaction.createAllTransaction');
         Route::post('create', 'AdminController@storeAllTransaction')->name('admins.transaction.storeAllTransaction');
+        Route::get('{id}/edit', 'AdminController@editAllTransaction')->name('admins.transaction.editAllTransaction');
+        Route::post('update', 'AdminController@updateAllTransaction')->name('admins.transaction.updateAllTransaction');
         Route::get('search', 'AdminController@searchAllTransaction')->name('admins.transaction.searchAllTransaction');
         Route::post('action', 'AdminController@actionAllTransaction')->name('admins.transaction.actionAllTransaction');
+    });
+
+        // notification
+    Route::group(['prefix' => 'report'], function () {
+            // post-Admin
+        Route::get('list', 'AdminController@listReport')->name('admins.report.list');
+        Route::post('list', 'AdminController@searchReport')->name('admins.report.search');
     });
 
 });
@@ -249,7 +290,8 @@ Route::group(['prefix' => 'managements'], function () {
 Route::group(['prefix' => 'common'], function () {
     // Skill - Admin
     Route::get('listDistrict', 'CommonController@listDistricts')->name('common.district.list');
-    Route::get('getItemByDistrict', 'CommonController@getItemByDistrict')->name('common.getItemByDistrict');
+    Route::get('getVillageByDistrict', 'CommonController@getVillageByDistrict')->name('common.getVillageByDistrict');
+    Route::get('getStreetByVillage', 'CommonController@getStreetByVillage')->name('common.getStreetByVillage');
 
     Route::get('getLoaiNhaDat', 'CommonController@getLoaiNhaDat')->name('common.getLoaiNhaDat');
     Route::get('getCustomerByUserLogin', 'CommonController@getCustomerByUserLogin')->name('common.getCustomerByUserLogin');
@@ -259,16 +301,14 @@ Route::group(['prefix' => 'common'], function () {
 });
 
     // Login
-    Route::group(['namespace' =>'Auth'],function(){
-    
+Route::group(['namespace' =>'Auth'],function(){
     Route::get('login', 'AuthController@login')->name('auth.login');
     Route::post('login', 'AuthController@postLogin')->name('auth.login');
     Route::get('logout', 'AuthController@logout')->name('auth.logout');
-
-        
+    Route::get('profile', 'AuthController@profile')->name('auth.profile');
 });
 
-
+// }); 
 // =====================public=========================
 Route::group(['prefix' => 'batdongsan'], function () {
     // index
@@ -277,21 +317,36 @@ Route::group(['prefix' => 'batdongsan'], function () {
     Route::get('gioithieu', 'PublicController@gioithieu')->name('public.gioithieu');
 
     Route::get('duan', 'PublicController@duan')->name('public.duan');
-    Route::get('chitietduan/{id}', 'PublicController@chitietduan')->name('public.chitietduan');
+    // Route::get('chitietduan/{id}', 'PublicController@chitietduan')->name('public.chitietduan');
+    Route::get('duan/{name}-{id}.html', 'PublicController@chitietduan')->name('public.chitietduan');
+    Route::get('sanphamduan/{id}', 'PublicController@sanphamduan')->name('public.duan.sanpham');
+    Route::get('timkiemsanphamduan', 'PublicController@timkiemsanphamduan')->name('public.duan.timkiemsanphamduan');
+    Route::get('tinhtrang/{id}', 'PublicController@tinhtrangduan')->name('public.duan.tinhtrang');
+    Route::get('getBlockByProject', 'PublicController@getBlockByProject')->name('public.duan.getBlockByProject');
+    Route::get('getLandByBlock', 'PublicController@getLandByBlock')->name('public.duan.getLandByBlock');
+    Route::get('getFloorByLand', 'PublicController@getFloorByLand')->name('public.duan.getFloorByLand');
+    Route::get('timgiaodich', 'PublicController@timgiaodich')->name('public.duan.timgiaodich');
+    Route::get('chitietsanpham/{id}', 'PublicController@chitietsanpham')->name('public.duan.chitietsanpham');
 
-    Route::get('sangiaodich/type/{type}', 'PublicController@sangiaodich')->name('public.sangiaodich');
-    Route::get('sangiaodich/type/{type}/{id}', 'PublicController@sangiaodichtheloai')->name('public.sangiaodich.theloai');
-    Route::get('chitietsanbatdongsan/{id}', 'PublicController@chitietsanbatdongsan')->name('public.chitietsanbatdongsan');
+    Route::get('sangiaodich/{type}', 'PublicController@sangiaodich')->name('public.sangiaodich');
+    Route::get('sangiaodich/theloai/{id}', 'PublicController@sangiaodichtheloai')->name('public.sangiaodich.theloai');
+    // Route::get('chitietsanbatdongsan/{id}', 'PublicController@chitietsanbatdongsan')->name('public.chitietsanbatdongsan');
+    Route::get('sanbatdongsan/{name}-{id}.html', 'PublicController@chitietsanbatdongsan')->name('public.chitietsanbatdongsan');
 
     Route::get('lienhe', 'PublicController@lienhe')->name('public.lienhe');
     Route::post('lienhe', 'PublicController@taolienhe')->name('public.taolienhe');
 
     Route::get('tintuc', 'PublicController@listtintuc')->name('public.tintuc.list');
     Route::get('tintuc/{catId}', 'PublicController@tintuc')->name('public.tintuc');
-    Route::get('chitiettintuc/{id}', 'PublicController@chitiettintuc')->name('public.chitiettintuc');
+    // Route::get('chitiettintuc/{id}', 'PublicController@chitiettintuc')->name('public.chitiettintuc');
+    Route::get('tintuc/{name}-{id}.html', 'PublicController@chitiettintuc')->name('public.chitiettintuc');
 
     Route::get('dangtin', 'PublicController@dangtin')->name('public.dangtin');
     Route::post('taotin', 'PublicController@taotin')->name('public.taotin');
+    Route::get('danglai/{id}', 'PublicController@danglai')->name('public.danglai');
+    Route::get('suatin/{id}', 'PublicController@suatin')->name('public.suatin');
+    Route::post('capnhattin', 'PublicController@capnhattin')->name('public.capnhattin');
+    Route::get('xoatin/{id}', 'PublicController@xoatin')->name('public.xoatin');
 
     Route::get('dangnhap', 'PublicController@dangnhap')->name('public.dangnhap');
     Route::post('dangnhap', 'PublicController@xulydangnhap')->name('public.dangnhap');
@@ -299,41 +354,29 @@ Route::group(['prefix' => 'batdongsan'], function () {
     Route::get('dangky', 'PublicController@dangky')->name('public.dangky');
     Route::post('dangky', 'PublicController@postdangky')->name('public.postdangky');
 
-    Route::get('trangcanhan', 'PublicController@trangcanhan')->name('public.trangcanhan');
-    Route::get('chitiettuvan/{idPost}', 'PublicController@chitiettuvan')->name('public.trangcanhan.chitiettuvan');
-    Route::get('thaydoithongtincanhan', 'PublicController@thaydoithongtincanhan')->name('public.trangcanhan.thaydoithongtincanhan');
-    Route::post('postthaydoithongtincanhan', 'PublicController@postthaydoithongtincanhan')->name('public.trangcanhan.postthaydoithongtincanhan');
-    Route::get('thaydoimatkhau', 'PublicController@thaydoimatkhau')->name('public.trangcanhan.thaydoimatkhau');
-    Route::post('postthaydoimatkhau', 'PublicController@postthaydoimatkhau')->name('public.trangcanhan.postthaydoimatkhau');
+    Route::group(['middleware' =>'login'], function () {
+        Route::get('trangcanhan', 'PublicController@trangcanhan')->name('public.trangcanhan');
+        Route::post('trangcanhan/timkiem', 'PublicController@timkiemtrangcanhan')->name('public.trangcanhan.timkiem');
+        Route::get('chitiettuvan/{idPost}', 'PublicController@chitiettuvan')->name('public.trangcanhan.chitiettuvan');
+        Route::get('xoatuvan/{id}', 'PublicController@xoatuvan')->name('public.trangcanhan.xoatuvan');
+        Route::get('thaydoithongtincanhan', 'PublicController@thaydoithongtincanhan')->name('public.trangcanhan.thaydoithongtincanhan');
+        Route::post('postthaydoithongtincanhan', 'PublicController@postthaydoithongtincanhan')->name('public.trangcanhan.postthaydoithongtincanhan');
+        Route::get('thaydoimatkhau', 'PublicController@thaydoimatkhau')->name('public.trangcanhan.thaydoimatkhau');
+        Route::post('postthaydoimatkhau', 'PublicController@postthaydoimatkhau')->name('public.trangcanhan.postthaydoimatkhau');
+    });
     Route::get('dangxuat', 'PublicController@dangxuat')->name('public.trangcanhan.dangxuat');
 
     Route::get('tuvan', 'PublicController@tuvan')->name('public.tuvan');
     Route::get('tuvanduan', 'PublicController@tuvanduan')->name('public.tuvanduan');
+    Route::get('tuvansanpham', 'PublicController@tuvansanpham')->name('public.tuvansanpham');
     Route::post('dangkyduan', 'PublicController@dangkyduan')->name('public.dangkyduan');
-    Route::get('timkiem', 'PublicController@timkiem')->name('public.timkiem');
-    Route::post('posttimkiem', 'PublicController@posttimkiem')->name('public.posttimkiem');
+    Route::get('timkiem/duan', 'PublicController@timkiemduan')->name('public.timkiem.duan');
+    Route::post('posttimkiemduan', 'PublicController@posttimkiemduan')->name('public.posttimkiemduan');
+    Route::get('timkiem/sangiaodich', 'PublicController@timkiemsangiaodich')->name('public.timkiem.sangiaodich');
+    Route::post('posttimkiemsangiaodich', 'PublicController@posttimkiemsangiaodich')->name('public.posttimkiemsangiaodich');
 
+});
 
-        //=======ajax==========
-
-// Route::group(['prefix' => 'notification_schedules', 'as' => 'notification_schedules.'], function () {
-
-//             Route::get('/', ['as' => 'index', 'uses' => 'NotificationScheduleController@index']);
-//             Route::get('/create', ['as' => 'create', 'uses' => 'NotificationScheduleController@create']);
-//             Route::post('/{notificationSchedule}/confirm', ['as' => 'confirm', 'uses' => 'NotificationScheduleController@confirmNotificationSchedule'])
-//                 ->where('notificationSchedule', '[0-9]+');
-//             Route::post('/confirm_create', ['as' => 'confirm_create', 'uses' => 'NotificationScheduleController@confirmCreateNotificationSchedule']);
-//             Route::post('/create_draft_notification_schedule', ['as' => 'create_draft', 'uses' => 'NotificationScheduleController@createDraftNotificationSchedules']);
-//             Route::post('/create_notification_schedule', ['as' => 'create_notification_schedule', 'uses' => 'NotificationScheduleController@createNotification']);
-//             Route::get('/{notificationSchedule}', ['as' => 'show', 'uses' => 'NotificationScheduleController@show'])
-//                 ->where('notificationSchedule', '[0-9]+');
-//             Route::post('/{id}/destroy', ['as' => 'destroy', 'uses' => 'NotificationScheduleController@destroy'])
-//                 ->where('id', '[0-9]+');
-//             Route::get('/{notificationSchedule}/edit', ['as' => 'edit', 'uses' => 'NotificationScheduleController@edit'])
-//                 ->where('notificationSchedule', '[0-9]+');
-//             Route::post('/{notificationSchedule}/draft', ['as' => 'draft', 'uses' => 'NotificationScheduleController@draftNotificationSchedules'])
-//                 ->where('notificationSchedule', '[0-9]+');
-//             Route::post('/{notificationSchedule}/update', ['as' => 'update', 'uses' => 'NotificationScheduleController@updateNotificationSchedules'])
-//                 ->where('notificationSchedule', '[0-9]+');
-//         });
+Route::get('error', function () {
+    return view('errors');
 });

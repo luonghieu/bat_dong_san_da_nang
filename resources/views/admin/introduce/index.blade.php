@@ -3,7 +3,7 @@
 @include('admin.introduce.css')
 @endsection
 @section('title')
-Introduce
+<a href="{!! route('admins.introduce.list') !!}">Introduce</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -54,7 +54,7 @@ Introduce
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>Add success!</strong></p>
+					<p><strong>{!! session('success') !!}</strong></p>
 				</div>
 				@endif
 				<table class="table table-custom" id="editable-usage">

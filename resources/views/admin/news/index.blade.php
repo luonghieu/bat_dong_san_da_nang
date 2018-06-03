@@ -3,7 +3,7 @@
 @include('admin.news.css')
 @endsection
 @section('title')
-News
+<a href="{!! route('admins.news.list') !!}">News</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -54,7 +54,7 @@ News
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>Add success!</strong></p>
+					<p><strong>{!! session('success') !!}</strong></p>
 				</div>
 				@endif
 				<table class="table table-custom" id="editable-usage">

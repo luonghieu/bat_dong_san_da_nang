@@ -5,7 +5,10 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Models\Category;
+use App\Models\Village;
+use App\Models\Street;
 use App\Models\District;
+use App\Models\UnitPrice;
 
 class PostCreateRequest extends FormRequest
 {
@@ -24,10 +27,13 @@ class PostCreateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules() 
     {
-        $list = Category::all(['id'])->pluck('id')->toArray();
-        $district = District::all(['id'])->pluck('id')->toArray();
+        $list = Category::pluck('id')->toArray();
+        $districts = District::all(['id'])->pluck('id')->toArray();
+        $villages = Village::all(['id'])->pluck('id')->toArray();
+        $streets = Street::all(['id'])->pluck('id')->toArray();
+        $unitPrice = UnitPrice::pluck('id')->toArray();
         return [
             'name' => 'required|max:255',
             'fullname' => 'required|max:255',
@@ -35,11 +41,16 @@ class PostCreateRequest extends FormRequest
             'email' => 'required',
             'description' => 'required|min:30',
             'cat_id' => ['required', Rule::in($list)], 
-            'district_id' => ['required', Rule::in($district)] ,
+            'district_id' => ['required', Rule::in($districts)],
+            'village_id' => ['required', Rule::in($villages)],
+            'street_id' => ['required', Rule::in($streets)],
+            'unit_price_id' => ['required', Rule::in($unitPrice)] ,
             'area' => 'required|numeric',
             'price' => 'required|numeric',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date',
+            'image' => 'nullable|image|max: 1000',
+            'start_time' => 'required|date|after:today',
+            'end_time' => 'required|date|after:start_time',
+            'project' => 'nullable|max:255',
         ];
     }
 
@@ -62,10 +73,21 @@ class PostCreateRequest extends FormRequest
             'cat_id.in'  => 'Category not exist.',
             'district_id.required' => 'District is required.',
             'district_id.in'  => 'District not exist.',
+            'village_id.required' => 'Village is required.',
+            'village_id.in'  => 'Village not exist.',
+            'street_id.required' => 'Street is required.',
+            'street_id.in'  => 'Street not exist.',
+            'unit_price_id.required' => 'UnitPrice is required.',
+            'unit_price_id.in'  => 'UnitPrice not exist.',
+            'image.image' => 'Image must in png, jpg, jpeg.',
+            'image.max' => 'Image not greater than 1000kb.',
             'start_time.required' => 'Start time is required.',
+            'start_time.after' => 'Start time is must after today.',
             'start_time.date'  => 'Start time must be date.',
             'end_time.required' => 'End time is required.',
             'end_time.date'  => 'End time must be date.',
+            'end_time.after'  => 'End time must be after start time.',
+            'project.max' => 'Project is less than 255 character.',
         ];
     }
 }

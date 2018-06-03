@@ -16,7 +16,7 @@ class Transaction extends Model
     protected $table = 'transactions';
 
 	protected $fillable = [
-        'register_id', 'product_id', 'description', 'floor', 'created_at', 'status', 'rating'
+        'register_id', 'product_id', 'description', 'created_at', 'status', 'rating', 'apartment_id'
     ];
 
     public $timestamps=false;
@@ -35,5 +35,13 @@ class Transaction extends Model
     public function product()
     {
         return $this->belongsTo('App\Models\Product', 'product_id', 'id');
+    }
+
+    /**
+     * Get product relationship
+     */
+    public function apartment()
+    {
+        return $this->belongsTo('App\Models\Apartment', 'apartment_id', 'id');
     }
 }

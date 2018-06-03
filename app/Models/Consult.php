@@ -13,7 +13,7 @@ class Consult extends Model
     ];
 
 	protected $fillable = [
-        'name', 'email', 'phone', 'type', 'product_id', 'created_at', 'message'
+        'name', 'email', 'phone', 'type', 'product_id', 'created_at', 'message', 'sub_product_id'
     ];
 
     public $timestamps=false;
@@ -32,6 +32,14 @@ class Consult extends Model
     public function project()
     {
         return $this->belongsTo('App\Models\Project', 'product_id', 'id');
+    }
+
+    /**
+     * Get productTransaction relationship
+     */
+    public function product()
+    {
+        return $this->belongsTo('App\Models\Product', 'sub_product_id', 'id');
     }
 
 }

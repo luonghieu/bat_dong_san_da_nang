@@ -3,7 +3,7 @@
 <div class="content_wrapper">
     <div class="container">
         <div class="breakdum">
-            <a href="http://phoson.vn">Trang chủ</a> <i class="fa fa-caret-right" aria-hidden="true"></i> <a href="{!! route('public.tintuc', ['catId' => $obj->cat_id]) !!}">{!! $obj->catNew->name !!}</a> <span> <i class="fa fa-caret-right" aria-hidden="true"></i>{!! $obj->name !!}</span>
+            <a href="{!! route('public.trangchu') !!}">Trang chủ</a> <i class="fa fa-caret-right" aria-hidden="true"></i> <a href="{!! route('public.tintuc', ['catId' => $obj->cat_id]) !!}">{!! $obj->catNew->name !!}</a> <span> <i class="fa fa-caret-right" aria-hidden="true"></i>{!! $obj->name !!}</span>
         </div>
         <div class="row">
             <div class="col-md-8">
@@ -21,7 +21,7 @@
                 <ul class="ct_left_ul">
                     @foreach($relatedNews as $obj)
                     <li>
-                        <h3><a class="item_news_name_left" href="{!! route('public.chitiettintuc', ['id' => $obj->id]) !!}">{!! $obj->name !!}</a></h3>
+                        <h3><a class="item_news_name_left" href="{!! route('public.chitiettintuc', ['name' => str_slug($obj->name), 'id' => $obj->id]) !!}">{!! $obj->name !!}</a></h3>
                         <span class="item_news_date_left">{!! $obj->created_at !!}</span>
                     </li>
                     @endforeach

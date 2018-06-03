@@ -84,13 +84,17 @@ Assign Task
 							<td>{!! $obj->id !!}</td>
 							<td>{!! $obj->employee->name !!}</td>
 							<td>{!! $obj->customer->name !!}</td>
-							<td>{!! $obj->created_at !!}</td>
 							<td>{{ $obj->assigner->username }}</td>
 							<td>{{ ($obj->assigner->role == 1) ? 'Admin' : 'Leader' }}</td>
+							<td>{!! $obj->created_at !!}</td>
 							<td>{!! $obj->description !!}</td>
 							<td class="actions">
+								@if (isEmployee()) 
+								No permission
+								@else
 								<a href="{!! route('admins.assign.edit',['id' => $obj->id]) !!}" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a>
 								<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a>
+								@endif
 							</td>
 						</tr>
 						@endforeach
@@ -100,6 +104,7 @@ Assign Task
 		</div>
 		<!-- /tile body -->
 		<!-- tile footer -->
+		@if (!isEmployee())
 		<div class="tile-footer dvd dvd-top">
 			<div class="row">
 
@@ -111,6 +116,7 @@ Assign Task
 				</div>
 			</div>
 		</div>
+		@endif
 		<!-- /tile footer -->
 	</form>
 </section>

@@ -3,7 +3,7 @@
 @include('admin.post.posters.css')
 @endsection
 @section('title')
-Post Customer
+<a href="{!! route('admins.poster.list') !!}">Posters</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +11,7 @@ Post Customer
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Customer</strong></h1>
+		<h1 class="custom-font"><strong>Posters</strong></h1>
 		<ul class="controls">
 			<li class="dropdown">
 
@@ -51,7 +51,7 @@ Post Customer
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>Add success!</strong></p>
+					<p><strong>{{ session('success') }}</strong></p>
 				</div>
 				@endif
 				<table class="table table-custom" id="editable-usage">
@@ -90,14 +90,20 @@ Post Customer
 								<a href="{!! route('admins.post.listByPoster', ['id' => $obj->id ]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">Detail</a>
 							</td>
 							<td>
-								@if ($obj->active == 0) 
+								@if ($obj->user->active == 0) 
 								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class" data-toggle="checked"></span>
 								@else
 								<span onclick="active({!! $obj->id !!})" class="check-toggler toggle-class checked" data-toggle="checked"></span>
 								@endif
 							</td>
 							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
-							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
+							<td class="actions">
+								@if (isEmployee()) 
+									No permission
+								@else
+								<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a>
+								@endif
+							</td>
 						</tr>
 						@endforeach
 					</tbody>
@@ -106,7 +112,8 @@ Post Customer
 		</div>
 		<!-- /tile body -->
 		<!-- tile footer -->
-		<div class="tile-footer dvd dvd-top">
+		@if (!isEmployee()) 
+			<div class="tile-footer dvd dvd-top">
 			<div class="row">
 
 				<div class="col-sm-5 hidden-xs">
@@ -119,6 +126,7 @@ Post Customer
 				</div>
 			</div>
 		</div>
+		@endif
 		<!-- /tile footer -->
 	</form>
 </section>

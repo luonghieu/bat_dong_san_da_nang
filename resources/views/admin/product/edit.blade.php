@@ -3,7 +3,9 @@
 @include('admin.product.css')
 @endsection
 @section('title')
-Product
+<a href="{!! route('admins.project.detail', ['id' => $obj->project_id ]) !!}">{{ $obj->project->name }}</a> >
+<a href="{{ route('admins.product.list', ['projectId' => $obj->project_id]) }}">Products</a> > 
+Edit Product
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +13,7 @@ Product
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Add Product</strong></h1>
+		<h1 class="custom-font"><strong>Edit Product</strong></h1>
 		<ul class="controls">
 			<li>
 				<a id="add-entry" role="button" tabindex="0"><i class="fa fa-plus mr-5"></i> Edit</a>
@@ -84,7 +86,7 @@ Product
 			<div class="form-group">
 				<label for="inputPassword3">Floor</label>
 				<div>
-					<input type="text" class="form-control" placeholder="Floor" name="floor" value="{{ $obj->floor }}">
+					<input type="number" min="0" max="100" class="form-control" name="floor" value="{{ $obj->floor }}">
 					@if ($errors->has('floor'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -94,9 +96,31 @@ Product
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="inputPassword3">Area</label>
+				<label for="inputPassword3">Apartment</label>
 				<div>
-					<input type="text" class="form-control" placeholder="Area" name="area" value="{{ $obj->area }}">
+					<input type="number" min="0" max="100" class="form-control" name="apartment" value="{{ $obj->apartment }}">
+					@if ($errors->has('apartment'))
+					<div class="alert alert-lightred alert-dismissable fade in">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<strong>{!! $errors->first('apartment') !!}</strong>
+					</div>
+					@endif
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3">Category</label>
+				<div>
+					<select class="form-control" name="cat_id">
+						@foreach($categories as $key => $item)
+						<option value="{{$key}}" {{($obj->cat_id == $key) ? 'selected="selected"' : ''}} >{{ $item }}</option>
+						@endforeach
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3">Area(m2)</label>
+				<div>
+					<input type="number" min="0" max="10000" class="form-control" name="area" value="{{ $obj->area }}">
 					@if ($errors->has('area'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -108,13 +132,23 @@ Product
 			<div class="form-group">
 				<label for="inputPassword3">Price</label>
 				<div>
-					<input type="text" class="form-control" placeholder="Price" name="price" value="{{ $obj->price }}">
+					<input type="number" min="0" max="999" class="form-control" name="price" value="{{ $obj->price }}">
 					@if ($errors->has('price'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
 						<strong>{!! $errors->first('price') !!}</strong>
 					</div>
 					@endif
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3">Unit Price</label>
+				<div>
+					<select class="form-control" name="unit_price_id">
+						@foreach($unitPrice as $key => $item)
+						<option value="{{$key}}" {{($obj->unit_price_id == $key) ? 'selected="selected"' : ''}}>{{ $item }}</option>
+						@endforeach
+					</select>
 				</div>
 			</div>
 			<div class="form-group">
@@ -125,6 +159,17 @@ Product
 						<option {{($obj->direction == $key) ? 'selected="selected"' : ''}} value="{{$key}}">{{ $item }}</option>
 						@endforeach
 					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3">Images</label>
+				<div>
+					<div class="img-container mb-10">
+						@foreach(explode("|", $obj->images) as $item)
+						<img src="{!! asset((empty($item)) ? '/images/default.jpg' : $item ) !!}" width="100px" height="100px">
+						@endforeach
+					</div>
+					<input type="file" name="images[]" class="filestyle" data-buttonText="Find file" data-iconName="fa fa-inbox" multiple>
 				</div>
 			</div>
 			<div class="form-group">

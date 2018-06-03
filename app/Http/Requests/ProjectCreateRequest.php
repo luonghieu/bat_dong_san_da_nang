@@ -4,6 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Models\District;
+use App\Models\Village;
+use App\Models\Street;
 
 class ProjectCreateRequest extends FormRequest
 {
@@ -24,6 +27,10 @@ class ProjectCreateRequest extends FormRequest
      */
     public function rules()
     {
+        $districts = District::all(['id'])->pluck('id')->toArray();
+        $villages = Village::all(['id'])->pluck('id')->toArray();
+        $streets = Street::all(['id'])->pluck('id')->toArray();
+
         return [
             'name' => 'required|min:3',
             'image' => 'nullable|image',
@@ -33,6 +40,9 @@ class ProjectCreateRequest extends FormRequest
             'utilities' => 'required',
             'progress' => 'required',
             'price_payment' => 'required',
+            'district_id' => ['required', Rule::in($districts)],
+            'village_id' => ['required', Rule::in($villages)],
+            'street_id' => ['required', Rule::in($streets)],
         ];
     }
 
@@ -49,6 +59,12 @@ class ProjectCreateRequest extends FormRequest
             'utilities.required' => 'Utilities is required.',
             'progress.required' => 'Progress is required.',
             'price_payment.required' => 'Price and Payment is required.',
+            'district_id.required' => 'District is required.',
+            'district_id.in'  => 'District not exist.',
+            'village_id.required' => 'Village is required.',
+            'village_id.in'  => 'Village not exist.',
+            'street_id.required' => 'Street is required.',
+            'street_id.in'  => 'Street not exist.',
         ];
     }
 }

@@ -3,63 +3,12 @@
 <div class="content_wrapper">
     <div class="container">
         <div class="breakdum">
-            <a href="{!! route('public.trangchu') !!}">Trang chủ</a><span> <i class="fa fa-caret-right" aria-hidden="true"></i> <h1>Tin tức</h1></span>
+            <a href="{!! route('public.trangchu') !!}">Trang chủ</a><span> <i class="fa fa-caret-right" aria-hidden="true"></i> <h1>Liên hệ</h1></span>
         </div>
         <div class="block_over">
             <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-6 margintb10">
-                    <h2 class="title-home"><span>Công Ty Cổ Phần Đầu Tư Bất Động Sản Phố Son</span></h2>
-                    <div>
-                        <ul class="tt_lienhe">
-                            <li class="home1">
-                                <span>Trụ sở chính: 05 Đào Tấn - Q. Hải Châu - TP. Đà Nẵng</span>
-                                <span>Chi nhánh: 274 Đường 2 Tháng 9 - Q. Hải Châu - TP. Đà Nẵng</span>
-                            </li>
-                            <li class="phone1">
-                               <span class="tel_hotline_email"><a href="tel:0943 822 922">0943 822 922</a></span>                        <span class="tel_hotline_email"><a href="tel:0963 822 922">0963 822 922</a></span>
-                           </li>
-                           <li class="mail1">
-                               <span class="tel_hotline_email"><a href="mailto:phosonland@gmail.com">phosonland@gmail.com</a></span>
-                           </li>
-                           <div class="clear"></div>
-                       </ul>
-                       <div>
-                        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHnNC04F9_o08K9ImoQivLJua1rv94IWY&callback=initMap" type="text/javascript"></script>
-                        <script type="text/javascript">
-                          var map;
-                          function initiadivze() {
-                              var myLatlng = new google.maps.LatLng(16.045584, 108.222650);
-                              var myOptions = {
-                                zoom: 16,
-                                center:new google.maps.LatLng(16.045584, 108.222650),
-                                mapTypeId: google.maps.MapTypeId.ROADMAP,            
-
-
-                            }
-                            map = new google.maps.Map(document.getElementById("div_id"), myOptions); 
-                  // Biến text chứa nội dung sẽ được hiển thị
-                  var text;
-                  text= "<b>Bất động sản Phố Son</b> <br/> Địa chỉ: 05 Đào Tấn - Q. Hải Châu - TP. Đà Nẵng";
-                  var infowindow = new google.maps.InfoWindow(
-                    { content: text,
-                        size: new google.maps.Size(100,50),
-                        position: myLatlng
-                    });
-                  infowindow.open(map); 
-                  var marker = new google.maps.Marker({
-                      position: myLatlng, 
-                      map: map,
-                      title:""
-                  });
-              }
-          </script>
-          <body onLoad="initiadivze()">
-            <div  id="div_id" style="height: 205px; width: 100%; color: #333;padding: 2px;border: 1px solid #096EBA;margin-top: 10px;"></div>
-        </body> 
-    </div>
-</div>
-</div>
-<div class="col-lg-6 col-md-6 col-sm-6 margintb10">
+                
+<div class="col-lg-8 col-md-8 col-sm-8 margintb10">
 
     <div class="box_form_lienhe">
         @if (session('error'))

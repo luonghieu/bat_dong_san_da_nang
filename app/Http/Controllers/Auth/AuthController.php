@@ -15,7 +15,15 @@ class AuthController extends Controller
     
     public function login()
     {
+        if (isLogin()) {
+            return redirect()->route("auth.profile");
+        }
         return view('admin.auth.login');
+    }
+    
+    public function profile()
+    {
+        return view('admin.auth.profile');
     }
 
     public function postLogin(Request $request){
@@ -25,41 +33,15 @@ class AuthController extends Controller
         $objUser = User::where("username","=",$username)->where("password","=",$passWord)->where('active','=',1)->first();
         if (!empty($objUser)) {
             $request->session()->put('objUser', $objUser);
-            return redirect()->route("admins.profile");
+            return redirect()->route("auth.profile")->with('success', 'Login success!');
             die();
         }else{
             return redirect()->route("auth.login")->with('fail', 'Fail');
         }          
     }
 
-     public function logout(Request $request){
-         $request->session()->forget('objUser');
+     public function logout(){
+         session()->forget('objUser');
          return redirect()->route("auth.login");
      }
-
-    // public function getUser($id){
-        
-    //     $objUser = NguoiDung::FindOrFail($id);
-    //     echo json_encode($objUser);
-    // }
-
-   
-
-    // public function postUser(Request $request){
-        
-    //     $passWord=$_POST['passwordedit'];
-    //     $objAdmin =NguoiDung::where('maso','=','123')->first();
-    //     $currentPass =$objAdmin->password;
-
-    //     if($currentPass != $passWord) {
-    //         $objAdmin->password=md5($passWord);
-    //         $objAdmin->save();
-    //         echo json_encode(1);
-    //     } else {
-    //          echo json_encode('notoke');
-    //     }
-       
-        
-    // }
-
 }

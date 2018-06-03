@@ -80,8 +80,7 @@
             data: $("#form-addDetail").serialize(),
             dataType : 'html',
             success : function(result){
-                html = result + $('#contentDetail').html();
-                $('#contentDetail').html(html);
+                $('#contentDetail').append(result);
                 alert('Add success!');
                 $('#resetAdd').click();
                 $('#addDetail').modal('hide');

@@ -24,9 +24,9 @@
                     </li>
 
                     @foreach($menu as $key => $value)
-                    <li >
+                    <li class="{{ (isset($cat) && $cat->id == $key) ? 'havespan' : '' }}">
 
-                        <h3><a class="item_news_name_left" href="{!! route('public.sangiaodich.theloai', ['type' => $type, 'id' => $key]) !!}">{!! $value !!}</a></h3>
+                        <h3><a class="item_news_name_left" href="{!! route('public.sangiaodich.theloai', ['id' => $key]) !!}">{!! $value !!}</a></h3>
 
                     </li>
                     @endforeach
@@ -47,13 +47,13 @@
 
                             <div class="boc">
 
-                                <a href="{!! route('public.chitietsanbatdongsan', ['id' => $item->id]) !!}"><img src="{!! asset($item->image) !!}" alt="{{ asset($item->name) }}" class="img-responsive" style="width:265px;height:120px;" /></a>
+                                <a href="{!! route('public.chitietsanbatdongsan', ['name' => str_slug($item->name), 'id' => $item->id]) !!}"><img src="{!! asset((empty(explode('|', $item->images)[0])) ? '/images/default.jpg' : explode('|', $item->images)[0] ) !!}" alt="{{ asset($item->name) }}" class="img-responsive" style="width:265px;height:120px;" /></a>
 
                                 <div class="bocne">
 
                                     <div class="thiet_bi_ten">
                                         <h2>
-                                            <a href="{!! route('public.chitietsanbatdongsan', ['id' => $item->id]) !!}" id="title">{{ $item->name }}</a>
+                                            <a href="{!! route('public.chitietsanbatdongsan', ['name' => str_slug($item->name), 'id' => $item->id]) !!}" id="title">{{ $item->name }}</a>
                                         </h2>
 
                                         <a title="Nhận tư vấn và thông tin ưu đãi" onclick="getcontact({!! $item->id !!})" href="javascript:void(0)" class="cliksao"><img src="{!! asset('/images/star.png') !!}" alt="{{ asset($item->name) }}" style="position: absolute;right: 3px;top: 13px;font-size: 16px; width: 20px; height: 20px;"/></a>

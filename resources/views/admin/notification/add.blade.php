@@ -3,7 +3,7 @@
 @include('admin.notification.css')
 @endsection
 @section('title')
-Notification
+<a href="{!! route('admins.notification.list') !!}">Schedule</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +11,7 @@ Notification
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Notification</strong></h1>
+		<h1 class="custom-font"><strong>Schedule</strong></h1>
 		<ul class="controls">
 			<li>
 				<a role="button" tabindex="0" id="add"><i class="fa fa-plus mr-5"></i> Add</a>
@@ -64,11 +64,7 @@ Notification
 					<table class="table" id="table_add">
 						<thead>
 							<tr>
-								<th>
-									<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0">
-										<input type="checkbox" id="select-all"><i></i>
-									</label>
-								</th>
+								<th></th>
 								<th>Customer</th>
 								<th>Email</th>
 							</tr>
@@ -77,7 +73,7 @@ Notification
 							@foreach($list as $obj)
 							<tr>
 								<td>
-									<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0"><input type="checkbox" class="selectMe" name="selected[]" value="{!! $obj->id !!}" ><i></i></label>
+									<label class="checkbox checkbox-custom-alt checkbox-custom-sm m-0"><input type="radio" class="selectMe" name="customer" value="{!! $obj->id !!}" ><i></i></label>
 								</td>
 								<td>{!! $obj->name !!}</td>
 								<td>{!! $obj->email !!}</td>
@@ -211,19 +207,11 @@ Notification
 @include('admin.notification.script')
 <script>
 
-	$('#select-all').change(function() {
-		if ($(this).is(":checked")) {
-			$('#table_add .selectMe').prop('checked', true);
-		} else {
-			$('#table_add .selectMe').prop('checked', false);
-		}
-	});
-
 	$('#add').click(function() {
 		type = $('input[name="type"]').val();
 
 		if (type != 1) {
-			var list = $('input[name="selected[]"]:checked');
+			var list = $('input[name="customer"]:checked');
 			if (list.length == 0) {
 				alert('No obj is selected!');
 				return false;

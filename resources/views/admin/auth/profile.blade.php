@@ -13,8 +13,8 @@ $objUser = Session::get("objUser");
 @endif
 <div class="pagecontent">
     @if (session('success'))
-        <div class="alert alert-danger">
-            <p>Update account successfully!</p>
+        <div class="alert alert-success">
+            <p>{!! session('success') !!}</p>
         </div>
         @endif
     <form method="post" action="{!! route('admins.profile.update') !!}" enctype="multipart/form-data">

@@ -9,7 +9,7 @@ class Street extends Model
     protected $table = 'street';
 
 	protected $fillable = [
-        'name', 'district_id'
+        'name', 'village_id'
     ];
 
     public $timestamps=false;
@@ -17,9 +17,9 @@ class Street extends Model
     /**
      * Get type district relationship
      */
-    public function district()
+    public function village()
     {
-        return $this->belongsTo('App\Models\District', 'district_id', 'id');
+        return $this->belongsTo('App\Models\Village', 'village_id', 'id');
     }
 
     /**

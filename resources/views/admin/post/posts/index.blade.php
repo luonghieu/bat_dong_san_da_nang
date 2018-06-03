@@ -3,7 +3,7 @@
 @include('admin.post.posts.css')
 @endsection
 @section('title')
-Posts
+<a href="{!! route('admins.post.list') !!}">Posts</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -51,7 +51,7 @@ Posts
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>Add success!</strong></p>
+					<p><strong>{{ session('success') }}</strong></p>
 				</div>
 				@endif
 				<table class="table table-custom" id="editable-usage">
@@ -89,6 +89,7 @@ Posts
 							<th>Infomation contact</th>
 							<th>Posted by</th>
 							<th>Deleted at</th>
+							<th>Created at</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
 						</tr>
 					</thead>
@@ -101,12 +102,7 @@ Posts
 							<td>{!! $obj->id !!}</td>
 							<td>{!! $obj->name !!}</td>
 							<td>{!! $obj->description !!}</td>
-							<td>
-								@foreach($direction as $key => $value)
-								@if($obj->direction == $key) {!! $value !!}
-								@endif
-								@endforeach
-							</td>
+							<td>{!! $obj->direction !!}</td>
 							<td>{!! $obj->cat->name !!}</td>
 							<td>
 								@if ($obj->cat->type_transaction == 1)
@@ -118,30 +114,23 @@ Posts
 							<td><img src="{!! asset((empty($obj->image)) ? '/images/default.jpg' : $obj->image ) !!}" class="img-responsive text-center" /></td>
 							<td>
 								<select name="status-{!! $obj->id !!}" onChange = "changeStatus({!! $obj->id !!})">
-									<option {{ ($obj->status ==0) ? "selected='selected'" : '' }} value="1">Processing</option>
-									<option {{ ($obj->status ==1) ? "selected='selected'" : '' }} value="2">Processed</option>
-									<option {{ ($obj->status ==2) ? "selected='selected'" : '' }} value="3">Cancel</option>
+									<option {{ ($obj->status ==0) ? "selected='selected'" : '' }} value="0">Processing</option>
+									<option {{ ($obj->status ==1) ? "selected='selected'" : '' }} value="1">Processed</option>
+									<option {{ ($obj->status ==2) ? "selected='selected'" : '' }} value="2">Cancel</option>
 								</select>
-							</td>
+							</td> 
 							<td>
 								@if ($obj->village_id)
 								{!! $obj->village->name !!}
 								@endif
-								<p>Khong xac dinh</p>
 							</td>
 							<td>
 								@if ($obj->street_id)
 								{!! $obj->street->name !!}
 								@endif
-								<p>Khong xac dinh</p>
 							</td>
 							<td>{!! $obj->district->name !!}</td>
-							<td>
-								@if ($obj->project_id)
-								{!! $obj->project->name !!}
-								@endif
-								<p>Khong xac dinh</p>
-							</td>
+							<td>{!! $obj->project !!}</td>
 							<td>{!! $obj->area !!}</td>
 							<td>{!! $obj->view !!}</td>
 							<td>{!! $obj->price !!}</td>
@@ -154,33 +143,49 @@ Posts
 							<td>{!! $obj->number_of_room !!}</td>
 							<td>{!! $obj->number_of_toilet !!}</td>
 							<td>{!! $obj->furniture !!}</td>
-							<td>{!! $obj->info_contact !!}</td>
-							<td>{!! $obj->poster->name !!}</td>
-							<td>{!! date( "d/m/Y", strtotime($obj->deleted_at)) !!}</td>
-							<td class="actions"><a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a></td>
-						</tr>
-						@endforeach
-					</tbody>
-				</table>
-			</div>
+							<td>
+								@foreach(explode("|", $obj->info_contact) as $key => $item)
+								@if (!empty($item))
+								{!! $item !!}
+							</br>
+							@endif
+							@endforeach
+						</td>
+						<td>{!! $obj->poster->name !!}</td>
+						<td>{!! date( "d/m/Y", strtotime($obj->deleted_at)) !!}</td>
+						<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>
+						<td class="actions">
+							@if (isEmployee()) 
+							No permission
+							@else
+							<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a>
+							@endif
+						</td>
+					</tr>
+					@endforeach
+				</tbody>
+			</table>
 		</div>
-		<!-- /tile body -->
-		<!-- tile footer -->
-		<div class="tile-footer dvd dvd-top">
-			<div class="row">
+	</div>
+	<!-- /tile body -->
+	<!-- tile footer -->
+	@if (!isEmployee()) 
+	<div class="tile-footer dvd dvd-top">
+		<div class="row">
 
-				<div class="col-sm-5 hidden-xs">
-					<select class="input-sm form-control w-sm inline" name="option">
-						<option value="1">Delete selected</option>
-						<option value="2">Change to processed status</option>
-						<option value="3">Change to cancel status</option>
-					</select>
-					<input type="submit" id="apply" class="btn btn-sm btn-default" value="Apply">
-				</div>
+			<div class="col-sm-5 hidden-xs">
+				<select class="input-sm form-control w-sm inline" name="option">
+					<option value="1">Delete selected</option>
+					<option value="2">Change to processed status</option>
+					<option value="3">Change to cancel status</option>
+				</select>
+				<input type="submit" id="apply" class="btn btn-sm btn-default" value="Apply">
 			</div>
 		</div>
-		<!-- /tile footer -->
-	</form>
+	</div>
+	@endif
+	<!-- /tile footer -->
+</form>
 </section>
 <!-- /tile -->
 @endsection
@@ -198,7 +203,7 @@ Posts
 		});
 
 		$('#apply').click(function() {
-			var list = $('input[name="selected"]:checked');
+			var list = $('input[name="selected[]"]:checked');
 			if (list.length == 0) {
 				alert('No obj is selected!');
 				return false;

@@ -6,7 +6,7 @@
 
         <div class="breakdum">
 
-            <a href="http://phoson.vn">Trang chủ</a><span> <i class="fa fa-caret-right" aria-hidden="true"></i> <h1>Tin tức</h1>
+            <a href="{{route('public.trangchu')}}">Trang chủ</a><span> <i class="fa fa-caret-right" aria-hidden="true"></i> <h1>Tin tức</h1>
                 @if(isset($cat))
                 <i class="fa fa-caret-right" aria-hidden="true"></i><h1>{!! $cat->name !!}</h1>
                 @endif
@@ -22,13 +22,13 @@
 
                 <div class="item_news">
 
-                    <a href="{!! route('public.chitiettintuc', ['id' => $obj->id]) !!}"><img src="{{ asset($obj->image) }}" class="img-responsive"/></a>
+                    <a href="{!! route('public.chitiettintuc', ['name' => str_slug($obj->name), 'id' => $obj->id]) !!}"><img src="{{ asset($obj->image) }}" class="img-responsive"/></a>
 
                     <div class="item_news_content">
 
                         <span class="item_news_date">{!! $obj->created_at !!}</span>
 
-                        <h2><a class="item_news_name" href="{!! route('public.chitiettintuc', ['id' => $obj->id]) !!}">{!! $obj->name !!}</a></h2>
+                        <h2><a class="item_news_name" href="{!! route('public.chitiettintuc', ['name' => str_slug($obj->name), 'id' => $obj->id]) !!}">{!! $obj->name !!}</a></h2>
 
                         <div class="item_news_ct">{!! $obj->feature !!}</div>
 
@@ -49,7 +49,7 @@
 
                     <li>
 
-                        <h3><a class="item_news_name_left" href="{!! route('public.chitiettintuc', ['id' => $obj->id]) !!}">{!! $obj->name !!}</a></h3>
+                        <h3><a class="item_news_name_left" href="{!! route('public.chitiettintuc', ['name' => str_slug($obj->name), 'id' => $obj->id]) !!}">{!! $obj->name !!}</a></h3>
 
                         <span class="item_news_date_left">{!! $obj->created_at !!}</span>
 

@@ -3,7 +3,7 @@
 @include('admin.notification.css')
 @endsection
 @section('title')
-Notification
+<a href="{!! route('admins.notification.list') !!}">Schedule</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +11,7 @@ Notification
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>Notification</strong></h1>
+		<h1 class="custom-font"><strong>Schedule</strong></h1>
 		<ul class="controls">
 			<li class="dropdown">
 

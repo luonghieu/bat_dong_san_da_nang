@@ -3,7 +3,7 @@
 @include('admin.consult.css')
 @endsection
 @section('title')
-News
+<a href="{!! route('admins.consult.list') !!}">Register and consult</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -11,7 +11,7 @@ News
 
 	<!-- tile header -->
 	<div class="tile-header dvd dvd-btm">
-		<h1 class="custom-font"><strong>News</strong></h1>
+		<h1 class="custom-font"><strong>Register and consult</strong></h1>
 		<ul class="controls">
 			<li class="dropdown">
 
@@ -51,7 +51,7 @@ News
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>Add success!</strong></p>
+					<p><strong>{{ session('success') }}</strong></p>
 				</div>
 				@endif
 				<table class="table table-custom" id="editable-usage">
@@ -69,6 +69,7 @@ News
 							<th>Message</th>
 							<th>Type</th>
 							<th>Product</th>
+							<th>Sub product</th>
 							<th>Created at</th>
 							<th>Save</th>
 							<th style="width: 160px;" class="no-sort">Actions</th>
@@ -97,6 +98,12 @@ News
 								{!! $obj->post->name !!}
 								@else
 								{!! $obj->project->name !!}
+								@endif
+							</td>
+							<td>
+								@if ($obj->type == 2 && isset($obj->product))
+								{!! $obj->product->block !!}
+								{!! $obj->product->land !!}
 								@endif
 							</td>
 							<td>{!! date( "d/m/Y", strtotime($obj->created_at)) !!}</td>

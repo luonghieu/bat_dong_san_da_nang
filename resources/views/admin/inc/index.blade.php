@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Minovate - Admin Dashboard</title>
-    <link rel="icon" type="image/ico" href="{!! asset('admin_asset/images/favicon.ico') !!}" />
+    <title>Bất động sản Đà Nẵng</title>
+    <link rel="icon" type="image/ico" href="{!! asset('public_asset/images/logo2.png') !!}" />
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -69,23 +69,16 @@
 
                     <div class="pageheader">
 
-                        <h2>Dashboard <span>@yield('title')</span></h2>
                         <div class="page-bar">
 
                             <ul class="page-breadcrumb">
                                 <li>
-                                    <a href="index-2.html"><i class="fa fa-home"></i> Home</a>
+                                    <a href="{!! route('auth.profile') !!}"><i class="fa fa-home"></i> Home</a>
                                 </li>
                                 <li>
-                                    <a href="index-2.html">@yield('title')</a>
+                                    @yield('title')
                                 </li>
                             </ul>
-
-                            <div class="page-toolbar">
-                                <a role="button" tabindex="0" class="btn btn-lightred no-border pickDate">
-                                    <i class="fa fa-calendar"></i>&nbsp;&nbsp;<span></span>&nbsp;&nbsp;<i class="fa fa-angle-down"></i>
-                                </a>
-                            </div>
 
                         </div>
 

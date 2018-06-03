@@ -3,7 +3,7 @@
 @include('admin.transaction.css')
 @endsection
 @section('title')
-Add Transaction
+<a href="{!! route('admins.transaction.listAll') !!}">Transaction</a> > >Add Transaction
 @endsection
 @section('content')
 <!-- tile -->
@@ -93,6 +93,14 @@ Add Transaction
 				</div>
 			</div>
 			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">Position</label>
+				<div class="col-sm-10">
+					<select class="form-control" name="position" id="position">
+						<option value="-1">--Choose--</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
 				<label class="col-sm-2 control-label">Description</label>
 				<div class="col-sm-10">
 					<textarea id="editor1" name="description"></textarea>
@@ -166,11 +174,16 @@ Add Transaction
 		});
 
 		$('#project').change(function () {
+			$("#block").html('<option value="-1">--Choose--</option>');
+			$("#land").html('<option value="-1">--Choose--</option>');
+			$("#floor").html('<option value="-1">--Choose--</option>');
+			$("#position").html('<option value="-1">--Choose--</option>');
 			projectId = $(this).val();
 			if (block == -1) {
 				$("#block").html('<option value="-1">--Choose--</option>');
 				$("#land").html('<option value="-1">--Choose--</option>');
 				$("#floor").html('<option value="-1">--Choose--</option>');
+				$("#position").html('<option value="-1">--Choose--</option>');
 				return false;
 			}
 			$.ajax({
@@ -191,10 +204,14 @@ Add Transaction
 		});
 
 		$('#block').change(function () {
+			$("#land").html('<option value="-1">--Choose--</option>');
+			$("#floor").html('<option value="-1">--Choose--</option>');
+			$("#position").html('<option value="-1">--Choose--</option>');
 			block = $(this).val();
 			if (block == -1) {
 				$("#land").html('<option value="-1">--Choose--</option>');
 				$("#floor").html('<option value="-1">--Choose--</option>');
+				$("#position").html('<option value="-1">--Choose--</option>');
 				return false;
 			}
 			$.ajax({
@@ -216,9 +233,12 @@ Add Transaction
 		});
 
 		$('#land').change(function () {
+			$("#floor").html('<option value="-1">--Choose--</option>');
+			$("#position").html('<option value="-1">--Choose--</option>');
 			land = $(this).val();
 			if (land == -1) {
 				$("#floor").html('<option value="-1">--Choose--</option>');
+				$("#position").html('<option value="-1">--Choose--</option>');
 				return false;
 			}
 			$.ajax({
@@ -236,6 +256,33 @@ Add Transaction
 						html += '<option value="' + item + '">' + item + '</option>'
 					});
 					$('#floor').html(html);
+				}
+			});
+		});
+
+		$('#floor').change(function () {
+			$("#position").html('<option value="-1">--Choose--</option>');
+			floor = $(this).val();
+			if (floor == -1) {
+				$("#position").html('<option value="-1">--Choose--</option>');
+				return false;
+			}
+			$.ajax({
+				url: "{{ route('admins.project.getApartmentByFloor') }}",
+				method: "GET",
+				data: {
+					'block' : $('#block').val(),
+					'land' : $('#land').val(),
+					'floor' : floor,
+					'projectId' : $('#project').val(),
+				},
+				dataType : 'json',
+				success : function(result){
+					html = '<option value="-1">--Choose--</option>';
+					$.each (result, function (key, item){
+						html += '<option value="' + item + '">' + item + '</option>'
+					});
+					$('#position').html(html);
 				}
 			});
 		});

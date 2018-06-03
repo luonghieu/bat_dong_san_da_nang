@@ -3,7 +3,8 @@
 @include('admin.customer.css')
 @endsection
 @section('title')
-Transaction
+<a href="{!! route('admins.customer.list') !!}">Customer</a> >
+<a href="{!! route('admins.customer.detailTransaction', ['registerId' => $register->id ]) !!}">Transaction</a> 
 @endsection
 @section('content')
 <!-- tile -->
@@ -16,7 +17,6 @@ Transaction
 			<li>
 				<a href="{!! route('admins.customer.createTransaction', ['registerId' => $register->id]) !!}" role="button" tabindex="0" id="add-entry"><i class="fa fa-plus mr-5"></i> Add</a>
 			</li>
-
 			<li class="dropdown">
 
 				<a role="button" tabindex="0" class="dropdown-toggle settings" data-toggle="dropdown">
@@ -32,7 +32,7 @@ Transaction
 						</a>
 					</li>
 					<li>
-						<a role="button" tabindex="0" class="tile-refresh">
+						<a href="{!! route('admins.customer.detailTransaction', ['registerId' => $register->id ]) !!}" role="button" tabindex="0" class="tile-refresh">
 							<i class="fa fa-refresh"></i> Refresh
 						</a>
 					</li>
@@ -50,7 +50,7 @@ Transaction
 
 	<!-- tile body -->
 	<center><h3>
-		<a href="{!! route('admins.project.detail',['project_id' => $register->project->id]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $register->project->name !!}</a>
+		<a href="{!! route('admins.project.edit',['project_id' => $register->project->id]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $register->project->name !!}</a>
 	</h3></center>
 	<form class="form-horizontal" role="form" method="post" action="{!! route('admins.customer.actionTransaction') !!}">
 		<input type="hidden" name="_token" value="{{csrf_token()}}" />
@@ -74,8 +74,9 @@ Transaction
 							<th>Block</th>
 							<th>Land</th>
 							<th>Floor</th>
+							<th>Apartment</th>
 							<th>Direction</th>
-							<th width="150px">Status</th>
+							<th>Status</th>
 							<th>Created at</th>
 							<th>Description</th>
 							<th>Rating</th>
@@ -93,10 +94,23 @@ Transaction
 								<a href="{!! route('admins.product.detail',['id' => $obj->product->id]) !!}" role="button" tabindex="0" class="text-uppercase text-strong text-sm mr-10">{!! $obj->product->block !!}</a>
 							</td>
 							<td>{!! $obj->product->land !!}</td>
-							<td>{!! $obj->floor !!}</td>
-							<td>{!! $direction[$obj->product->direction] !!}</td>
 							<td>
-								<select class="form-control mb-10" name="status-{!! $obj->id !!}" onchange="statusTransaction({!! $obj->id !!})">
+								@if(isset($obj->apartment))
+								{!! $obj->apartment->floor !!}
+								@else
+								0
+								@endif
+							</td>
+							<td>
+								@if(isset($obj->apartment))
+								{!! $obj->apartment->position !!}
+								@else
+								0
+								@endif
+							</td>
+							<td>{!! $obj->product->direction !!}</td>
+							<td>
+								<select name="status-{!! $obj->id !!}" onchange="statusTransaction({!! $obj->id !!})">
 									@foreach ($status as $key => $value)
 									<option {{($obj->status == $value)? 'selected="selected"' : ''}} value="{!! $value !!}">{!! $key !!}</option>
 									@endforeach
@@ -139,7 +153,11 @@ Transaction
 												},
 												dataType : 'json',
 												success : function(result){
-													alert('Rating success!');
+													if (result == 'ok') {
+														alert('Rating success!');
+													} else {
+														alert('Rating fail!');
+													}
 													return false;
 												}
 											});

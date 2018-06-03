@@ -9,8 +9,7 @@ class Post extends Model
     const STATUS = [
         'processing' => 0,
         'processed' => 1,
-        'paid' => 2,
-        'cancel' => 3,
+        'cancel' => 2,
     ];
 
     const DIRECTION = [
@@ -28,7 +27,7 @@ class Post extends Model
     protected $table = 'posts';
 
 	protected $fillable = [
-        'name', 'description', 'direction', 'cat_id', 'image', 'status', 'village_id', 'street_id', 'district_id', 'project_id', 'area', 'view', 'price', 'unit_price_id', 'frontispiece', 'road_ahead', 'number_of_floor', 'number_of_room', 'number_of_toilet', 'furniture', 'poster_id', 'deleted_at', 'info_contact', 'start_time', 'end_time'
+        'name', 'description', 'direction', 'cat_id', 'images', 'status', 'village_id', 'street_id', 'district_id', 'project', 'area', 'view', 'price', 'unit_price_id', 'frontispiece', 'road_ahead', 'number_of_floor', 'number_of_room', 'number_of_toilet', 'furniture', 'poster_id', 'deleted_at', 'info_contact', 'start_time', 'end_time', 'created_at', 'map'
     ];
 
     public $timestamps=false;

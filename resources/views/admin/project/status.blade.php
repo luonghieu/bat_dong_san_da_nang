@@ -3,7 +3,9 @@
 @include('admin.project.css')
 @endsection
 @section('title')
-Project
+<a href="{!! route('admins.project.list') !!}">Project</a> >
+<a href="{!! route('admins.project.detail', ['id' => $obj->id ]) !!}">{{ $obj->name }}</a> >
+<a href="{!! route('admins.project.status',['project_id' => $obj->id]) !!}">Status Transaction</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -51,6 +53,13 @@ Project
                 <form class="navbar-form navbar-left form-search" action="{{ route('admins.project.searchTransaction') }}" method="GET">
                     <input type="hidden" name="_token" value="{{csrf_token()}}" />
                     <input type="hidden" id="projectId" name="projectId" value="{{ $obj->id }}" />
+                    <label>Category</label>
+                    <select class="form-control" name="cat_id" id="cat_id">
+                        <option value="-1">--Choose--</option>
+                        @foreach($cats as $id => $name)
+                        <option {{ (isset($search)&&$search['cat_id']==$id) ? 'selected="selected"' : '' }} value="{!! $id !!}">{!! $name !!}</option>
+                        @endforeach
+                    </select>
                     <label>Block</label>
                     <select class="form-control" name="block" id="block">
                         <option value="-1">--Choose--</option>
@@ -58,7 +67,7 @@ Project
                         <option {{ (isset($search)&&$search['block']==$item) ? 'selected="selected"' : '' }} value="{!! $item !!}">{!! $item !!}</option>
                         @endforeach
                     </select>
-                    <label for="">Floor: </label>
+                    <label for="">Land: </label>
                     <select class="form-control" name="land" id="land">
                         <option value="-1">--Choose--</option>
                         @if (isset($lands))
@@ -83,7 +92,9 @@ Project
                         <option  {{ (isset($search)&&$search['status']==$value) ? 'selected="selected"' : '' }}  value="{{ $value }}">{{ $key }}</option>
                         @endforeach
                     </select>
-                    <button style="margin-left: 15px" class="form-control" type="submit" class="pull-right">Search</button>
+                    <center>
+                    <button style="margin-top: 15px" class="form-control" type="submit" class="pull-right">Search</button>
+                    <a href="{!! route('admins.project.status',['project_id' => $obj->id]) !!}" role="button" tabindex="0" style="margin-top: 15px; text-decoration: none" class="form-control" class="pull-right">Show all</a></center>
                 </form>
             </div>
         </div>
@@ -93,9 +104,15 @@ Project
                 <thead>
                     <tr>
                         <th>Id</th>
+                        <th>Customer name</th>
+                        <th>Customer phone</th>
+                        <th>Customer email</th>
+                        <th>Category</th>
                         <th>Block</th>
                         <th>Land</th>
+                        <th>Number of floors</th>
                         <th>Floor</th>
+                        <th>Position</th>
                         <th>Status</th>
                         <th>Rating</th>
                         <th>Description</th>
@@ -107,9 +124,34 @@ Project
                     @foreach($transactions as $obj)
                     <tr class="odd gradeX">
                         <td>{!! $obj->id !!}</td>
+                        <td>{!! $obj->register->customer->name  !!}</td>
+                        <td>{!! $obj->register->customer->phone  !!}</td>
+                        <td>{!! $obj->register->customer->email  !!}</td>
+                        <td>{!! $obj->product->cat->name !!}</td>
                         <td>{!! $obj->product->block !!}</td>
                         <td>{!! $obj->product->land !!}</td>
-                        <td>{!! $obj->floor !!}</td>
+                        <td>
+                            @if($obj->product->floor)
+                            {!! $obj->product->floor !!}
+                            @else
+                            <span>0</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if(isset($obj->apartment->floor))
+                            {!! $obj->apartment->floor !!}
+                            @else
+                            <span>0</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if(isset($obj->apartment->position))
+                            {!! $obj->apartment->position !!}
+                            @else
+                            <span>0</span>
+                            @endif
+
+                        </td>
                         <td>
                             {{ getTransactionStatus($obj->status) }}
                         </td>

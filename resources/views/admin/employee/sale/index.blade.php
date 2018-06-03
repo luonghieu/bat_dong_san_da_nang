@@ -3,7 +3,7 @@
 @include('admin.employee.sale.css')
 @endsection
 @section('title')
-Employee
+<a href="{!! route('admins.sale.list') !!}">Sales</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -54,7 +54,7 @@ Employee
 		<div class="table-responsive">
 			@if (session('success'))
 			<div class="alert alert-success">
-				<p><strong>Action success!</strong></p>
+				<p><strong>{!! session('success') !!}</strong></p>
 			</div>
 			@endif
 			<table class="table table-custom" id="editable-usage">

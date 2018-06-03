@@ -3,7 +3,7 @@
 @include('admin.news.css')
 @endsection
 @section('title')
-Slider
+<a href="{!! route('admins.slider.list') !!}">Slider</a>
 @endsection
 @section('content')
 <!-- tile -->

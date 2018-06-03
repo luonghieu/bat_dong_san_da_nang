@@ -1,8 +1,8 @@
 @extends('public.inc.index')
 @section('content')
-@if (session('objUser'))
+@if (session('objCustomer'))
 @php      
-$objUser = Session::get("objUser");
+$objCustomer = Session::get("objCustomer");
 @endphp
 @endif
 <div class="content_wrapper">
@@ -19,7 +19,7 @@ $objUser = Session::get("objUser");
                 <div id="PH_Container_MainContent_pnMainContent">
                     <form class="form-horizontal" role="form" method="post" action="{!! route('public.trangcanhan.postthaydoimatkhau') !!}">
                         <input type="hidden" name="_token" value="{{csrf_token()}}" />
-                        <input type="hidden" name="id" value="{!! $objUser->id !!}" />
+                        <input type="hidden" name="id" value="{!! $objCustomer->id !!}" />
 
                         <div class="w-700 fr">
                            @if (session('error'))

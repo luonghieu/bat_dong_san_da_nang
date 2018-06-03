@@ -3,7 +3,8 @@
 @include('admin.product.css')
 @endsection
 @section('title')
-Product
+<a href="{!! route('admins.project.detail', ['id' => $project->id ]) !!}">{{ $project->name }}</a> >
+<a href="{{ route('admins.product.list', ['projectId' => $project->id]) }}">Products</a> > Add Product
 @endsection
 @section('content')
 <!-- tile -->
@@ -54,7 +55,7 @@ Product
 			<p>{{ session('error') }}</p>
 		</div>
 		@endif
-		<form role="form" id="form-add" method="post" action="{!! route('admins.product.store', ['id' => $projectId]) !!}" enctype="multipart/form-data">
+		<form role="form" id="form-add" method="post" action="{!! route('admins.product.store', ['id' => $project->id]) !!}" enctype="multipart/form-data">
 			<input type="hidden" name="_token" value="{{csrf_token()}}" />
 			<div class="form-group">
 				<label for="inputPassword3">Block</label>
@@ -83,7 +84,7 @@ Product
 			<div class="form-group">
 				<label for="inputPassword3">Floor</label>
 				<div>
-					<input type="text" class="form-control" placeholder="Floor" name="floor" value="">
+					<input type="number" min="0" max="100" class="form-control" name="floor" value="">
 					@if ($errors->has('floor'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -93,9 +94,31 @@ Product
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="inputPassword3">Area</label>
+				<label for="inputPassword3">Apartment</label>
 				<div>
-					<input type="text" class="form-control" placeholder="Area" name="area" value="">
+					<input type="number" min="0" max="100" class="form-control" name="apartment" value="">
+					@if ($errors->has('apartment'))
+					<div class="alert alert-lightred alert-dismissable fade in">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<strong>{!! $errors->first('apartment') !!}</strong>
+					</div>
+					@endif
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3">Category</label>
+				<div>
+					<select class="form-control" name="cat_id">
+						@foreach($categories as $key => $item)
+						<option value="{{$key}}">{{ $item }}</option>
+						@endforeach
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3">Area(m2)</label>
+				<div>
+					<input type="number" min="0" max="10000" class="form-control" name="area" value="">
 					@if ($errors->has('area'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -107,13 +130,23 @@ Product
 			<div class="form-group">
 				<label for="inputPassword3">Price</label>
 				<div>
-					<input type="text" class="form-control" placeholder="Price" name="price" value="">
+					<input type="number" min="0" max="999" class="form-control" name="price" value="">
 					@if ($errors->has('price'))
 					<div class="alert alert-lightred alert-dismissable fade in">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
 						<strong>{!! $errors->first('price') !!}</strong>
 					</div>
 					@endif
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3">Unit Price</label>
+				<div>
+					<select class="form-control" name="unit_price_id">
+						@foreach($unitPrice as $key => $item)
+						<option value="{{$key}}">{{ $item }}</option>
+						@endforeach
+					</select>
 				</div>
 			</div>
 			<div class="form-group">
@@ -124,6 +157,12 @@ Product
 						<option value="{{$key}}">{{ $item }}</option>
 						@endforeach
 					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label>Images</label>
+				<div>
+					<input type="file" name="images[]" class="filestyle" data-buttonText="Find file" data-iconName="fa fa-inbox" multiple>
 				</div>
 			</div>
 			<div class="form-group">

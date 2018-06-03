@@ -3,7 +3,7 @@
 @include('admin.transaction.css')
 @endsection
 @section('title')
-Transaction
+<a href="{!! route('admins.transaction.listAll') !!}">Transaction</a>
 @endsection
 @section('content')
 <!-- tile -->
@@ -31,7 +31,7 @@ Transaction
 						</a>
 					</li>
 					<li>
-						<a role="button" tabindex="0" class="tile-refresh">
+						<a href="{!! route('admins.transaction.listAll') !!}" role="button" tabindex="0" class="tile-refresh">
 							<i class="fa fa-refresh"></i> Refresh
 						</a>
 					</li>
@@ -53,48 +53,61 @@ Transaction
 			<div class="search filter-search">
 				<form class="navbar-form navbar-left form-search" action="{{ route('admins.transaction.searchAllTransaction') }}" method="GET">
 					<input type="hidden" name="_token" value="{{csrf_token()}}" />
-					<label>Project</label>
-					<select class="form-control" witdth="50px;" name="project" id="project">
-						<option value="-1">--Choose--</option>
-						@foreach($projects as $key => $item)
-						<option {{ (isset($search)&&$search['project']==$key) ? 'selected="selected"' : '' }} value="{!! $key !!}">{!! $item !!}</option>
-						@endforeach
-					</select>
-					<label>Block</label>
-					<select class="form-control" name="block" id="block">
-						<option value="-1">--Choose--</option>
-						@if (isset($lands))
-						@foreach($blocks as $item)
-						<option {{ (isset($search)&&$search['block']==$item) ? 'selected="selected"' : '' }} value="{!! $item !!}">{!! $item !!}</option>
-						@endforeach
-						@endif
-					</select>
-					<label for="">Floor: </label>
-					<select class="form-control" name="land" id="land">
-						<option value="-1">--Choose--</option>
-						@if (isset($lands))
-						@foreach($lands as $item)
-						<option {{ (isset($search)&&$search['land']==$item) ? 'selected="selected"' : '' }} value="{{ $item }}">{{ $item }}</option>
-						@endforeach
-						@endif
-					</select>
-					<label for="">Floor: </label>
-					<select class="form-control" name="floor" id="floor">
-						<option value="-1">--Choose--</option>
-						@if (isset($floors))
-						@foreach($floors as $item)
-						<option {{ (isset($search)&&$search['floor']==$item) ? 'selected="selected"' : '' }} value="{{ $item }}">{{ $item }}</option>
-						@endforeach
-						@endif
-					</select>
-					<label for="">Status: </label>
-					<select class="form-control" name="status">
-						<option value="-1">--Choose--</option>
-						@foreach($status as $key => $value)
-						<option  {{ (isset($search)&&$search['status']==$value) ? 'selected="selected"' : '' }}  value="{{ $value }}">{{ $key }}</option>
-						@endforeach
-					</select>
-					<button style="margin-left: 15px" class="form-control" type="submit" class="pull-right">Search</button>
+					<div>
+						<label>Project</label>
+						<select class="form-control" witdth="50px;" name="project" id="project">
+							<option value="-1">--Choose--</option>
+							@foreach($projects as $key => $item)
+							<option {{ (isset($search)&&$search['project']==$key) ? 'selected="selected"' : '' }} value="{!! $key !!}">{!! $item !!}</option>
+							@endforeach
+						</select>
+						<label>Category</label>
+						<select class="form-control" name="cat_id" id="cat_id">
+							<option value="-1">--Choose--</option>
+							@foreach($cats as $id => $name)
+							<option {{ (isset($search)&&$search['cat_id']==$id) ? 'selected="selected"' : '' }} value="{!! $id !!}">{!! $name !!}</option>
+							@endforeach
+						</select>
+					</div>
+					<br>
+					<div>
+						<label>Block</label>
+						<select class="form-control" name="block" id="block">
+							<option value="-1">--Choose--</option>
+							@if (isset($lands))
+							@foreach($blocks as $item)
+							<option {{ (isset($search)&&$search['block']==$item) ? 'selected="selected"' : '' }} value="{!! $item !!}">{!! $item !!}</option>
+							@endforeach
+							@endif
+						</select>
+						<label for="">Land: </label>
+						<select class="form-control" name="land" id="land">
+							<option value="-1">--Choose--</option>
+							@if (isset($lands))
+							@foreach($lands as $item)
+							<option {{ (isset($search)&&$search['land']==$item) ? 'selected="selected"' : '' }} value="{{ $item }}">{{ $item }}</option>
+							@endforeach
+							@endif
+						</select>
+						<label for="">Floor: </label>
+						<select class="form-control" name="floor" id="floor">
+							<option value="-1">--Choose--</option>
+							@if (isset($floors))
+							@foreach($floors as $item)
+							<option {{ (isset($search)&&$search['floor']==$item) ? 'selected="selected"' : '' }} value="{{ $item }}">{{ $item }}</option>
+							@endforeach
+							@endif
+						</select>
+						<label for="">Status: </label>
+						<select class="form-control" name="status">
+							<option value="-1">--Choose--</option>
+							@foreach($status as $key => $value)
+							<option  {{ (isset($search)&&$search['status']==$value) ? 'selected="selected"' : '' }}  value="{{ $value }}">{{ $key }}</option>
+							@endforeach
+						</select>
+						<button style="margin-left: 15px" class="form-control" type="submit" class="pull-right">Search</button>
+						<a href="{!! route('admins.transaction.listAll') !!}" role="button" tabindex="0" style="margin-left: 15px; text-decoration: none" class="form-control" class="pull-right">Show all</a>
+					</div>
 				</form>
 			</div>
 		</div>
@@ -104,7 +117,7 @@ Transaction
 			<div class="table-responsive">
 				@if (session('success'))
 				<div class="alert alert-success">
-					<p><strong>success!</strong></p>
+					<p><strong>{{session('success')}}</strong></p>
 				</div>
 				@endif
 
@@ -118,9 +131,12 @@ Transaction
 							</th>
 							<th>Id</th>
 							<th>Project</th>
+							<th>Category</th>
 							<th>Block</th>
 							<th>Land</th>
+							<th>Number of floors</th>
 							<th>Floor</th>
+							<th>Position</th>
 							<th width="150px">Status</th>
 							<th>Created at</th>
 							<th>Description</th>
@@ -139,11 +155,32 @@ Transaction
 							</td>
 							<td>{!! $obj->id !!}</td>
 							<td>{!! $obj->product->project->name !!}</td>
+							<td>{!! $obj->product->cat->name !!}</td>
 							<td>{!! $obj->product->block !!}</td>
 							<td>{!! $obj->product->land !!}</td>
-							<td>{!! $obj->floor !!}</td>
 							<td>
-								<select name="status-{!! $obj->id !!}" onchange="statusTransaction({!! $obj->id !!})">
+								@if($obj->product->floor)
+								{!! $obj->product->floor !!}
+								@else
+								<span>0</span>
+								@endif
+							</td>
+							<td>
+								@if(isset($obj->apartment))
+								{!! $obj->apartment->floor !!}
+								@else
+								<span>0</span>
+								@endif
+							</td>
+							<td>
+								@if(isset($obj->apartment))
+								{!! $obj->apartment->position !!}
+								@else
+								<span>0</span>
+								@endif
+							</td>
+							<td>
+								<select name="status-{!! $obj->id !!}" @if ($obj->isPermit) onchange="statusTransaction({!! $obj->id !!}) @endif">
 									@foreach ($status as $key => $value)
 									<option {{($obj->status == $value)? 'selected="selected"' : ''}} value="{!! $value !!}">{!! $key !!}</option>
 									@endforeach
@@ -154,6 +191,7 @@ Transaction
 								{!! $obj->description !!}
 							</td>
 							<td>
+								@if ($obj->isPermit)
 								@if($obj->status == 0)
 								<div id="rateYo{{$obj->id}}"></div>
 								<span style="color: red"></span>
@@ -207,12 +245,33 @@ Transaction
 									});
 								</script>
 								@endif
+								@else
+								<div id="rateYo{{$obj->id}}"></div>
+								<script type="text/javascript">
+									$(function () {
+										$("#rateYo" + {{$obj->id}}).rateYo({
+											maxValue: 10,
+											numStars: 10,
+											starWidth: "20px",
+											rating: {{$obj->rating}},
+											readOnly: true
+										});
+									});
+								</script>
+								@endif
 							</td>
 							<td>{!! $obj->register->customer->name !!}</td>
 							<td>{!! $obj->register->customer->email !!}</td>
 							<td>{!! $obj->register->customer->phone !!}</td>
 							<td class="actions">
+								@if ($obj->isPermit)
+								@if ($obj->status == 0) 
+								<a href="{!! route('admins.transaction.editAllTransaction',['id' => $obj->id]) !!}" role="button" tabindex="0" class="edit text-primary text-uppercase text-strong text-sm mr-10">Edit</a>
+								@endif
 								<a role="button" tabindex="0" class="delete text-danger text-uppercase text-strong text-sm mr-10">Remove</a>
+								@else
+								No permit
+								@endif
 							</td>
 						</tr>
 						@endforeach

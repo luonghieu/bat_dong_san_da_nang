@@ -5,12 +5,7 @@
 <head>
 
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Bất động sản Phố Son </title>
-
-	<meta name="author" content="Bất Động Sản Phố Son" />
-	<meta name="keywords" content="dự án đất nền, thue van phong, căn hộ cao cấp Azura, F.Home, Coco River Garden, Fusion Suites, Công viên Châu Á, đường 2 tháng 9, bất động sản miền trung, bất động sản đà nẵng, bat dong san da nang, mua nha, ban nha, hoi an royal residence, hoian royal residence, halla jade" />
-	<meta name="description" content="Phố Son giàu kinh nghiệm tại thị trường Đà Nẵng, cung cấp 2 dịch vụ chính là tiếp thị phân phối và cho thuê. Phố Son đánh dấu thành công tại nhiều dự án như căn hộ, đất nền, văn phòng cho thuê, hiện là đối tác của các chủ đầu tư dự án uy tín tại Đà Nẵng như: Dự án Coco River Garden, căn hộ cao cấp Hòa Bình Green Đà Nẵng, căn hộ cao cấp Fusion Suites, căn hộ cao cấp Azura, khu đô thị công nghệ FPT City, căn hộ cao cấp F.Home, khu nghỉ mát Laguna Lăng Cô, văn phòng cho thuê Vĩnh Trung Plaza, Samsung Thư Dung Plaza…" />
-	<meta name="copyright" content="Copyright © 2012 - Công Ty Cổ Phần Bất Động Sản Phố Son" />
+	<title>Bất động sản Đà Nẵng</title>
 
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="expires" content="0" />
@@ -31,7 +26,7 @@
 	<meta property="og:site_name" content="Bất động sản Phố Son" />
 	<meta property="article:tag" content="Bất động sản Phố Son" />   
 
-	<link rel="shortcut icon" href="{!! asset('public_asset/images/favicon.png') !!}" type="image/x-icon"/>
+	<link rel="shortcut icon" href="{!! asset('public_asset/images/logo2.png') !!}" type="image/x-icon"/>
 	<link href="{!! asset('public_asset/css/owl.carousel.css') !!}" rel="stylesheet" type="text/css" />
 	<link href="{!! asset('public_asset/font_awesome/css/font-awesome.css') !!}" rel="stylesheet" type="text/css" />
 	<link href="{!! asset('public_asset/css/bootstrap.min.css') !!}" rel="stylesheet" type="text/css" />
@@ -50,7 +45,9 @@
 	
 	<link href="{!! asset('public_asset/css/jquery-ui.min.css') !!}" rel="stylesheet" type="text/css" />
 	<link href="{!! asset('public_asset/css/jquery.selectbox.css') !!}" rel="stylesheet" type="text/css" />
+
 	<link href="{!! asset('public_asset/css/dataTables.bootstrap.min.css') !!}" rel="stylesheet" type="text/css" />
+	
 	<script src="{!! asset('public_asset/js/jquery.min.js') !!}"></script>
 	<script>
 		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

@@ -8,7 +8,7 @@
                         <div class="box-cont bor-left bor-right bor-bot font14">
                             <ul class="clearfix">
                                 <li class="bor-bot clearfix">
-                                    <a class="active block color-text pd10" href="{!! route('public.trangcanhan') !!}">
+                                    <a class="{{Request::Segment(2)==='trangcanhan' ?'active' : ''}} block color-text pd10" href="{!! route('public.trangcanhan') !!}">
                                         <s class="ic-arow-news fl mt5 mr5"></s>Quản lý tin rao bán/ thuê
                                     </a>
                                 </li>
@@ -18,12 +18,12 @@
                                     </a>
                                 </li>
                                 <li class="bor-bot clearfix">
-                                    <a class="block color-text pd10" href="{!! route('public.trangcanhan.thaydoithongtincanhan') !!}">
+                                    <a class="{{Request::Segment(2)==='thaydoithongtincanhan' ?'active' : ''}} block color-text pd10" href="{!! route('public.trangcanhan.thaydoithongtincanhan') !!}">
                                         <s class="ic-arow-news fl mt5 mr5"></s>Thay đổi thông tin cá nhân
                                     </a>
                                 </li>
                                 <li class="bor-bot clearfix">
-                                    <a class="block color-text pd10" href="{!! route('public.trangcanhan.thaydoimatkhau') !!}">
+                                    <a class="{{Request::Segment(2)==='thaydoimatkhau' ?'active' : ''}} block color-text pd10" href="{!! route('public.trangcanhan.thaydoimatkhau') !!}">
                                         <s class="ic-arow-news fl mt5 mr5"></s>Thay đổi mật khẩu
                                     </a>
                                 </li>

@@ -12,7 +12,7 @@
 
         var oTable = $('#editable-usage').DataTable({
             "aoColumnDefs": [
-                { 'bSortable': false, 'aTargets': [ "no-sort" ] }
+            { 'bSortable': false, 'aTargets': [ "no-sort" ] }
             ]
         });
 
@@ -34,8 +34,29 @@
                 },
                 dataType : 'json',
                 success : function(result){
-                    oTable.row(nRow).remove().draw();
-                    alert("Deleted!");
+                    if (result == 'ok') {
+                        oTable.row(nRow).remove().draw();
+                        alert("Deleted!");
+                    } else {
+                        if (confirm('Are you really want to delete?')) {
+                            $.ajax({
+                                url: "{!! route('admins.customer.deleteConfirmTransaction') !!}",
+                                method: "GET",
+                                data: {
+                                    'id' : aData[1],
+                                },
+                                dataType : 'json',
+                                success : function(result){
+                                    if (result == 'ok') {
+                                        oTable.row(nRow).remove().draw();
+                                        alert("Deleted!");
+                                    }
+                                }
+                            });
+                        } else {
+                            return false;
+                        }                        
+                    }
                 }
             });
         });

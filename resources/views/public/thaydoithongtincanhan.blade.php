@@ -1,9 +1,9 @@
 
 @extends('public.inc.index')
 @section('content')
-@if (session('objUser'))
+@if (session('objCustomer'))
 @php      
-$objUser = Session::get("objUser");
+$objCustomer = Session::get("objCustomer");
 @endphp
 @endif
 <div class="content_wrapper">
@@ -37,8 +37,8 @@ $objUser = Session::get("objUser");
                                 <li class="mb20 clearfix">
                                     <label class="w-20-100 fl mt5">Họ tên</label>
                                     <label class="w-80-100 fl pl20">
-                                        <input name="name" type="text" value="{!! $objUser->poster->name !!}" id="txtFullName" class="width-full" />
-                                        <input type="hidden" name="id" id="hddUserId" value="{!! $objUser->poster->id !!}" />
+                                        <input name="name" type="text" value="{!! $objCustomer->poster->name !!}" id="txtFullName" class="width-full" />
+                                        <input type="hidden" name="id" id="hddUserId" value="{!! $objCustomer->poster->id !!}" />
                                         @if ($errors->has('name'))
                                         <div class="alert alert-lightred alert-dismissable fade in">
                                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -50,13 +50,13 @@ $objUser = Session::get("objUser");
                                 <li class="mb20 clearfix">
                                     <label class="w-20-100 fl mt5">Email</label>
                                     <label class="w-80-100 fl mt5 pl20">
-                                        <span id="txtEmail">{!! $objUser->email !!}</span>
+                                        <span id="txtEmail">{!! $objCustomer->email !!}</span>
                                     </label>
                                 </li>
                                 <li class="mb20 clearfix">
                                     <label class="w-20-100 fl mt5">Điện thoại<span class="request"> *</span></label>
                                     <label class="w-80-100 fl pl20">
-                                        <input name="phone" type="text" value="{!! $objUser->poster->phone !!}" id="txtPhone" class="width-full" /><span class="null" id="spanDidong"></span></label>
+                                        <input name="phone" type="text" value="{!! $objCustomer->poster->phone !!}" id="txtPhone" class="width-full" /><span class="null" id="spanDidong"></span></label>
                                         @if ($errors->has('phone'))
                                         <div class="alert alert-lightred alert-dismissable fade in">
                                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -67,7 +67,7 @@ $objUser = Session::get("objUser");
                                     <li class="mb20 clearfix">
                                         <label class="w-20-100 fl mt5">Địa chỉ</label>
                                         <label class="w-80-100 fl pl20">
-                                            <input name="address" type="text" value="{!! $objUser->poster->address !!}" id="txtPhone" class="width-full" /><span class="null" id="spanDidong"></span></label>
+                                            <input name="address" type="text" value="{!! $objCustomer->poster->address !!}" id="txtPhone" class="width-full" /><span class="null" id="spanDidong"></span></label>
                                             @if ($errors->has('address'))
                                             <div class="alert alert-lightred alert-dismissable fade in">
                                                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
